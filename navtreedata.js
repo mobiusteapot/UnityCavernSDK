@@ -24,45 +24,12 @@
 */
 var NAVTREE =
 [
-  [ "Spelunx CAVERN Toolkit", "index.html", [
-    [ "CHANGELOG", "df/d11/md_CAVERN_Packages_com_spelunx_cavern_toolkit_CHANGELOG.html", null ],
-    [ "README", "d3/dd7/md_CAVERN_Packages_com_spelunx_cavern_toolkit_README.html", null ],
-    [ "Namespaces", "namespaces.html", [
-      [ "Namespace List", "namespaces.html", "namespaces_dup" ],
-      [ "Namespace Members", "namespacemembers.html", [
-        [ "All", "namespacemembers.html", null ],
-        [ "Enumerations", "namespacemembers_enum.html", null ]
-      ] ]
-    ] ],
-    [ "Classes", "annotated.html", [
-      [ "Class List", "annotated.html", "annotated_dup" ],
-      [ "Class Index", "classes.html", null ],
-      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
-      [ "Class Members", "functions.html", [
-        [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", null ],
-        [ "Variables", "functions_vars.html", null ],
-        [ "Enumerations", "functions_enum.html", null ],
-        [ "Properties", "functions_prop.html", null ]
-      ] ]
-    ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ],
-      [ "File Members", "globals.html", [
-        [ "All", "globals.html", null ],
-        [ "Typedefs", "globals_type.html", null ]
-      ] ]
-    ] ]
-  ] ]
+  [ "Spelunx CAVERN Toolkit", "index.html", ]
 ];
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"d3/dd5/classFullscreenEditor_1_1Fullscreen.html#a910d6fdbade91dfe6530f3ffa889a787",
-"d7/dbe/classFullscreenEditor_1_1Shortcut.html#a96d4f093137a025215cd32c68485023a",
-"db/ddb/classFullscreenEditor_1_1FullscreenView.html",
-"df/d81/classFullscreenEditor_1_1Windows_1_1User32.html#a13346b6aaa1988ab8a07df60125139a7"
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
