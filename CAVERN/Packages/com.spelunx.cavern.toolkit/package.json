@@ -1,0 +1,32 @@
+{
+  "name": "com.spelunx.cavern.toolkit",
+  "version": "0.1.0",
+  "displayName": "Spelunx CAVERN Toolkit",
+  "description": "Toolkit for CAVERN Development.",
+  "unity": "6000.0",
+  "documentationUrl": "https://api.spelunx.net",
+  "changelogUrl": "https://github.com/TypeDefinition/UnityCAVERN",
+  "licensesUrl": "https://github.com/TypeDefinition/UnityCAVERN",
+  "keywords": [
+    "ETC",
+    "CAVERN",
+    "Toolkit",
+    "Spelunx"
+  ],
+  "author": {
+    "name": "Spelunx",
+    "email": "terrylim@andrew.cmu.edu",
+    "url": "https://api.spelunx.net"
+  },
+  "samples": [
+    {
+      "displayName": "Fullscreen Preview Asset",
+      "description": "Fullscreen Preview Asset from the asset store. Helpful for cavern preview. Not for public distribution.",
+      "path": "Samples~/FullscreenAsset"
+    }
+  ],
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "17.0.3",
+    "com.unity.xr.openxr": "1.14.0"
+  }
+}
