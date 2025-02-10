@@ -9,7 +9,7 @@
         "com.unity.nuget.newtonsoft-json": "3.0.2"
       }
     },
-    "com.spelunx.cavern.toolkit": {
+    "com.spelunx.cavern.sdk": {
       "version": "file:com.spelunx.cavern.toolkit",
       "depth": 0,
       "source": "embedded",
