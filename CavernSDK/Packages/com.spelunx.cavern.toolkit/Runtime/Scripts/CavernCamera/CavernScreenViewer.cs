@@ -46,8 +46,8 @@ namespace Spelunx {
 
             /********************************************** Generate inner surface. **********************************************/
             
-            float cavernBottomHeight = -0.5f * cavernHeight + cavernElevation;
-            float cavernTopHeight = 0.5f * cavernHeight + cavernElevation;
+            float cavernBottomHeight = cavernElevation;
+            float cavernTopHeight = cavernHeight + cavernElevation;
 
             float topUV = (eyeView == EyeView.LeftEye) ? 1.0f : 0.5f;
             float bottomUV = (eyeView == EyeView.LeftEye) ? 0.5f : 0.0f;

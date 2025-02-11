@@ -4,31 +4,6 @@ using System.Collections.Generic;
 
 namespace Spelunx {
     public class CavernRenderer : MonoBehaviour {
-        /*class ProjectionPass : ScriptableRenderPass {
-            private Material material;
-
-            public ProjectionPass(Material material) {
-                this.material = material;
-            }
-
-            public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData) {
-                if (material == null) { return; }
-
-                UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
-                UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
-                if (resourceData.isActiveTargetBackBuffer) { return; } // The following line ensures that the render pass doesn't blit from the back buffer.
-
-                TextureHandle target = resourceData.activeColorTexture;
-
-                // This check is to avoid an error from the material preview in the scene.
-                if (!target.IsValid()) return;
-
-                TextureHandle emptySource = UniversalRenderer.CreateRenderGraphTexture(renderGraph, new RenderTextureDescriptor(32, 32, RenderTextureFormat.Default, 0), "Empty Source Texture", false);
-                RenderGraphUtils.BlitMaterialParameters blitParams = new RenderGraphUtils.BlitMaterialParameters(emptySource, target, material, 0);
-                renderGraph.AddBlitPass(blitParams, "Cavern Projection Pass");
-            }
-        }*/
-
         public enum StereoscopicMode {
             Mono,
             Stereo,
@@ -67,7 +42,6 @@ namespace Spelunx {
         private RenderTexture[] cubemaps;
         private RenderTexture screenViewerTexture;
         private Material material;
-        // private ProjectionPass projectionPass; // This does not work.
 
         public CubemapResolution GetCubemapResolution() { return cubemapResolution; }
         public StereoscopicMode GetStereoscopicMode() { return stereoMode; }
@@ -115,10 +89,6 @@ namespace Spelunx {
             material.SetTexture("_CubemapRight", cubemaps[(int)CubemapIndex.Right]);
             material.SetTexture("_CubemapFront", cubemaps[(int)CubemapIndex.Front]);
             material.SetTexture("_CubemapBack", cubemaps[(int)CubemapIndex.Back]);
-
-            // Initialise projection pass.
-            // projectionPass = new ProjectionPass(material);
-            // projectionPass.renderPassEvent = RenderPassEvent.AfterRendering;
         }
 
         private void Start() {
@@ -147,14 +117,13 @@ namespace Spelunx {
             switch (stereoMode) {
                 case StereoscopicMode.Mono:
                     eye.stereoSeparation = 0.0f;
+                    eye.transform.rotation = gameObject.transform.rotation; // Set eye's global orientation to the screen's orientation, regardless of the head's orientation.
                     eye.transform.localPosition = Vector3.zero;
-                    eye.transform.localRotation = Quaternion.identity;
                     eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Left], allMask | frontMask | leftMask | rightMask, Camera.MonoOrStereoscopicEye.Left);
                     break;
                 case StereoscopicMode.Stereo:
-                    // eye.stereoSeparation = interpupillaryDistance;
                     eye.stereoSeparation = 0.0f;
-                    eye.transform.localRotation = Quaternion.identity;
+                    eye.transform.rotation = gameObject.transform.rotation; // Set eye's global orientation to the screen's orientation, regardless of the head's orientation.
                     eye.transform.localPosition = new Vector3(-interpupillaryDistance * 0.5f, 0.0f, 0.0f);
                     eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Left], allMask | frontMask, Camera.MonoOrStereoscopicEye.Left);
                     eye.transform.localPosition = new Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);
@@ -168,29 +137,18 @@ namespace Spelunx {
             }
 
             material.SetInteger("_EnableStereo", stereoMode == StereoscopicMode.Stereo ? 1 : 0);
-            
             material.SetFloat("_CavernHeight", cavernHeight);
             material.SetFloat("_CavernRadius", cavernRadius);
             material.SetFloat("_CavernAngle", cavernAngle);
             material.SetFloat("_CavernElevation", cavernElevation);
-
-            // As we learnt in computer graphics class, the inverse of a rotation matrix is also it's transpose.
-            material.SetVector("_HeadPositionInverse", -head.transform.localPosition);
-            material.SetMatrix("_HeadRotationInverse", Matrix4x4.Rotate(head.transform.localRotation).transpose);
+            material.SetVector("_HeadPosition", head.transform.localPosition);
         }
 
-        private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras) {
-        }
+        private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
 
-        private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) {
-        }
+        private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
 
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
-            if (camera == eye) {
-                // UniversalRenderPipelineAsset urpAsset = (UniversalRenderPipelineAsset)GraphicsSettings.currentRenderPipeline;
-                // urpAsset.scriptableRenderer.EnqueuePass(projectionPass);
-            }
-        }
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
 
         private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
             if (camera == eye) {

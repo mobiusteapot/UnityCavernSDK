@@ -33,8 +33,7 @@ float _CavernAngle;
 float _CavernElevation;
 
 // Head Tracking Properties
-float3 _HeadPositionInverse; // Vector3
-float4x4 _HeadRotationInverse; // Matrix4x4
+float3 _HeadPosition; // Vector3
 
 // This attributes struct receives data about the mesh we are currently rendering.
 // Data is automatically placed in the fields according to their semantic.
@@ -72,59 +71,88 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
     // For monoscopic rendering, both halves will render the same thing.
-    bool isLeftEye = 0.5 < input.uv.y;
-    float2 uv2d = input.uv;
-    // For the left eye, convert the UV's y component from the [0.5, 1] range to the [0, 1] range.
-    if (isLeftEye) {
-        uv2d.y = (uv2d.y - 0.5) * 2.0;
-    }
-    // For the right eye, convert the UV's y component from the [0, 0.5] range to the [0, 1] range.
-    else {
-        uv2d.y *= 2.0;
-    }
+    const bool isLeftEye = 0.5 < input.uv.y;
 
-    // Convert the UV from the [0, 1] range to the [-1, 1] range.
-    uv2d = uv2d * 2.0 - float2(1.0, 1.0);
-    float screenAngle = uv2d.x * _CavernAngle * 0.5f; // Horizontal Screen Angle (Degrees)
-    float screenAngleRad = radians(screenAngle);
+    float2 ratio = input.uv;
+    // Convert the UV.x from the [0, 1] range to the [-1, 1] range.
+    ratio.x = ratio.x * 2.0f - 1.0f;
+    // For the left eye, convert the UV's y component from the [0.5, 1] range to the [0, 1] range.
+    // For the right eye, convert the UV's y component from the [0, 0.5] range to the [0, 1] range.
+    ratio.y = isLeftEye ? (ratio.y - 0.5) * 2.0f : ratio.y * 2.0f;
 
     // Take note that angle 0 points down the Z-axis, not the X-axis.
-    float3 uvCube = float3(_CavernRadius * sin(screenAngleRad), _CavernHeight * 0.5f * uv2d.y + _CavernElevation, _CavernRadius * cos(screenAngleRad));
-
-    // Now transform the screen by the inverse of the player's head position and rotation.
-    uvCube = mul(_HeadRotationInverse, float4(uvCube.x, uvCube.y, uvCube.z, 1.0f)).xyz;
-    uvCube += _HeadPositionInverse;
+    float screenAngle = ratio.x * _CavernAngle * 0.5f; // Horizontal Screen Angle (Degrees)
+    float screenAngleRad = radians(screenAngle);
+    float screenTop = _CavernElevation + _CavernHeight - _HeadPosition.y;
+    float screenBottom = _CavernElevation - _HeadPosition.y;
+    
+    float3 eyeToScreen = normalize(float3(_CavernRadius * sin(screenAngleRad) - _HeadPosition.x,
+                                          ratio.y * (screenTop - screenBottom) + screenBottom,
+                                          _CavernRadius * cos(screenAngleRad) - _HeadPosition.z));
 
     // Monoscopic
     if (!_EnableStereo) {
-        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, uvCube);
+        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
     }
+
+    float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
+    float3 eyeToScreenXZ = normalize(float3(eyeToScreen.x, 0.0f, eyeToScreen.z));
+    float directionAngle = degrees(acos(dot(forwardDir, eyeToScreenXZ))) * ((eyeToScreenXZ.x > 0.0f) ? 1.0f : -1.0f);
+
+    // For debugging purposes.
+    bool debugColour = false;
+    float4 rightColour = float4(1.0f, 0.0f, 0.0f, 1.0f);
+    float4 leftColour = float4(0.0f, 1.0f, 0.0f, 1.0f);
+    float4 frontColour = float4(0.0f, 0.0f, 1.0f, 1.0f);
+    float4 backColour = float4(1.0f, 0.0f, 1.0f, 1.0f);
     
     // Left Eye
     if (isLeftEye) {
-        // Physical screen left quadrant.
-        if (screenAngle < -45.0f) {
-            return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, uvCube);
+        // Rear direction, relative to player.
+        if (directionAngle > 135.0f || directionAngle < -135.0f) {
+            if (debugColour) return rightColour;
+            return SAMPLE_TEXTURECUBE(_CubemapRight, sampler_CubemapRight, eyeToScreen);
         }
-        // Physical screen right quadrant.
-        if (screenAngle > 45.0f) {
-            return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, uvCube);
+        
+        // Left direction, relative to player.
+        if (directionAngle < -45.0f) {
+            if (debugColour) return backColour;
+            return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, eyeToScreen);
         }
-        // Physical screen front quadrant.
-        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, uvCube);
+        
+        // Physcial screen right quadrant relative to head position.
+        if (directionAngle > 45.0f) {
+            if (debugColour) return frontColour;
+            return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, eyeToScreen);
+        }
+        
+        // Physcial screen front quadrant relative to head position.
+        if (debugColour) return leftColour;
+        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
     }
     
     // Right Eye
-    // Physical screen left quadrant.
-    if (screenAngle < -45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, uvCube);
+    // Rear direction, relative to player.
+    if (directionAngle > 135.0f || directionAngle < -135.0f) {
+        if (debugColour) return leftColour;
+        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
     }
-    // Physical screen right quadrant.
-    if (screenAngle > 45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, uvCube);
+        
+    // Left direction, relative to player.
+    if (directionAngle < -45.0f) {
+        if (debugColour) return frontColour;
+        return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, eyeToScreen);
     }
-    // Physical screen front quadrant.
-    return SAMPLE_TEXTURECUBE(_CubemapRight, sampler_CubemapRight, uvCube);
+    
+    // Physcial screen right quadrant relative to head position.
+    if (directionAngle > 45.0f) {
+        if (debugColour) return backColour;
+        return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, eyeToScreen);
+    }
+
+    // Physcial screen front quadrant relative to head position.
+    if (debugColour) return rightColour;
+    return SAMPLE_TEXTURECUBE(_CubemapRight, sampler_CubemapRight, eyeToScreen);
 }
 
 #endif // CAVERN_PROJECTION_HLSL
