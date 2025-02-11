@@ -42,11 +42,7 @@ namespace Spelunx {
         }
 
         private enum CubemapIndex {
-            // Monoscopic
-            Mono = 0,
-
-            // Stereoscopic
-            Left = 0,
+            Left = 0, // Also used for monoscopic.
             Right,
             Front,
             Back,
@@ -57,7 +53,7 @@ namespace Spelunx {
         [Header("Camera Settings")]
         [SerializeField] private StereoscopicMode stereoMode = StereoscopicMode.Mono;
         [SerializeField] private CubemapResolution cubemapResolution = CubemapResolution.Mid;
-        [SerializeField, Range(0.0f, 1.0f)] private float interpupillaryDistance = 0.1f; // IPD in metres.
+        [SerializeField, Range(0.0f, 1.0f)] private float interpupillaryDistance = 0.7f; // IPD in metres.
         [SerializeField, Min(0.1f)] private float cavernHeight = 2.0f; // Cavern physical screen height in metres.
         [SerializeField, Min(0.1f)] private float cavernRadius = 3.0f; // Cavern physical screen radius in metres.
         [SerializeField, Min(0.1f)] private float cavernAngle = 270.0f; // Cavern physical screen angle in degrees.
@@ -115,7 +111,6 @@ namespace Spelunx {
 
             // Initialise material.
             material = new Material(shader);
-            material.SetTexture("_CubemapMono", cubemaps[(int)CubemapIndex.Mono]);
             material.SetTexture("_CubemapLeft", cubemaps[(int)CubemapIndex.Left]);
             material.SetTexture("_CubemapRight", cubemaps[(int)CubemapIndex.Right]);
             material.SetTexture("_CubemapFront", cubemaps[(int)CubemapIndex.Front]);
@@ -154,7 +149,7 @@ namespace Spelunx {
                     eye.stereoSeparation = 0.0f;
                     eye.transform.localPosition = Vector3.zero;
                     eye.transform.localRotation = Quaternion.identity;
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Mono], allMask | frontMask | leftMask | rightMask, Camera.MonoOrStereoscopicEye.Left);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Left], allMask | frontMask | leftMask | rightMask, Camera.MonoOrStereoscopicEye.Left);
                     break;
                 case StereoscopicMode.Stereo:
                     // eye.stereoSeparation = interpupillaryDistance;

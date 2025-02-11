@@ -4,8 +4,7 @@ Shader "Spelunx/CavernProjection" {
     // List of property types: https://docs.unity3d.com/Manual/SL-Properties.html
     Properties {
         [Header(Projection Options)]
-        _CubemapMono ("Cubemap Mono", Cube) = "" {}
-        _CubemapLeft ("Cubemap Left", Cube) = "" {}
+        _CubemapLeft ("Cubemap Left", Cube) = "" {} // Also used for monoscopic rendering.
         _CubemapRight ("Cubemap Right", Cube) = "" {}
         _CubemapFront ("Cubemap Front", Cube) = "" {}
         _CubemapBack ("Cubemap Back", Cube) = "" {}

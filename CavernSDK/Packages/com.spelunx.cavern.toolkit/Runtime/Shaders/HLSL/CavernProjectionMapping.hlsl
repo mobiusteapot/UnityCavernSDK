@@ -8,11 +8,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 // Textures
-TEXTURECUBE(_CubemapMono);
-SAMPLER(sampler_CubemapMono);
-float4 _CubemapMono_ST;
-
-TEXTURECUBE(_CubemapLeft);
+TEXTURECUBE(_CubemapLeft); // Also used for monoscopic rendering.
 SAMPLER(sampler_CubemapLeft);
 float4 _CubemapLeft_ST;
 
@@ -101,7 +97,7 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
 
     // Monoscopic
     if (!_EnableStereo) {
-        return SAMPLE_TEXTURECUBE(_CubemapMono, sampler_CubemapMono, uvCube);
+        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, uvCube);
     }
     
     // Left Eye

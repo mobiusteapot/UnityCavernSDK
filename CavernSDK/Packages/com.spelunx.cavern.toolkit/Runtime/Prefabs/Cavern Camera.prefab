@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stereoMode: 0
   cubemapResolution: 2048
-  interpupillaryDistance: 0.1
+  interpupillaryDistance: 0.7
   cavernHeight: 2
   cavernRadius: 3
   cavernAngle: 270
