@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "Spelunx CAVERN Toolkit", "index.html", ]
+  [ "Spelunx Cavern SDK", "index.html", ]
 ];
 
 var NAVTREEINDEX =
