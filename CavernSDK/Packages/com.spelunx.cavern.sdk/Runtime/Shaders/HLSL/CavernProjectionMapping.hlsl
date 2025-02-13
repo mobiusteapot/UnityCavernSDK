@@ -83,11 +83,8 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     // Take note that angle 0 points down the Z-axis, not the X-axis.
     float screenAngle = ratio.x * _CavernAngle * 0.5f; // Horizontal Screen Angle (Degrees)
     float screenAngleRad = radians(screenAngle);
-    float screenTop = _CavernElevation + _CavernHeight - _HeadPosition.y;
-    float screenBottom = _CavernElevation - _HeadPosition.y;
-    
     float3 eyeToScreen = normalize(float3(_CavernRadius * sin(screenAngleRad) - _HeadPosition.x,
-                                          ratio.y * (screenTop - screenBottom) + screenBottom,
+                                          ratio.y * _CavernHeight + _CavernElevation - _HeadPosition.y,
                                           _CavernRadius * cos(screenAngleRad) - _HeadPosition.z));
 
     // Monoscopic
