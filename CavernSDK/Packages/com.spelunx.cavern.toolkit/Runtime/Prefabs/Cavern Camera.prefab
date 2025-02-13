@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stereoMode: 1
   cubemapResolution: 2048
-  interpupillaryDistance: 0.65
+  interpupillaryDistance: 0.065
   cavernHeight: 2.3
   cavernRadius: 3
   cavernAngle: 270
@@ -261,6 +261,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5213595555020570760}
+  - component: {fileID: 5181198178877428420}
   m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
@@ -277,10 +278,18 @@ Transform:
   m_GameObject: {fileID: 5893020151470778770}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1.65, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2737124166775961882}
   m_Father: {fileID: 6810088677021411189}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &5181198178877428420
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5893020151470778770}
+  m_Enabled: 1

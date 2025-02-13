@@ -28,7 +28,7 @@ namespace Spelunx {
         [Header("Camera Settings")]
         [SerializeField] private StereoscopicMode stereoMode = StereoscopicMode.Mono;
         [SerializeField] private CubemapResolution cubemapResolution = CubemapResolution.Mid;
-        [SerializeField, Range(0.0f, 1.0f)] private float interpupillaryDistance = 0.7f; // IPD in metres.
+        [SerializeField, Range(0.05f, 0.08f)] private float interpupillaryDistance = 0.065f; // IPD in metres.
         [SerializeField, Min(0.1f)] private float cavernHeight = 2.0f; // Cavern physical screen height in metres.
         [SerializeField, Min(0.1f)] private float cavernRadius = 3.0f; // Cavern physical screen radius in metres.
         [SerializeField, Min(0.1f)] private float cavernAngle = 270.0f; // Cavern physical screen angle in degrees.
@@ -110,7 +110,8 @@ namespace Spelunx {
             const int bottomMask = 1 << (int)CubemapFace.NegativeY;
             const int frontMask = 1 << (int)CubemapFace.PositiveZ;
             const int backMask = 1 << (int)CubemapFace.NegativeZ;
-            const int allMask = leftMask | rightMask | topMask | bottomMask | frontMask | backMask;
+            // const int allMask = leftMask | rightMask | topMask | bottomMask | frontMask | backMask;
+            const int allMask = 0;
 
             // Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera's rotation.
             // Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world's axes instead.
