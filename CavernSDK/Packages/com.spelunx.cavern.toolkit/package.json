@@ -1,6 +1,6 @@
 {
   "name": "com.spelunx.cavern.sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Spelunx Cavern SDK",
   "description": "SDK for CAVERN Development.",
   "unity": "6000.0",

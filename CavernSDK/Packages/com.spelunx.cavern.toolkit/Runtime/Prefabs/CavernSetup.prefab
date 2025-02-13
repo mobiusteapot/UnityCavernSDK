@@ -81,9 +81,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 975013845174002959}
     m_Modifications:
+    - target: {fileID: 2583024415210474445, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
+      propertyPath: m_AllowXRRendering
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6810088677021411189, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6923342978367221698, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
       propertyPath: m_Name
       value: CavernCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 7546003163734249346, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
+      propertyPath: interpupillaryDistance
+      value: 0.065
       objectReference: {fileID: 0}
     - target: {fileID: 8495539629446166763, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
       propertyPath: m_LocalPosition.x
