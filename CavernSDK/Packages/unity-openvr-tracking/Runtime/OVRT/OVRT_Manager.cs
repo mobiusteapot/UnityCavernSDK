@@ -41,6 +41,7 @@ namespace Spelunx.OVRT
         private bool _isInitialized = false;
         private CVRSystem _vrSystem;
         private TrackedDevicePose_t[] _poses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+        private TrackedDevicePose_t[] gamePoses = new TrackedDevicePose_t[0];
         private UnityAction<int, bool> _onDeviceConnected;
         private string _steamVrConfigPath = null;
 
@@ -216,11 +217,6 @@ namespace Spelunx.OVRT
             _vrSystem = null;
         }
 
-        private void Update()
-        {
-            Tick();
-        }
-
         private void OnBeforeRender()
         {
             if (doUpdatePosesBeforeRendering)
@@ -233,7 +229,8 @@ namespace Spelunx.OVRT
                 float secondsSinceLastVsync = Time.realtimeSinceStartup - lastVsyncTimestamp;
                 float frameDuration = 1f / Math.Max(displayFrequency, 1);
                 float secondsFromNow = Mathf.Max(0, frameDuration - secondsSinceLastVsync) + vsyncToPhotonsSeconds;
-                UpdatePoses(secondsFromNow);
+                // UpdatePoses(secondsFromNow);
+                UpdatePoses();
             }
 
             //Debug.Log($"{frameDuration} - {secondsSinceLastVsync} + {vsyncToPhotonsSeconds} = {secondsFromNow}");
@@ -244,7 +241,7 @@ namespace Spelunx.OVRT
             ConnectedDeviceIndices[index] = connected;
         }
 
-        private void Tick()
+        private void Update()
         {
             if (!_isInitialized) return;
             // if (SteamVR.active == false)
@@ -254,17 +251,23 @@ namespace Spelunx.OVRT
             if (_vrSystem == null)
                 return;
 
+            if (OpenVR.System == null)
+            {
+                return;
+            }
+
+            UpdatePoses();
             // let's just put in a bunch of checks
             // if (_vrSystem.ShouldApplicationPause()) return;
             // if(OpenVR.System.IsTrackedDeviceConnected()))
-            if (!_vrSystem.IsInputAvailable()) return;
+            // if (!_vrSystem.IsInputAvailable()) return;
 
             // not too sure about this check
-            if (!OpenVR.IsHmdPresent()) return;
+            // if (!OpenVR.IsHmdPresent()) return;
 
             // Process OpenVR event queue
             var vrEvent = new VREvent_t();
-            while (_vrSystem.PollNextEvent(ref vrEvent, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t))))
+            while (OpenVR.System.PollNextEvent(ref vrEvent, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t))))
             {
                 switch ((EVREventType)vrEvent.eventType)
                 {
@@ -305,12 +308,23 @@ namespace Spelunx.OVRT
                 }
             }
 
-            UpdatePoses(0);
+            // UpdatePoses(0);
         }
 
+        private void UpdatePoses()
+        {
+            var compositor = OpenVR.Compositor;
+            if (compositor != null)
+            {
+                compositor.GetLastPoses(_poses, gamePoses);
+                OVRT_Events.NewPoses.Invoke(_poses);
+                // OVRT_Events.NewPosesApplied.Send();
+            }
+        }
         private void UpdatePoses(float predictedSecondsToPhotonsFromNow)
         {
             if (!_isInitialized) return;
+
 
             _vrSystem.GetDeviceToAbsoluteTrackingPose(trackingUniverse, usePosePrediction ? predictedSecondsToPhotonsFromNow : 0f, _poses);
             OVRT_Events.NewPoses.Invoke(_poses);
