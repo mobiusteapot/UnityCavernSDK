@@ -1,5 +1,5 @@
 {
-    "name": "Spelunx.CAVERN.Toolkit.Tests",
+    "name": "Spelunx.Cavern.SDK.Editor.Tests",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
