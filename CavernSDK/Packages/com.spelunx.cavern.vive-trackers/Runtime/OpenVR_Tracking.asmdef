@@ -2,7 +2,8 @@
     "name": "OpenVR_Tracking",
     "rootNamespace": "Spelunx.OVRT",
     "references": [
-        "GUID:af79ba8b3a35c4f43938fe2d55ea677f"
+        "GUID:af79ba8b3a35c4f43938fe2d55ea677f",
+        "Unity.XR.OpenVR"
     ],
     "includePlatforms": [
         "Editor",
@@ -14,7 +15,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

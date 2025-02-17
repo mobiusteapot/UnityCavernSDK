@@ -46,7 +46,7 @@
       "name": "ETC Package Registry",
       "url": "https://upm.etc.cmu.edu",
       "scopes": [
-        "com.etc"
+        "com.spelunx"
       ],
       "overrideBuiltIns": false
     }

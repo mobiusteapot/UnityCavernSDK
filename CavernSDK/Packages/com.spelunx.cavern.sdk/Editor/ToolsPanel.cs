@@ -13,52 +13,37 @@ namespace Spelunx
         private GameObject newCavernSetup;
         private GameObject newViveManager;
         private GameObject newViveTracker;
+        private AudioConfiguration audioConfigs;
 
         [MenuItem("CAVERN/Tools")]
         public static void ShowWindow()
         {
-            GetWindow<Window>("CAVERN Tools");
+            GetWindow<Window>("CAVERN Tools and Setup");
         }
 
         void OnGUI()
         {
             GUILayout.Label("CAVERN Setup", EditorStyles.boldLabel);
-            GUILayout.Label("Adds the CAVERN camera rig into your scene");
-            GUILayout.Label("and creates a game object to hold additional CAVERN objects.");
-            if (GUILayout.Button("Add"))
+            EditorGUILayout.HelpBox("Sets up scene for CAVERN development. Replaces the default Unity camera with the CAVERN camera rig. Defaults audio speaker mode to 5.1 surround sound.", MessageType.Info);
+            // GUILayout.Label("Replaces the default Unity camera with the CAVERN camera rig in your scene");
+            // GUILayout.Label("and creates a CAVERN setup game object to hold additional CAVERN objects.");
+            if (GUILayout.Button("Add new CAVERN setup"))
             {
+                // adds cavern setup prefab to scene
                 cavernSetup = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/CavernSetup.prefab", typeof(GameObject));
-                Debug.Log("cavern setup: " + cavernSetup.name);
                 newCavernSetup = (GameObject)PrefabUtility.InstantiatePrefab(cavernSetup as GameObject);
-            }
 
-            GUILayout.Label("Vive Tracker", EditorStyles.boldLabel);
-            GUILayout.Label("Adds a new vive tracker and tracker manager to your scene.");
-            GUILayout.Label("A Vive tracker can detect movement with 6 degrees of freedom.");
+                // sets speaker mode to 5.1 surround
+                audioConfigs = AudioSettings.GetConfiguration();
+                audioConfigs.speakerMode = AudioSpeakerMode.Mode5point1;
+                AudioSettings.Reset(audioConfigs);
 
-            if (GUILayout.Button("Add"))
-            {
-                // load from GUI input
-                // objToSpawn = EditorGUILayout.ObjectField("Prefab", objToSpawn, typeof(Object), true);
-
-                // load from path
-                viveManager = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/ViveTrackerManager.prefab", typeof(GameObject));
-                viveTracker = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/ViveTracker.prefab", typeof(GameObject));
-                Debug.Log("vive setup: " + viveManager.name + " " + viveTracker.name);
-                // Debug.Log("Got " + objToSpawn.name + objToSpawn.GetType());
-
-                // instantiate prefab
-                newViveManager = (GameObject)PrefabUtility.InstantiatePrefab(viveManager as GameObject);
-                newViveTracker = (GameObject)PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
-
-
-                // set prefab's hierarcy in scene
-                newViveManager.GetComponent<Transform>().parent = GameObject.Find("CavernSetup").GetComponent<Transform>();
-
-                // TODO: find way to instantiate prefab at specific place in scene hierarchy
+                // removes any default main cameras in scene (but preserves any cameras not tagged as MainCamera)
+                Undo.DestroyObjectImmediate(GameObject.FindGameObjectWithTag("MainCamera"));
             }
         }
     }
 
 }
+
 
