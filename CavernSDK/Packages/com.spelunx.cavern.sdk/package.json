@@ -1,6 +1,6 @@
 {
   "name": "com.spelunx.cavern.sdk",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "displayName": "Spelunx Cavern SDK",
   "description": "SDK for CAVERN Development.",
   "unity": "6000.0",
@@ -23,6 +23,11 @@
       "displayName": "Fullscreen Preview Asset",
       "description": "Fullscreen Preview Asset from the asset store. Helpful for cavern preview. Not for public distribution.",
       "path": "Samples~/FullscreenAsset"
+    },
+    {
+      "displayName": "Spelunx Sample Scenes",
+      "description": "Sample scenes that show the functionality of the Spelunx Cavern Toolkit.",
+      "path": "Samples~/SampleScene"
     }
   ],
   "dependencies": {

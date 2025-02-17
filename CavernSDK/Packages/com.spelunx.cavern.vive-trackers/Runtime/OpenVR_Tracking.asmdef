@@ -1,0 +1,21 @@
+{
+    "name": "OpenVR_Tracking",
+    "rootNamespace": "Spelunx.OVRT",
+    "references": [
+        "GUID:af79ba8b3a35c4f43938fe2d55ea677f"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "WSA",
+        "WindowsStandalone32",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
