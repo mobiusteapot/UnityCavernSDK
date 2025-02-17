@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7766101610368079905}
   - component: {fileID: 3963778506884812708}
   m_Layer: 6
-  m_Name: Cavern Camera
+  m_Name: CavernCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -261,6 +261,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5213595555020570760}
+  - component: {fileID: 351456729288192419}
   m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
@@ -284,3 +285,11 @@ Transform:
   - {fileID: 2737124166775961882}
   m_Father: {fileID: 6810088677021411189}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &351456729288192419
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5893020151470778770}
+  m_Enabled: 1

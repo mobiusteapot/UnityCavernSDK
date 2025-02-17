@@ -83,7 +83,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 836597995932936465, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
       propertyPath: m_Name
-      value: Cavern Camera
+      value: CavernCamera
       objectReference: {fileID: 0}
     - target: {fileID: 6810088677021411189, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
       propertyPath: m_LocalPosition.x
