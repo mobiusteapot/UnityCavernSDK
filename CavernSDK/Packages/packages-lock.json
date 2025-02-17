@@ -17,7 +17,7 @@
         "com.unity.nuget.newtonsoft-json": "3.0.2",
         "com.spelunx.cavern.sdk": "0.1.5",
         "com.unity.xr.openxr": "1.14.0",
-        "com.valvesoftware.unity.openvr": "1.2.1"
+        "com.valvesoftware.unity.openvr": "1.2.3"
       }
     },
     "com.unity.ai.navigation": {
