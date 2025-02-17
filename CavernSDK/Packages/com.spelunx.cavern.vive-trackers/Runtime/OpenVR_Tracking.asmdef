@@ -2,8 +2,7 @@
     "name": "OpenVR_Tracking",
     "rootNamespace": "Spelunx.OVRT",
     "references": [
-        "GUID:af79ba8b3a35c4f43938fe2d55ea677f",
-        "Unity.XR.OpenVR"
+        "GUID:af79ba8b3a35c4f43938fe2d55ea677f"
     ],
     "includePlatforms": [
         "Editor",
