@@ -35,6 +35,10 @@ namespace Spelunx {
         [SerializeField, Min(0.1f)] private float cavernAngle = 270.0f; // Cavern physical screen angle in degrees.
         [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f; // Cavern physical screen elevation relative to where the player is standing.
 
+        [Header("Head Tracking")]
+        [SerializeField] private bool clampHeadPosition = true;
+        [SerializeField, Range(0.0f, 1.0f)] private float clampHeadRatio = 0.8f;
+
         [Header("References")]
         [SerializeField] private Transform head;
         [SerializeField] private Camera eye;
@@ -113,7 +117,7 @@ namespace Spelunx {
             Debug.Log(message);
         }
 
-        private void GetRenderDirections(out int eastWestMask, out int northSouthMask) {
+        private void GetRenderDirections(Vector3 headPosition, out int eastWestMask, out int northSouthMask) {
             const int leftMask = 1 << (int)CubemapFace.PositiveX;
             const int rightMask = 1 << (int)CubemapFace.NegativeX;
             const int topMask = 1 << (int)CubemapFace.PositiveY;
@@ -131,13 +135,13 @@ namespace Spelunx {
             // Get North-East and South-West boundaries where the sampled cubemap switches for stereoscopic rendering.
             List<float> xIntersectSouthWestToNorthEast = MathsUtil.SolveQuadraticEquation(
                 1.0f,
-                head.transform.localPosition.x + head.transform.localPosition.z,
-                -0.5f * (cavernRadius * cavernRadius - head.transform.localPosition.x * head.transform.localPosition.x - head.transform.localPosition.z * head.transform.localPosition.z));
+                headPosition.x + headPosition.z,
+                -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
             // Get North-West and South-East boundaries where the sampled cubemap switches for stereoscopic rendering.
             List<float> xIntersectNorthWestToSouthEast = MathsUtil.SolveQuadraticEquation(
                 1.0f,
-                head.transform.localPosition.x - head.transform.localPosition.z,
-                -0.5f * (cavernRadius * cavernRadius - head.transform.localPosition.x * head.transform.localPosition.x - head.transform.localPosition.z * head.transform.localPosition.z));
+                headPosition.x - headPosition.z,
+                -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
             if (xIntersectSouthWestToNorthEast.Count == 1) {
                 northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
                 southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
@@ -236,9 +240,9 @@ namespace Spelunx {
             eastWestMask |= frontMask; // Always render the front.
             northSouthMask = 0;
 
-            float screenTop = cavernElevation + cavernHeight - head.transform.localPosition.y;
-            float screenBottom = cavernElevation - head.transform.localPosition.y;
-            Vector3 headOffset = new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
+            float screenTop = cavernElevation + cavernHeight - headPosition.y;
+            float screenBottom = cavernElevation - headPosition.y;
+            Vector3 headOffset = new Vector3(headPosition.x, 0.0f, headPosition.z);
 
             // Calculate the render mask for the East and West cubemaps.
             if (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
@@ -288,11 +292,20 @@ namespace Spelunx {
         }
 
         private void RenderEyes() {
+            // If clampHeadPosition is true, limit the head position to be within the bounds of the circle.
+            if (clampHeadPosition) {
+                Vector2 horizontalPosition = new Vector2(head.transform.localPosition.x, head.transform.localPosition.z);
+                if (horizontalPosition.sqrMagnitude > clampHeadRatio * clampHeadRatio * cavernRadius * cavernRadius) {
+                    horizontalPosition = horizontalPosition.normalized * clampHeadRatio * cavernRadius;
+                    head.transform.localPosition = new Vector3(horizontalPosition.x, head.transform.localPosition.y, horizontalPosition.y);
+                }
+            }
+
             // Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera's rotation.
             // Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world's axes instead.
             int eastWestMask = 0;
             int northSouthMask = 0;
-            GetRenderDirections(out eastWestMask, out northSouthMask);
+            GetRenderDirections(head.transform.localPosition, out eastWestMask, out northSouthMask);
 
             switch (stereoMode) {
                 case StereoscopicMode.Mono:
