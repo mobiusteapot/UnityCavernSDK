@@ -1,6 +1,6 @@
 {
     "name": "Spelunx.Cavern.SDK.Tests",
-    "rootNamespace": "",
+    "rootNamespace": "Spelunx",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,10 +1,12 @@
 {
     "name": "Spelunx.Cavern.SDK.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "Spelunx",
     "references": [
-        "GUID:5cf6644817ffaac4e91194cca1efea53"
+        "Spelunx.Cavern.SDK"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

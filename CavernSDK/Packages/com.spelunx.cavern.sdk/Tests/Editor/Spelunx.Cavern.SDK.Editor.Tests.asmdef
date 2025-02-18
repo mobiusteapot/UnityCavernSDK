@@ -1,8 +1,10 @@
 {
     "name": "Spelunx.Cavern.SDK.Editor.Tests",
-    "rootNamespace": "",
+    "rootNamespace": "Spelunx",
     "references": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

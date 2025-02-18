@@ -1,18 +1,13 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SearchService;
-using UnityEngine.SceneManagement;
 
 namespace SpelunxVive
 {
     public class Window : EditorWindow
     {
-        private Object cavernSetup;
         private Object viveManager;
         private Object viveTracker;
-        private GameObject newCavernSetup;
         private GameObject newViveManager;
-        private GameObject newViveTracker;
         private int trackerCount;
 
         [MenuItem("CAVERN/Vive Trackers")]
@@ -55,7 +50,7 @@ namespace SpelunxVive
                 }
 
                 // instantiate a new vive tracker
-                newViveTracker = (GameObject)PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
+                PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
             }
         }
     }
