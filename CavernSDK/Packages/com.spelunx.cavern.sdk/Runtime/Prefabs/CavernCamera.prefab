@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 836597995932936465}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -58,6 +58,7 @@ MonoBehaviour:
   head: {fileID: 5213595555020570760}
   eye: {fileID: 5900885314504736604}
   shader: {fileID: 4800000, guid: d250a68325f512d4082683a9f6882f49, type: 3}
+  enableDirectionDebug: 0
 --- !u!114 &7802660903058383603
 MonoBehaviour:
   m_ObjectHideFlags: 0

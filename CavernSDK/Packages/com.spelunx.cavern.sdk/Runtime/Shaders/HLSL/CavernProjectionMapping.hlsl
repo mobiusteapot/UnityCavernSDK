@@ -8,21 +8,21 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
 // Textures
-TEXTURECUBE(_CubemapLeft); // Also used for monoscopic rendering.
-SAMPLER(sampler_CubemapLeft);
-float4 _CubemapLeft_ST;
+TEXTURECUBE(_CubemapNorth); // Also used for monoscopic rendering.
+SAMPLER(sampler_CubemapNorth);
+float4 _CubemapNorth_ST;
 
-TEXTURECUBE(_CubemapRight);
-SAMPLER(sampler_CubemapRight);
-float4 _CubemapRight_ST;
+TEXTURECUBE(_CubemapSouth);
+SAMPLER(sampler_CubemapSouth);
+float4 _CubemapSouth_ST;
 
-TEXTURECUBE(_CubemapFront);
-SAMPLER(sampler_CubemapFront);
-float4 _CubemapFront_ST;
+TEXTURECUBE(_CubemapEast);
+SAMPLER(sampler_CubemapEast);
+float4 _CubemapEast_ST;
 
-TEXTURECUBE(_CubemapBack);
-SAMPLER(sampler_CubemapBack);
-float4 _CubemapBack_ST;
+TEXTURECUBE(_CubemapWest);
+SAMPLER(sampler_CubemapWest);
+float4 _CubemapWest_ST;
 
 // Other Material Properties
 int _EnableStereo;
@@ -89,7 +89,7 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
 
     // Monoscopic
     if (!_EnableStereo) {
-        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
     }
 
     float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
@@ -108,48 +108,48 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
         // Rear direction, relative to player.
         if (directionAngle > 135.0f || directionAngle < -135.0f) {
             if (debugColour) return rightColour;
-            return SAMPLE_TEXTURECUBE(_CubemapRight, sampler_CubemapRight, eyeToScreen);
+            return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
         }
         
         // Left direction, relative to player.
         if (directionAngle < -45.0f) {
             if (debugColour) return backColour;
-            return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, eyeToScreen);
+            return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
         }
         
         // Physcial screen right quadrant relative to head position.
         if (directionAngle > 45.0f) {
             if (debugColour) return frontColour;
-            return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, eyeToScreen);
+            return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
         }
         
         // Physcial screen front quadrant relative to head position.
         if (debugColour) return leftColour;
-        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
+        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
     }
     
     // Right Eye
     // Rear direction, relative to player.
     if (directionAngle > 135.0f || directionAngle < -135.0f) {
         if (debugColour) return leftColour;
-        return SAMPLE_TEXTURECUBE(_CubemapLeft, sampler_CubemapLeft, eyeToScreen);
+        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
     }
         
     // Left direction, relative to player.
     if (directionAngle < -45.0f) {
         if (debugColour) return frontColour;
-        return SAMPLE_TEXTURECUBE(_CubemapFront, sampler_CubemapFront, eyeToScreen);
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
     }
     
     // Physcial screen right quadrant relative to head position.
     if (directionAngle > 45.0f) {
         if (debugColour) return backColour;
-        return SAMPLE_TEXTURECUBE(_CubemapBack, sampler_CubemapBack, eyeToScreen);
+        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
     }
 
     // Physcial screen front quadrant relative to head position.
     if (debugColour) return rightColour;
-    return SAMPLE_TEXTURECUBE(_CubemapRight, sampler_CubemapRight, eyeToScreen);
+    return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
 }
 
 #endif // CAVERN_PROJECTION_HLSL

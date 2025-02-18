@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Spelunx {
     public class CavernRenderer : MonoBehaviour {
@@ -17,10 +18,10 @@ namespace Spelunx {
         }
 
         private enum CubemapIndex {
-            Left = 0, // Also used for monoscopic.
-            Right,
-            Front,
-            Back,
+            North = 0, // Also used for monoscopic.
+            South,
+            East,
+            West,
 
             Num,
         }
@@ -39,6 +40,10 @@ namespace Spelunx {
         [SerializeField] private Camera eye;
         [SerializeField] private Shader shader;
 
+        [Header("For Debugging Purposes")]
+        [SerializeField] private bool enableDirectionDebug = false;
+
+        // Internal variables.
         private RenderTexture[] cubemaps;
         private RenderTexture screenViewerTexture;
         private Material material;
@@ -51,7 +56,7 @@ namespace Spelunx {
         public float GetCavernAngle() { return cavernAngle; }
         public float GetCavernElevation() { return cavernElevation; }
         public RenderTexture GetScreenViewerTexture() { return screenViewerTexture; }
-        
+
         public float GetAspectRatio() {
             return ((cavernAngle / 360.0f) * 2.0f * cavernRadius * Mathf.PI) / cavernHeight;
         }
@@ -85,10 +90,10 @@ namespace Spelunx {
 
             // Initialise material.
             material = new Material(shader);
-            material.SetTexture("_CubemapLeft", cubemaps[(int)CubemapIndex.Left]);
-            material.SetTexture("_CubemapRight", cubemaps[(int)CubemapIndex.Right]);
-            material.SetTexture("_CubemapFront", cubemaps[(int)CubemapIndex.Front]);
-            material.SetTexture("_CubemapBack", cubemaps[(int)CubemapIndex.Back]);
+            material.SetTexture("_CubemapNorth", cubemaps[(int)CubemapIndex.North]);
+            material.SetTexture("_CubemapSouth", cubemaps[(int)CubemapIndex.South]);
+            material.SetTexture("_CubemapEast", cubemaps[(int)CubemapIndex.East]);
+            material.SetTexture("_CubemapWest", cubemaps[(int)CubemapIndex.West]);
         }
 
         private void Start() {
@@ -103,32 +108,12 @@ namespace Spelunx {
 #endif
         }
 
-        private void RenderEyes() {
-            // TODO: Clean this code up. And document it so that it's not just some scribbles on paper.
-            // Find the intersection points.
-            // Solve quadratic equation for Line 1:
-            float c = -(cavernRadius * cavernRadius - head.transform.localPosition.x * head.transform.localPosition.x - head.transform.localPosition.z * head.transform.localPosition.z) * 0.5f;
-            float b1 = head.transform.localPosition.x + head.transform.localPosition.z;
-            float t1 = (-b1 + Mathf.Sqrt(b1 * b1 - 4 * c)) / 2.0f;
-            float t2 = (-b1 - Mathf.Sqrt(b1 * b1 - 4 * c)) / 2.0f;
+        private void LogDirection(string message) {
+            if (!enableDirectionDebug) return;
+            Debug.Log(message);
+        }
 
-            // TODO: Deal with cases when b^2 - 4ac < 0.
-
-            // Solve quadratic equation for Line 2:
-            float b2 = head.transform.localPosition.x - head.transform.localPosition.z;
-            float s1 = (-b2 + Mathf.Sqrt(b2 * b2 - 4 * c)) / 2.0f;
-            float s2 = (-b2 - Mathf.Sqrt(b2 * b2 - 4 * c)) / 2.0f;
-
-            Vector3 A = new Vector3(Mathf.Max(t1, t2), 0.0f, Mathf.Max(t1, t2));
-            Vector3 C = new Vector3(Mathf.Min(t1, t2), 0.0f, Mathf.Min(t1, t2));
-            Vector3 B = new Vector3(Mathf.Min(s1, s2), 0.0f, -Mathf.Min(s1, s2));
-            Vector3 D = new Vector3(Mathf.Max(s1, s2), 0.0f, -Mathf.Max(s1, s2));
-
-            A += new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            B += new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            C += new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            D += new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-
+        private void GetRenderDirections(out int eastWestMask, out int northSouthMask) {
             const int leftMask = 1 << (int)CubemapFace.PositiveX;
             const int rightMask = 1 << (int)CubemapFace.NegativeX;
             const int topMask = 1 << (int)CubemapFace.PositiveY;
@@ -136,95 +121,197 @@ namespace Spelunx {
             const int frontMask = 1 << (int)CubemapFace.PositiveZ;
             const int backMask = 1 << (int)CubemapFace.NegativeZ;
 
-            string debugStr = "Rendering: Front";
+            eastWestMask = 0;
+            northSouthMask = 0;
+            Vector3 southWestBoundary = Vector3.zero;
+            Vector3 northEastBoundary = Vector3.zero;
+            Vector3 northWestBoundary = Vector3.zero;
+            Vector3 southEastBoundary = Vector3.zero;
 
-            int leftRightEyeMask = frontMask;
-            if (Vector3.Angle(C, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(D, Vector3.forward) < cavernAngle * 0.5f) {
-                leftRightEyeMask |= backMask;
-                debugStr += ", Back";
+            // Get North-East and South-West boundaries where the sampled cubemap switches for stereoscopic rendering.
+            List<float> xIntersectSouthWestToNorthEast = MathsUtil.SolveQuadraticEquation(
+                1.0f,
+                head.transform.localPosition.x + head.transform.localPosition.z,
+                -0.5f * (cavernRadius * cavernRadius - head.transform.localPosition.x * head.transform.localPosition.x - head.transform.localPosition.z * head.transform.localPosition.z));
+            // Get North-West and South-East boundaries where the sampled cubemap switches for stereoscopic rendering.
+            List<float> xIntersectNorthWestToSouthEast = MathsUtil.SolveQuadraticEquation(
+                1.0f,
+                head.transform.localPosition.x - head.transform.localPosition.z,
+                -0.5f * (cavernRadius * cavernRadius - head.transform.localPosition.x * head.transform.localPosition.x - head.transform.localPosition.z * head.transform.localPosition.z));
+            if (xIntersectSouthWestToNorthEast.Count == 1) {
+                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
+                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
+            } else if (xIntersectSouthWestToNorthEast.Count == 2) {
+                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[1], 0.0f, xIntersectSouthWestToNorthEast[1]);
+                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
             }
 
-            int frontBackEyeMask = 0;
-            if (Vector3.Angle(A, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(D, Vector3.forward) < cavernAngle * 0.5f) {
-                frontBackEyeMask |= rightMask;
-                debugStr += ", Right";
-            }
-            if (Vector3.Angle(B, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(C, Vector3.forward) < cavernAngle * 0.5f) {
-                frontBackEyeMask |= leftMask;
-                debugStr += ", Left";
+            if (xIntersectNorthWestToSouthEast.Count == 1) {
+                northWestBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
+                southEastBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
+            } else if (xIntersectNorthWestToSouthEast.Count == 2) {
+                northWestBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
+                southEastBoundary = new Vector3(xIntersectNorthWestToSouthEast[1], 0.0f, -xIntersectNorthWestToSouthEast[1]);
             }
 
-            A -= new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            B -= new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            C -= new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
-            D -= new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
+            // Edge Case 1: Head is moved out of the screen area and there are no intersects.
+            // This means that the screen is entirely in one quadrant relative to the head.
+            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count == 0) {
+                // Screen is south of the head.
+                if (0.0f < head.localPosition.z &&
+                    Mathf.Abs(head.localPosition.x) < Mathf.Abs(head.localPosition.z)) {
+                    // For edge cases, fuck it just render the top and the bottom too.
+                    // I can't be bothered to check those as well, since this should rarely ever happen.
+                    eastWestMask |= (backMask | topMask | bottomMask);
+                    LogDirection("[East-West] Back, Top, Bottom");
+                    return;
+                }
 
-            Vector3 forwardQuadTopCheck = (A.z < B.z) ? A : B;
-            forwardQuadTopCheck.y = cavernElevation + cavernHeight - head.transform.localPosition.y;
-            Vector3 backQuadTopCheck = (C.z > D.z) ? C : D;
-            backQuadTopCheck.y = cavernElevation + cavernHeight - head.transform.localPosition.y;
-            
-            if (Mathf.Abs(forwardQuadTopCheck.z) < Mathf.Abs(forwardQuadTopCheck.y) ||
-                Mathf.Abs(backQuadTopCheck.z) < Mathf.Abs(backQuadTopCheck.y)) {
-                leftRightEyeMask |= topMask;
-                debugStr += ", Horizontal Top";
+                // Screen is north of the head.
+                if (head.localPosition.z < 0.0f &&
+                    Mathf.Abs(head.localPosition.x) < Mathf.Abs(head.localPosition.z)) {
+                    eastWestMask |= (frontMask | topMask | bottomMask);
+                    LogDirection("[East-West] Front, Top, Bottom");
+                    return;
+                }
+
+                // Screen is east of the head.
+                if (head.localPosition.x < 0.0f &&
+                    Mathf.Abs(head.localPosition.z) < Mathf.Abs(head.localPosition.x)) {
+                    northSouthMask |= (rightMask | topMask | bottomMask);
+                    LogDirection("[North-South] Right, Top, Bottom");
+                    return;
+                }
+
+                // Screen is west of the head.
+                if (head.localPosition.x > 0.0f &&
+                    Mathf.Abs(head.localPosition.z) < Mathf.Abs(head.localPosition.x)) {
+                    northSouthMask |= (leftMask | topMask | bottomMask);
+                    LogDirection("[North-South] Left, Top, Bottom");
+                    return;
+                }
             }
 
-            Vector3 forwardQuadBottomCheck = (A.z < B.z) ? A : B;
-            forwardQuadBottomCheck.y = cavernElevation - head.transform.localPosition.y;
-            Vector3 backQuadBottomCheck = (C.z > D.z) ? C : D;
-            backQuadBottomCheck.y = cavernElevation - head.transform.localPosition.y;
+            // Edge Case 2: Head is moved out of the screen and only the South-West to North-East line intersects.
+            if (xIntersectSouthWestToNorthEast.Count > 0 && xIntersectNorthWestToSouthEast.Count == 0) {
+                // Screen is south-west of the head.
+                if (Vector3.Dot(new Vector3(1.0f, 1.0f), new Vector2(head.localPosition.x, head.localPosition.z)) > 1.0f) {
+                    eastWestMask |= (backMask | topMask | bottomMask);
+                    northSouthMask |= (leftMask | topMask | bottomMask);
+                    LogDirection("[East-West] Back, Top, Bottom\n[North-South] Left, Top, Bottom");
+                    return;
+                }
 
-            if (Mathf.Abs(forwardQuadBottomCheck.z) < Mathf.Abs(forwardQuadBottomCheck.y) ||
-                Mathf.Abs(backQuadBottomCheck.z) < Mathf.Abs(backQuadBottomCheck.y)) {
-                leftRightEyeMask |= bottomMask;
-                debugStr += ", Horizontal Bottom";
+                // Screen is north-east of the head.
+                if (Vector3.Dot(new Vector3(-1.0f, -1.0f), new Vector2(head.localPosition.x, head.localPosition.z)) > 1.0f) {
+                    eastWestMask |= (frontMask | topMask | bottomMask);
+                    northSouthMask |= (rightMask | topMask | bottomMask);
+                    LogDirection("[East-West] Front, Top, Bottom\n[North-South] Right, Top, Bottom");
+                    return;
+                }
             }
 
-            Vector3 leftQuadTopCheck = (B.x > C.x) ? B : C;
-            leftQuadTopCheck.y = cavernElevation + cavernHeight - head.transform.localPosition.y;
-            Vector3 rightQuadTopCheck = (A.x < D.x) ? A : D;
-            rightQuadTopCheck.y = cavernElevation + cavernHeight - head.transform.localPosition.y;
-            
-            if (Mathf.Abs(leftQuadTopCheck.x) < Mathf.Abs(leftQuadTopCheck.y) ||
-                Mathf.Abs(rightQuadTopCheck.x) < Mathf.Abs(rightQuadTopCheck.y)) {
-                frontBackEyeMask |= topMask;
-                debugStr += ", Vertical Top";
+            // Edge Case 3: Head is moved out of the screen and only the North-West to South-East line intersects.
+            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count > 0) {
+                // Screen is north-west of the head.
+                if (Vector3.Dot(new Vector3(1.0f, -1.0f), new Vector2(head.localPosition.x, head.localPosition.z)) > 1.0f) {
+                    eastWestMask |= (frontMask | topMask | bottomMask);
+                    northSouthMask |= (leftMask | topMask | bottomMask);
+                    LogDirection("[East-West] Front, Top, Bottom\n[North-South] Left, Top, Bottom");
+                    return;
+                }
+
+                // Screen is south-east of the head.
+                if (Vector3.Dot(new Vector3(-1.0f, 1.0f), new Vector2(head.localPosition.x, head.localPosition.z)) > 1.0f) {
+                    eastWestMask |= (backMask | topMask | bottomMask);
+                    northSouthMask |= (rightMask | topMask | bottomMask);
+                    LogDirection("[East-West] Back, Top, Bottom\n[North-South] Right, Top, Bottom");
+                    return;
+                }
             }
 
-            Vector3 leftQuadBottomCheck = (B.x > C.x) ? B : C;
-            leftQuadTopCheck.y = cavernElevation - head.transform.localPosition.y;
-            Vector3 rightQuadBottomCheck = (A.x < D.x) ? A : D;
-            rightQuadTopCheck.y = cavernElevation - head.transform.localPosition.y;
+            // Regular Case: The head is within the screen area.
+            string eastWestDebugMsg = "[East-West] Front";
+            string northSouthDebugMsg = "\n[North-South]";
+            eastWestMask |= frontMask; // Always render the front.
+            northSouthMask = 0;
 
-            if (Mathf.Abs(leftQuadBottomCheck.x) < Mathf.Abs(leftQuadBottomCheck.y) ||
-                Mathf.Abs(rightQuadTopCheck.x) < Mathf.Abs(rightQuadTopCheck.y)) {
-                frontBackEyeMask |= bottomMask;
-                debugStr += ", Vertical Bottom";
+            float screenTop = cavernElevation + cavernHeight - head.transform.localPosition.y;
+            float screenBottom = cavernElevation - head.transform.localPosition.y;
+            Vector3 headOffset = new Vector3(head.transform.localPosition.x, 0.0f, head.transform.localPosition.z);
+
+            // Calculate the render mask for the East and West cubemaps.
+            if (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
+                eastWestMask |= backMask;
+                eastWestDebugMsg += ", Back";
+            }
+            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenTop)) {
+                eastWestMask |= topMask;
+                eastWestDebugMsg += ", Top";
+            }
+            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenBottom)) {
+                eastWestMask |= bottomMask;
+                eastWestDebugMsg += ", Bottom";
             }
 
-            // Debug.Log(debugStr);
+            // Calculate the render mask for the North and South cubemaps.
+            if (Vector3.Angle(headOffset + northEastBoundary, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
+                northSouthMask |= rightMask;
+                northSouthDebugMsg += " Right";
+            }
+            if (Vector3.Angle(headOffset + northWestBoundary, Vector3.forward) < cavernAngle * 0.5f || Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f) {
+                northSouthMask |= leftMask;
+                northSouthDebugMsg += ", Left";
+            }
+            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenTop) ||
+                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenTop)) {
+                northSouthMask |= topMask;
+                northSouthDebugMsg += ", Top";
+            }
+            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenBottom) ||
+                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenBottom)) {
+                northSouthMask |= bottomMask;
+                northSouthDebugMsg += ", Bottom";
+            }
 
+            LogDirection(eastWestDebugMsg + northSouthDebugMsg);
+        }
+
+        private void RenderEyes() {
             // Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera's rotation.
             // Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world's axes instead.
+            int eastWestMask = 0;
+            int northSouthMask = 0;
+            GetRenderDirections(out eastWestMask, out northSouthMask);
+
             switch (stereoMode) {
                 case StereoscopicMode.Mono:
                     eye.stereoSeparation = 0.0f;
                     eye.transform.rotation = gameObject.transform.rotation; // Set eye's global orientation to the screen's orientation, regardless of the head's orientation.
                     eye.transform.localPosition = Vector3.zero;
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Left], leftRightEyeMask | frontBackEyeMask, Camera.MonoOrStereoscopicEye.Left);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.North], eastWestMask | northSouthMask, Camera.MonoOrStereoscopicEye.Left);
                     break;
                 case StereoscopicMode.Stereo:
                     eye.stereoSeparation = 0.0f;
                     eye.transform.rotation = gameObject.transform.rotation; // Set eye's global orientation to the screen's orientation, regardless of the head's orientation.
                     eye.transform.localPosition = new Vector3(interpupillaryDistance * -0.5f, 0.0f, 0.0f);
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Left], leftRightEyeMask, Camera.MonoOrStereoscopicEye.Left);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.West], eastWestMask, Camera.MonoOrStereoscopicEye.Left);
                     eye.transform.localPosition = new Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Right], leftRightEyeMask, Camera.MonoOrStereoscopicEye.Right);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.East], eastWestMask, Camera.MonoOrStereoscopicEye.Right);
                     eye.transform.localPosition = new Vector3(0.0f, 0.0f, interpupillaryDistance * 0.5f);
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Front], frontBackEyeMask, Camera.MonoOrStereoscopicEye.Left);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.North], northSouthMask, Camera.MonoOrStereoscopicEye.Left);
                     eye.transform.localPosition = new Vector3(0.0f, 0.0f, interpupillaryDistance * -0.5f);
-                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.Back], frontBackEyeMask, Camera.MonoOrStereoscopicEye.Right);
+                    eye.RenderToCubemap(cubemaps[(int)CubemapIndex.South], northSouthMask, Camera.MonoOrStereoscopicEye.Right);
                     eye.transform.localPosition = Vector3.zero;
                     break;
             }
