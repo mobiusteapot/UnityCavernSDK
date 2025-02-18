@@ -1,5 +1,45 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &44055202914751798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 461285982155417285}
+  - component: {fileID: 5105509885875884984}
+  m_Layer: 6
+  m_Name: Ear
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &461285982155417285
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44055202914751798}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6810088677021411189}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &5105509885875884984
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44055202914751798}
+  m_Enabled: 1
 --- !u!1 &836597995932936465
 GameObject:
   m_ObjectHideFlags: 0
@@ -34,6 +74,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5213595555020570760}
+  - {fileID: 461285982155417285}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7546003163734249346
@@ -55,10 +96,12 @@ MonoBehaviour:
   cavernRadius: 3
   cavernAngle: 270
   cavernElevation: 0
+  tetherEar: 1
   clampHeadPosition: 1
   clampHeadRatio: 0.8
   head: {fileID: 5213595555020570760}
   eye: {fileID: 5900885314504736604}
+  ear: {fileID: 5105509885875884984}
   shader: {fileID: 4800000, guid: d250a68325f512d4082683a9f6882f49, type: 3}
   enableDirectionDebug: 0
 --- !u!114 &7802660903058383603
@@ -264,7 +307,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5213595555020570760}
-  - component: {fileID: 351456729288192419}
   m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
@@ -288,11 +330,3 @@ Transform:
   - {fileID: 2737124166775961882}
   m_Father: {fileID: 6810088677021411189}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!81 &351456729288192419
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5893020151470778770}
-  m_Enabled: 1

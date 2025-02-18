@@ -42,14 +42,20 @@ namespace Spelunx {
         [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f;
 
         [Header("Head Tracking")]
+        /// If set to true, the ear will follow the head.
+        [SerializeField] private bool tetherEar = true;
         /// If set to true, the head position will be clamped to within the the radius of the screen.
         [SerializeField] private bool clampHeadPosition = true;
-        /// Sets the clamping radius of the head. For example, if clampHeadRatio = 0.8 and cavernRadius = 3, the head will be clamped to a radius of 2.4.
+        /// <summary>
+        /// Sets the clamping radius of the head, if clampHeadPosition = true. 
+        /// For example, if clampHeadRatio = 0.8 and cavernRadius = 3, the head will be clamped to a radius of 2.4.
+        /// </summary>
         [SerializeField, Range(0.0f, 1.0f)] private float clampHeadRatio = 0.8f;
 
-        [Header("References (Do not edit!)")]
+        [Header("References (Do NOT edit!)")]
         [SerializeField] private Transform head;
         [SerializeField] private Camera eye;
+        [SerializeField] private AudioListener ear;
         [SerializeField] private Shader shader;
 
         [Header("For Debugging Purposes")]
@@ -110,6 +116,11 @@ namespace Spelunx {
         }
 
         private void Update() {
+            if (tetherEar) {
+                ear.gameObject.transform.position = head.transform.position;
+                ear.gameObject.transform.rotation = head.transform.rotation;
+            }
+
             RenderEyes();
 
 #if UNITY_EDITOR
