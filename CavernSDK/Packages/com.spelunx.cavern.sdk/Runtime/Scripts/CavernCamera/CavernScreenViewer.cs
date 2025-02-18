@@ -1,26 +1,22 @@
-using Spelunx;
 using UnityEngine;
 
 namespace Spelunx {
 
+    /// <summary>
+    /// A preview screen to simulate the Cavern screen in the editor's Scene window.
+    /// </summary>
     [RequireComponent(typeof(CavernRenderer))]
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
     public class CavernScreenViewer : MonoBehaviour {
         public enum EyeView { LeftEye, RightEye };
 
+        /// <summary>
+        /// The eye's POV to render on the screen viewer.
+        /// </summary>
         [SerializeField] private EyeView eyeView = EyeView.LeftEye;
 
         public EyeView GetEyeView() { return eyeView; }
-
-        private void Awake() {
-        }
-
-        private void Start() {
-        }
-        
-        private void Update() {
-        }
 
         private void LateUpdate() {
 #if UNITY_EDITOR
@@ -97,12 +93,18 @@ namespace Spelunx {
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        ///  Generate a mesh in the dimensions of the screen, as set in the CavernRenderer component.
+        /// </summary>
         public void GenerateMesh() {
             CavernRenderer cavernRenderer = GetComponent<CavernRenderer>();
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = GenerateMesh(cavernRenderer.GetCavernRadius(), cavernRenderer.GetCavernHeight(), cavernRenderer.GetCavernElevation(), cavernRenderer.GetCavernAngle(), eyeView);
         }
 
+        /// <summary>
+        /// Clear the screen's mesh.
+        /// </summary>
         public void ClearMesh() {
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = new Mesh();
