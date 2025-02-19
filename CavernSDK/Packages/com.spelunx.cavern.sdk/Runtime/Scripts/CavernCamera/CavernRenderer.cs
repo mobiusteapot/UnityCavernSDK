@@ -76,6 +76,8 @@ namespace Spelunx {
         public RenderTexture GetScreenViewerTexture() { return screenViewerTexture; }
         public float GetAspectRatio() { return ((cavernAngle / 360.0f) * Mathf.PI * cavernRadius * 2.0f) / cavernHeight; }
         public GameObject GetHead() { return head.gameObject; }
+        public GameObject GetEye() { return eye.gameObject; }
+        public GameObject GetEar() { return ear.gameObject; }
 
         private void OnEnable() {
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
