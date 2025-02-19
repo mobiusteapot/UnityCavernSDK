@@ -1,6 +1,6 @@
 {
   "name": "com.spelunx.cavern.sdk",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "displayName": "Spelunx Cavern SDK",
   "description": "SDK for CAVERN Development.",
   "unity": "6000.0",
@@ -33,5 +33,6 @@
   "dependencies": {
     "com.unity.render-pipelines.universal": "17.0.3",
     "com.unity.xr.openxr": "1.14.0"
-  }
+  },
+  "hideInEditor": false
 }

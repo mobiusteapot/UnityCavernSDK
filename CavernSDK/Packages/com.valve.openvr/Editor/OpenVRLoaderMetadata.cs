@@ -28,7 +28,7 @@ class OpenVRPackage : IXRPackage
     private static IXRPackageMetadata s_Metadata = new OpenVRPackageMetadata()
     {
         packageName = "OpenVR XR Plugin",
-        packageId = "com.valvesoftware.unity.openvr",
+        packageId = "com.spelunx.valvesoftware.unity.openvr",
         settingsType = "Unity.XR.OpenVR.OpenVRSettings",
         loaderMetadata = new List<IXRLoaderMetadata>() {
                 new OpenVRLoaderMetadata() {
