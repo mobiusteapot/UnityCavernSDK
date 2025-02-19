@@ -6,8 +6,8 @@ using System.Linq;
 namespace Spelunx {
     public class CavernRenderer : MonoBehaviour {
         public enum StereoscopicMode {
-            Mono,
-            Stereo,
+            Mono, // Monoscopic mode. No 3D effect.
+            Stereo, // Stereoscopic mode. Gives a 3D-movie effect when wearing 3D glasses.
         }
 
         public enum CubemapResolution {
@@ -27,21 +27,35 @@ namespace Spelunx {
         }
 
         [Header("Camera Settings")]
+        /// Stereoscopic mode to render the 
         [SerializeField] private StereoscopicMode stereoMode = StereoscopicMode.Mono;
         [SerializeField] private CubemapResolution cubemapResolution = CubemapResolution.Mid;
-        [SerializeField, Range(0.055f, 0.075f)] private float interpupillaryDistance = 0.065f; // IPD in metres.
-        [SerializeField, Min(0.1f)] private float cavernHeight = 2.0f; // Cavern physical screen height in metres.
-        [SerializeField, Min(0.1f)] private float cavernRadius = 3.0f; // Cavern physical screen radius in metres.
-        [SerializeField, Min(0.1f)] private float cavernAngle = 270.0f; // Cavern physical screen angle in degrees.
-        [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f; // Cavern physical screen elevation relative to where the player is standing.
+        /// Interpupillary Distance (IPD) in metres.
+        [SerializeField, Range(0.055f, 0.075f)] private float interpupillaryDistance = 0.065f;
+        /// Cavern physical screen height in metres.
+        [SerializeField, Min(0.1f)] private float cavernHeight = 2.0f;
+        /// Cavern physical screen radius in metres.
+        [SerializeField, Min(0.1f)] private float cavernRadius = 3.0f;
+        /// Cavern physical screen angle in degrees.
+        [SerializeField, Min(0.1f)] private float cavernAngle = 270.0f;
+        /// Cavern physical screen elevation in metres, relative to the player's feet.
+        [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f;
 
         [Header("Head Tracking")]
+        /// If set to true, the ear will follow the head.
+        [SerializeField] private bool tetherEar = true;
+        /// If set to true, the head position will be clamped to within the the radius of the screen.
         [SerializeField] private bool clampHeadPosition = true;
+        /// <summary>
+        /// Sets the clamping radius of the head, if clampHeadPosition = true. 
+        /// For example, if clampHeadRatio = 0.8 and cavernRadius = 3, the head will be clamped to a radius of 2.4.
+        /// </summary>
         [SerializeField, Range(0.0f, 1.0f)] private float clampHeadRatio = 0.8f;
 
-        [Header("References")]
+        [Header("References (Do NOT edit!)")]
         [SerializeField] private Transform head;
         [SerializeField] private Camera eye;
+        [SerializeField] private AudioListener ear;
         [SerializeField] private Shader shader;
 
         [Header("For Debugging Purposes")]
@@ -60,10 +74,10 @@ namespace Spelunx {
         public float GetCavernAngle() { return cavernAngle; }
         public float GetCavernElevation() { return cavernElevation; }
         public RenderTexture GetScreenViewerTexture() { return screenViewerTexture; }
-
-        public float GetAspectRatio() {
-            return ((cavernAngle / 360.0f) * 2.0f * cavernRadius * Mathf.PI) / cavernHeight;
-        }
+        public float GetAspectRatio() { return ((cavernAngle / 360.0f) * Mathf.PI * cavernRadius * 2.0f) / cavernHeight; }
+        public GameObject GetHead() { return head.gameObject; }
+        public GameObject GetEye() { return eye.gameObject; }
+        public GameObject GetEar() { return ear.gameObject; }
 
         private void OnEnable() {
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
@@ -104,10 +118,15 @@ namespace Spelunx {
         }
 
         private void Update() {
+            if (tetherEar) {
+                ear.gameObject.transform.position = head.transform.position;
+                ear.gameObject.transform.rotation = head.transform.rotation;
+            }
+
             RenderEyes();
 
-            // In editor mode, blit to the screen viewer.
 #if UNITY_EDITOR
+            // In editor mode, blit to the screen viewer.
             Graphics.Blit(null, screenViewerTexture, material);
 #endif
         }

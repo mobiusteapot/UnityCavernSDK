@@ -87,68 +87,51 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
                                           ratio.y * _CavernHeight + _CavernElevation - _HeadPosition.y,
                                           _CavernRadius * cos(screenAngleRad) - _HeadPosition.z));
 
-    // Monoscopic
+    // Monoscopic mode.
     if (!_EnableStereo) {
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
     }
 
+    // Stereoscopic mode.
     float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
     float3 eyeToScreenXZ = normalize(float3(eyeToScreen.x, 0.0f, eyeToScreen.z));
     float directionAngle = degrees(acos(dot(forwardDir, eyeToScreenXZ))) * ((eyeToScreenXZ.x > 0.0f) ? 1.0f : -1.0f);
 
-    // For debugging purposes.
-    bool debugColour = false;
-    float4 rightColour = float4(1.0f, 0.0f, 0.0f, 1.0f);
-    float4 leftColour = float4(0.0f, 1.0f, 0.0f, 1.0f);
-    float4 frontColour = float4(0.0f, 0.0f, 1.0f, 1.0f);
-    float4 backColour = float4(1.0f, 0.0f, 1.0f, 1.0f);
-    
-    // Left Eye
+    /**** Left Eye ****/
     if (isLeftEye) {
         // Rear direction, relative to player.
         if (directionAngle > 135.0f || directionAngle < -135.0f) {
-            if (debugColour) return rightColour;
             return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
         }
         
         // Left direction, relative to player.
         if (directionAngle < -45.0f) {
-            if (debugColour) return backColour;
             return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
         }
         
         // Physcial screen right quadrant relative to head position.
         if (directionAngle > 45.0f) {
-            if (debugColour) return frontColour;
             return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
         }
         
         // Physcial screen front quadrant relative to head position.
-        if (debugColour) return leftColour;
         return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
     }
     
-    // Right Eye
+    /**** Right Eye ****/
     // Rear direction, relative to player.
     if (directionAngle > 135.0f || directionAngle < -135.0f) {
-        if (debugColour) return leftColour;
         return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
     }
-        
     // Left direction, relative to player.
     if (directionAngle < -45.0f) {
-        if (debugColour) return frontColour;
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
     }
-    
     // Physcial screen right quadrant relative to head position.
     if (directionAngle > 45.0f) {
-        if (debugColour) return backColour;
         return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
     }
-
     // Physcial screen front quadrant relative to head position.
-    if (debugColour) return rightColour;
     return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
 }
 
