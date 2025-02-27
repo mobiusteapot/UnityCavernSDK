@@ -24,16 +24,19 @@ TEXTURECUBE(_CubemapWest);
 SAMPLER(sampler_CubemapWest);
 float4 _CubemapWest_ST;
 
-// Other Material Properties
-int _EnableStereo;
-
+// Cavern Dimensions Uniforms
 float _CavernHeight;
 float _CavernRadius;
 float _CavernAngle;
 float _CavernElevation;
 
-// Head Tracking Properties
-float3 _HeadPosition; // Vector3
+// Head Tracking Uniforms
+float3 _HeadPosition;
+
+// Stereoscopic Rendering Uniforms
+int _IsStereoscopic;
+int _EnableHighAccuracy;
+float _InterpupillaryDistance;
 
 // This attributes struct receives data about the mesh we are currently rendering.
 // Data is automatically placed in the fields according to their semantic.
@@ -64,6 +67,42 @@ Vert2Frag Vertex(Attributes input) {
     return output;
 }
 
+float4 SampleLeftEye(float3 headToScreen, float angleToFragment, float3 ipdOffsetNorth, float3 ipdOffsetEast)
+{
+    // Physcial screen rear quadrant relative to head position.
+    if (angleToFragment > 135.0f || angleToFragment < -135.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, headToScreen - ipdOffsetEast);
+    }
+    // Physcial screen left quadrant relative to head position.
+    if (angleToFragment < -45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, headToScreen + ipdOffsetNorth);
+    }
+    // Physcial screen right quadrant relative to head position.
+    if (angleToFragment > 45.0f)  {
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen - ipdOffsetNorth);
+    }
+    // Physcial screen front quadrant relative to head position.
+    return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, headToScreen + ipdOffsetEast);
+}
+
+float4 SampleRightEye(float3 headToScreen, float angleToFragment, float3 ipdOffsetNorth, float3 ipdOffsetEast)
+{
+    // Physcial screen rear quadrant relative to head position.
+    if (angleToFragment > 135.0f || angleToFragment < -135.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, headToScreen + ipdOffsetEast);
+    }
+    // Physcial screen left quadrant relative to head position.
+    if (angleToFragment < -45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen - ipdOffsetNorth);
+    }
+    // Physcial screen right quadrant relative to head position.
+    if (angleToFragment > 45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, headToScreen + ipdOffsetNorth);
+    }
+    // Physcial screen front quadrant relative to head position.
+    return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, headToScreen - ipdOffsetEast);
+}
+
 // The fragment function, runs once per pixel on the screen.
 // It must have a float4 return type and have the SV_TARGET semantic.
 // Values in the Vert2Frag have been interpolated based on each pixel's position.
@@ -71,7 +110,7 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
     // For monoscopic rendering, both halves will render the same thing.
-    const bool isLeftEye = 0.5 < input.uv.y;
+    const bool isLeftEye = 0.5f < input.uv.y;
 
     float2 ratio = input.uv;
     // Convert the UV.x from the [0, 1] range to the [-1, 1] range.
@@ -81,58 +120,24 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     ratio.y = isLeftEye ? (ratio.y - 0.5) * 2.0f : ratio.y * 2.0f;
 
     // Take note that angle 0 points down the Z-axis, not the X-axis.
-    float screenAngle = ratio.x * _CavernAngle * 0.5f; // Horizontal Screen Angle (Degrees)
-    float screenAngleRad = radians(screenAngle);
-    float3 eyeToScreen = normalize(float3(_CavernRadius * sin(screenAngleRad) - _HeadPosition.x,
-                                          ratio.y * _CavernHeight + _CavernElevation - _HeadPosition.y,
-                                          _CavernRadius * cos(screenAngleRad) - _HeadPosition.z));
+    float screenAngle = radians(ratio.x * _CavernAngle * 0.5f);
+    float3 headToScreen = float3(_CavernRadius * sin(screenAngle) - _HeadPosition.x,
+                                ratio.y * _CavernHeight - _HeadPosition.y,
+                                _CavernRadius * cos(screenAngle) - _HeadPosition.z);
 
     // Monoscopic mode.
-    if (!_EnableStereo) {
-        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
+    if (!_IsStereoscopic) {
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen);
     }
 
     // Stereoscopic mode.
-    float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
-    float3 eyeToScreenXZ = normalize(float3(eyeToScreen.x, 0.0f, eyeToScreen.z));
-    float directionAngle = degrees(acos(dot(forwardDir, eyeToScreenXZ))) * ((eyeToScreenXZ.x > 0.0f) ? 1.0f : -1.0f);
-
-    /**** Left Eye ****/
-    if (isLeftEye) {
-        // Rear direction, relative to player.
-        if (directionAngle > 135.0f || directionAngle < -135.0f) {
-            return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
-        }
-        
-        // Left direction, relative to player.
-        if (directionAngle < -45.0f) {
-            return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
-        }
-        
-        // Physcial screen right quadrant relative to head position.
-        if (directionAngle > 45.0f) {
-            return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
-        }
-        
-        // Physcial screen front quadrant relative to head position.
-        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
-    }
+    const float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
+    float3 headToScreenXZ = normalize(float3(headToScreen.x, 0.0f, headToScreen.z));
+    float angleToFragment = degrees(acos(dot(forwardDir, headToScreenXZ))) * ((headToScreenXZ.x > 0.0f) ? 1.0f : -1.0f);
+    const float3 ipdOffsetNorth = _EnableHighAccuracy ? float3(0.0f, 0.0f, _InterpupillaryDistance * 0.5f) : float3(0.0f, 0.0f, 0.0f);
+    const float3 ipdOffsetEast = _EnableHighAccuracy ? float3(_InterpupillaryDistance * 0.5f, 0.0f, 0.0f) : float3(0.0f, 0.0f, 0.0f);
     
-    /**** Right Eye ****/
-    // Rear direction, relative to player.
-    if (directionAngle > 135.0f || directionAngle < -135.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, eyeToScreen);
-    }
-    // Left direction, relative to player.
-    if (directionAngle < -45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, eyeToScreen);
-    }
-    // Physcial screen right quadrant relative to head position.
-    if (directionAngle > 45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, eyeToScreen);
-    }
-    // Physcial screen front quadrant relative to head position.
-    return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, eyeToScreen);
+    return isLeftEye ? SampleLeftEye(headToScreen, angleToFragment, ipdOffsetNorth, ipdOffsetEast) : SampleRightEye(headToScreen, angleToFragment, ipdOffsetNorth, ipdOffsetEast);
 }
 
 #endif // CAVERN_PROJECTION_HLSL
