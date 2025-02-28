@@ -1,13 +1,13 @@
 {
   "name": "com.spelunx.cavern.vive-trackers",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "displayName": "Spelunx Vive Tracking",
   "description": "OpenVR tracking for Unity without hassles",
   "unity": "6000.0",
   "documentationUrl": "https://github.com/biosmanager/unity-openvr-tracking",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",
-    "com.spelunx.cavern.sdk": "0.1.8",
+    "com.spelunx.cavern.sdk": "0.1.9",
     "com.unity.xr.openxr": "1.14.0",
     "com.spelunx.valvesoftware.unity.openvr": "1.2.5"
   },
