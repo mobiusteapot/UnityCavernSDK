@@ -2,12 +2,12 @@
 #ifndef CAVERN_PROJECTION_HLSL
 #define CAVERN_PROJECTION_HLSL
 
-// Pull in URP library functions and our own common functions.
+// Include URP library functions.
 // URP library functions can be found via the Unity Editor in "Packages/Universal RP/Shader Library/".
-// The HLSL shader files for the URP are in the Packages/com.unity.render-pipelines.universal/ShaderLibrary/ folder in your project.
+// HLSL shader files for URP are in the "Packages/com.unity.render-pipelines.universal/ShaderLibrary/" directory in your project.
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-// Textures
+// Textures Uniforms
 TEXTURECUBE(_CubemapNorth); // Also used for monoscopic rendering.
 SAMPLER(sampler_CubemapNorth);
 float4 _CubemapNorth_ST;
@@ -34,31 +34,27 @@ float _CavernElevation;
 float3 _HeadPosition;
 
 // Stereoscopic Rendering Uniforms
-int _IsStereoscopic;
-int _EnableHighAccuracy;
+int _EnableStereoscopic;
+int _EnableConvergence;
 float _InterpupillaryDistance;
 
-// This attributes struct receives data about the mesh we are currently rendering.
-// Data is automatically placed in the fields according to their semantic.
-// List of available semantics: https://docs.unity3d.com/Manual/SL-VertexProgramInputs.html
+// Vertex attributes.
+// Fields are automatically populated according to their semantic. (https://docs.unity3d.com/Manual/SL-VertexProgramInputs.html)
 struct Attributes { // We can name this struct anything we want.
     float3 positionOS : POSITION; // Position in object space.
     float2 uv : TEXCOORD0; // Material texture UVs.
 };
 
-// A struct to define the variables we will pass from the vertex function to the fragment function.
+// Data passed from the vertex function to the fragment function.
 struct Vert2Frag { // We can name this struct anything we want.
-    // The output variable of the vertex shader must have the semantics SV_POSITION.
-    // This value should contain the position in clip space when output from the vertex function.
-    // It will be transformed into pixel position of the current fragment on the screen when read from the fragment function.
-    float4 positionCS : SV_POSITION;
-    float2 uv : TEXCOORD0; // By the variable a TEXCOORDN semantic, Unity will automatically interpolate it for each fragment.
+    float4 positionCS : SV_POSITION; // Clip space position must have the semantics SV_POSITION.
+    float2 uv : TEXCOORD0; // Render texture UV coordinates.
 };
 
 // The vertex function, runs once per vertex.
 Vert2Frag Vertex(Attributes input) {
-    // GetVertexPositionInputs is from ShaderVariableFunctions.hlsl in the URP package.
-    VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS); // Apply the model-view-projection transformations onto our position.
+    // Helper function from ShaderVariableFunctions.hlsl in the URP package
+    VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS);
 
     Vert2Frag output;
     output.positionCS = positionInputs.positionCS; // Set the clip space position.
@@ -67,45 +63,42 @@ Vert2Frag Vertex(Attributes input) {
     return output;
 }
 
-float4 SampleLeftEye(float3 headToScreen, float angleToFragment, float3 ipdOffsetNorth, float3 ipdOffsetEast)
-{
+float4 SampleLeftEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX) {
     // Physcial screen rear quadrant relative to head position.
-    if (angleToFragment > 135.0f || angleToFragment < -135.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, headToScreen - ipdOffsetEast);
+    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, _EnableConvergence ? (headToScreen - ipdOffsetX) : headToScreen);
     }
     // Physcial screen left quadrant relative to head position.
-    if (angleToFragment < -45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, headToScreen + ipdOffsetNorth);
+    if (fragmentRelativeAngle < -45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, _EnableConvergence ? (headToScreen + ipdOffsetZ) : headToScreen);
     }
     // Physcial screen right quadrant relative to head position.
-    if (angleToFragment > 45.0f)  {
-        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen - ipdOffsetNorth);
+    if (fragmentRelativeAngle > 45.0f)  {
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, _EnableConvergence ? (headToScreen - ipdOffsetZ) : headToScreen);
     }
     // Physcial screen front quadrant relative to head position.
-    return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, headToScreen + ipdOffsetEast);
+    return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, _EnableConvergence ? (headToScreen + ipdOffsetX) : headToScreen);
 }
 
-float4 SampleRightEye(float3 headToScreen, float angleToFragment, float3 ipdOffsetNorth, float3 ipdOffsetEast)
-{
+float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX) {
     // Physcial screen rear quadrant relative to head position.
-    if (angleToFragment > 135.0f || angleToFragment < -135.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, headToScreen + ipdOffsetEast);
+    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, _EnableConvergence ? (headToScreen + ipdOffsetX) : headToScreen);
     }
     // Physcial screen left quadrant relative to head position.
-    if (angleToFragment < -45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen - ipdOffsetNorth);
+    if (fragmentRelativeAngle < -45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, _EnableConvergence ? (headToScreen - ipdOffsetZ) : headToScreen);
     }
     // Physcial screen right quadrant relative to head position.
-    if (angleToFragment > 45.0f) {
-        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, headToScreen + ipdOffsetNorth);
+    if (fragmentRelativeAngle > 45.0f) {
+        return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, _EnableConvergence ? (headToScreen + ipdOffsetZ) : headToScreen);
     }
     // Physcial screen front quadrant relative to head position.
-    return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, headToScreen - ipdOffsetEast);
+    return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, _EnableConvergence ? (headToScreen - ipdOffsetX) : headToScreen);
 }
 
 // The fragment function, runs once per pixel on the screen.
 // It must have a float4 return type and have the SV_TARGET semantic.
-// Values in the Vert2Frag have been interpolated based on each pixel's position.
 float4 Fragment(Vert2Frag input) : SV_TARGET {
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
@@ -119,23 +112,29 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     // For the right eye, convert the UV's y component from the [0, 0.5] range to the [0, 1] range.
     ratio.y = isLeftEye ? (ratio.y - 0.5) * 2.0f : ratio.y * 2.0f;
 
-    // Take note that angle 0 points down the Z-axis, not the X-axis.
-    float screenAngle = radians(ratio.x * _CavernAngle * 0.5f);
-    float3 headToScreen = float3(_CavernRadius * sin(screenAngle), ratio.y * _CavernHeight, _CavernRadius * cos(screenAngle)) - _HeadPosition;
+    // Find the angle of the fragment on screen. Take note that angle 0 points down the Z-axis, not the X-axis.
+    float fragmentAngle = ratio.x * _CavernAngle * 0.5f;
+    // Find the direction from the head to the fragment.
+    float3 headToScreen = float3(_CavernRadius * sin(radians(fragmentAngle)),
+                                 _CavernElevation + _CavernHeight * ratio.y,
+                                 _CavernRadius * cos(radians(fragmentAngle))) - _HeadPosition;
 
     // Monoscopic mode.
-    if (!_IsStereoscopic) {
+    if (!_EnableStereoscopic) {
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen);
     }
 
     // Stereoscopic mode.
+    const float3 ipdOffsetZ = float3(0.0f, 0.0f, _InterpupillaryDistance * 0.5f);
+    const float3 ipdOffsetX = float3(_InterpupillaryDistance * 0.5f, 0.0f, 0.0f);
+    
     const float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
     float3 headToScreenXZ = normalize(float3(headToScreen.x, 0.0f, headToScreen.z));
-    float angleToFragment = degrees(acos(dot(forwardDir, headToScreenXZ))) * ((headToScreenXZ.x > 0.0f) ? 1.0f : -1.0f);
-    const float3 ipdOffsetNorth = _EnableHighAccuracy ? float3(0.0f, 0.0f, _InterpupillaryDistance * 0.5f) : float3(0.0f, 0.0f, 0.0f);
-    const float3 ipdOffsetEast = _EnableHighAccuracy ? float3(_InterpupillaryDistance * 0.5f, 0.0f, 0.0f) : float3(0.0f, 0.0f, 0.0f);
+    float fragmentRelativeAngle = degrees(acos(dot(forwardDir, headToScreenXZ))) * ((0.0f < headToScreenXZ.x) ? 1.0f : -1.0f);
     
-    return isLeftEye ? SampleLeftEye(headToScreen, angleToFragment, ipdOffsetNorth, ipdOffsetEast) : SampleRightEye(headToScreen, angleToFragment, ipdOffsetNorth, ipdOffsetEast);
+    return isLeftEye
+               ? SampleLeftEye(headToScreen, fragmentRelativeAngle, ipdOffsetZ, ipdOffsetX)
+               : SampleRightEye(headToScreen, fragmentRelativeAngle, ipdOffsetZ, ipdOffsetX);
 }
 
 #endif // CAVERN_PROJECTION_HLSL

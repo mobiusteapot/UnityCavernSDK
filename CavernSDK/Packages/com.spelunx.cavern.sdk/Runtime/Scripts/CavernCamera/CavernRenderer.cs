@@ -40,8 +40,8 @@ namespace Spelunx {
         [SerializeField, Range(1.0f, 360.0f)] private float cavernAngle = 270.0f;
         /// Cavern physical screen elevation in metres, relative to the player's feet.
         [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f;
-        // Increase accuracy at the cost of performance. Only enable if needed.
-        [SerializeField] private bool enableHighAccuracy = false;
+        /// Increase accuracy at the cost of significant performance.
+        [SerializeField] private bool enableConvergence = false;
 
         [Header("Head Tracking")]
         /// If set to true, the ear will follow the head.
@@ -263,15 +263,11 @@ namespace Spelunx {
             float screenTop = cavernElevation + cavernHeight - headPosition.y;
             float screenBottom = cavernElevation - headPosition.y;
             Vector3 headOffset = new Vector3(headPosition.x, 0.0f, headPosition.z);
-            Vector3 ipdOffsetNorth = new Vector3(0.0f, 0.0f, interpupillaryDistance * 0.5f);
-            Vector3 ipdOffsetSouth = new Vector3(0.0f, 0.0f, interpupillaryDistance * -0.5f);
-            Vector3 ipdOffsetEast = new Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);
-            Vector3 ipdOffsetWest = new Vector3(interpupillaryDistance * -0.5f, 0.0f, 0.0f);
 
             /******************* Looking North *******************/
             monoMask |= frontMask;
-            westMask |= frontMask | (enableHighAccuracy ? rightMask : 0); // Left Eye
-            eastMask |= frontMask | (enableHighAccuracy ? leftMask : 0); // Right Eye
+            westMask |= frontMask | (enableConvergence ? rightMask : 0); // Left Eye
+            eastMask |= frontMask | (enableConvergence ? leftMask : 0); // Right Eye
 
             /******************* Looking South *******************/
             if (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f ||
@@ -285,16 +281,16 @@ namespace Spelunx {
             if (Vector3.Angle(headOffset + northEastBoundary, Vector3.forward) < cavernAngle * 0.5f ||
                 Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
                 monoMask |= rightMask;
-                northMask |= rightMask | (enableHighAccuracy ? backMask : 0); // Left Eye
-                southMask |= rightMask | (enableHighAccuracy ? frontMask : 0); // Right Eye
+                northMask |= rightMask | (enableConvergence ? backMask : 0); // Left Eye
+                southMask |= rightMask | (enableConvergence ? frontMask : 0); // Right Eye
             }
 
             /******************* Looking West *******************/
             if (Vector3.Angle(headOffset + northWestBoundary, Vector3.forward) < cavernAngle * 0.5f ||
                 Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f) {
                 monoMask |= leftMask;
-                southMask |= leftMask | (enableHighAccuracy ? frontMask : 0); // Left Eye
-                northMask |= leftMask | (enableHighAccuracy ? backMask : 0); // Right Eye
+                southMask |= leftMask | (enableConvergence ? frontMask : 0); // Left Eye
+                northMask |= leftMask | (enableConvergence ? backMask : 0); // Right Eye
             }
 
             /******************* Top & Bottom Faces *******************/
@@ -378,8 +374,8 @@ namespace Spelunx {
             material.SetVector("_HeadPosition", head.transform.localPosition);
 
             // Stereoscopic Rendering Uniforms
-            material.SetInteger("_IsStereoscopic", stereoMode == StereoscopicMode.Stereo ? 1 : 0);
-            material.SetInteger("_EnableHighAccuracy", enableHighAccuracy ? 1 : 0);
+            material.SetInteger("_EnableStereoscopic", stereoMode == StereoscopicMode.Stereo ? 1 : 0);
+            material.SetInteger("_EnableConvergence", enableConvergence ? 1 : 0);
             material.SetFloat("_InterpupillaryDistance", interpupillaryDistance);
         }
 
