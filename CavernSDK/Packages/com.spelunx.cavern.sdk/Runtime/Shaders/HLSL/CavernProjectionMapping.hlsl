@@ -121,9 +121,7 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
 
     // Take note that angle 0 points down the Z-axis, not the X-axis.
     float screenAngle = radians(ratio.x * _CavernAngle * 0.5f);
-    float3 headToScreen = float3(_CavernRadius * sin(screenAngle) - _HeadPosition.x,
-                                ratio.y * _CavernHeight - _HeadPosition.y,
-                                _CavernRadius * cos(screenAngle) - _HeadPosition.z);
+    float3 headToScreen = float3(_CavernRadius * sin(screenAngle), ratio.y * _CavernHeight, _CavernRadius * cos(screenAngle)) - _HeadPosition;
 
     // Monoscopic mode.
     if (!_IsStereoscopic) {
