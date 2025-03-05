@@ -139,9 +139,9 @@ $(document).ready(function(){initNavTree('d8/d7b/CavernRenderer_8cs_source.html'
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">        /// Cavern physical screen angle in degrees.</span></div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"></span>        [SerializeField, Range(1.0f, 360.0f)] <span class="keyword">private</span> <span class="keywordtype">float</span> cavernAngle = 270.0f;<span class="comment"></span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">        /// Cavern physical screen elevation in metres, relative to the player&#39;s feet.</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"></span>        [SerializeField, Range(-0.5f, 0.5f)] <span class="keyword">private</span> <span class="keywordtype">float</span> cavernElevation = 0.0f;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="comment">// Increase accuracy at the cost of performance. Only enable if needed.</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        [SerializeField] <span class="keyword">private</span> <span class="keywordtype">bool</span> enableHighAccuracy = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"></span>        [SerializeField, Range(-0.5f, 0.5f)] <span class="keyword">private</span> <span class="keywordtype">float</span> cavernElevation = 0.0f;<span class="comment"></span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">        /// Increase accuracy at the cost of significant performance.</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment"></span>        [SerializeField] <span class="keyword">private</span> <span class="keywordtype">bool</span> enableConvergence = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        [Header(<span class="stringliteral">&quot;Head Tracking&quot;</span>)]<span class="comment"></span></div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment">        /// If set to true, the ear will follow the head.</span></div>
@@ -363,139 +363,135 @@ $(document).ready(function(){initNavTree('d8/d7b/CavernRenderer_8cs_source.html'
 <div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>            <span class="keywordtype">float</span> screenTop = cavernElevation + cavernHeight - headPosition.y;</div>
 <div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>            <span class="keywordtype">float</span> screenBottom = cavernElevation - headPosition.y;</div>
 <div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            Vector3 headOffset = <span class="keyword">new</span> Vector3(headPosition.x, 0.0f, headPosition.z);</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>            Vector3 ipdOffsetNorth = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * 0.5f);</div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            Vector3 ipdOffsetSouth = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * -0.5f);</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            Vector3 ipdOffsetEast = <span class="keyword">new</span> Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            Vector3 ipdOffsetWest = <span class="keyword">new</span> Vector3(interpupillaryDistance * -0.5f, 0.0f, 0.0f);</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment">            /******************* Looking North *******************/</span></div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            monoMask |= frontMask;</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>            westMask |= frontMask | (enableHighAccuracy ? rightMask : 0); <span class="comment">// Left Eye</span></div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            eastMask |= frontMask | (enableHighAccuracy ? leftMask : 0); <span class="comment">// Right Eye</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment">            /******************* Looking South *******************/</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>                monoMask |= backMask;</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>                eastMask |= backMask; <span class="comment">// Left Eye</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>                westMask |= backMask; <span class="comment">// Right Eye</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>            }</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span> </div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="comment">            /******************* Looking East *******************/</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + northEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>                monoMask |= rightMask;</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>                northMask |= rightMask | (enableHighAccuracy ? backMask : 0); <span class="comment">// Left Eye</span></div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>                southMask |= rightMask | (enableHighAccuracy ? frontMask : 0); <span class="comment">// Right Eye</span></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>            }</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="comment">            /******************* Looking West *******************/</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + northWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>                Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>                monoMask |= leftMask;</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>                southMask |= leftMask | (enableHighAccuracy ? frontMask : 0); <span class="comment">// Left Eye</span></div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>                northMask |= leftMask | (enableHighAccuracy ? backMask : 0); <span class="comment">// Right Eye</span></div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>            }</div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="comment">            /******************* Top &amp; Bottom Faces *******************/</span></div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>                Mathf.Abs(northWestBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>                Mathf.Abs(southEastBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>                Mathf.Abs(southWestBoundary.z) &lt; Mathf.Abs(screenTop)) {</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>                monoMask |= topMask;</div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>                eastMask |= topMask;</div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>                westMask |= topMask;</div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>            }</div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>                Mathf.Abs(northWestBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                Mathf.Abs(southEastBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                Mathf.Abs(southWestBoundary.z) &lt; Mathf.Abs(screenBottom)) {</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>                monoMask |= bottomMask;</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                eastMask |= bottomMask;</div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>                westMask |= bottomMask;</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>            }</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>                Mathf.Abs(northWestBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>                Mathf.Abs(southEastBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>                Mathf.Abs(southWestBoundary.x) &lt; Mathf.Abs(screenTop)) {</div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>                monoMask |= topMask;</div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>                northMask |= topMask;</div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>                southMask |= topMask;</div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>            }</div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>                Mathf.Abs(northWestBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>                Mathf.Abs(southEastBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>                Mathf.Abs(southWestBoundary.x) &lt; Mathf.Abs(screenBottom)) {</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>                monoMask |= topMask;</div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>                northMask |= bottomMask;</div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>                southMask |= bottomMask;</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>            }</div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>        }</div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span> </div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> RenderEyes() {</div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>            <span class="comment">// If clampHeadPosition is true, limit the head position to be within the bounds of the circle.</span></div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>            <span class="keywordflow">if</span> (clampHeadPosition) {</div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>                Vector2 horizontalPosition = <span class="keyword">new</span> Vector2(head.transform.localPosition.x, head.transform.localPosition.z);</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>                <span class="keywordflow">if</span> (horizontalPosition.sqrMagnitude &gt; clampHeadRatio * clampHeadRatio * cavernRadius * cavernRadius) {</div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>                    horizontalPosition = horizontalPosition.normalized * clampHeadRatio * cavernRadius;</div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>                    head.transform.localPosition = <span class="keyword">new</span> Vector3(horizontalPosition.x, head.transform.localPosition.y, horizontalPosition.y);</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>                }</div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>            }</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span> </div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>            <span class="comment">// Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera&#39;s rotation.</span></div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>            <span class="comment">// Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world&#39;s axes instead.</span></div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>            <span class="keywordtype">int</span> monoMask = 0; <span class="keywordtype">int</span> northMask = 0; <span class="keywordtype">int</span> southMask = 0; <span class="keywordtype">int</span> eastMask = 0; <span class="keywordtype">int</span> westMask = 0;</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>            GetRenderFaces(out monoMask, out northMask, out southMask, out eastMask, out westMask);</div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>            <span class="keywordflow">switch</span> (stereoMode) {</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>                <span class="keywordflow">case</span> <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Mono:</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>                    eye.stereoSeparation = 0.0f;</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>                    eye.transform.rotation = gameObject.transform.rotation; <span class="comment">// Set eye&#39;s global orientation to the screen&#39;s orientation, regardless of the head&#39;s orientation.</span></div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>                    eye.transform.localPosition = Vector3.zero;</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.North], monoMask, Camera.MonoOrStereoscopicEye.Left);</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>                <span class="keywordflow">case</span> <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Stereo:</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>                    eye.stereoSeparation = 0.0f;</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>                    eye.transform.rotation = gameObject.transform.rotation; <span class="comment">// Set eye&#39;s global orientation to the screen&#39;s orientation, regardless of the head&#39;s orientation.</span></div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * 0.5f);</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.North], northMask, Camera.MonoOrStereoscopicEye.Left);</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * -0.5f);</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.South], southMask, Camera.MonoOrStereoscopicEye.Right);</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.East], eastMask, Camera.MonoOrStereoscopicEye.Right);</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(interpupillaryDistance * -0.5f, 0.0f, 0.0f);</div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.West], westMask, Camera.MonoOrStereoscopicEye.Left);</div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>                    eye.transform.localPosition = Vector3.zero;</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>            }</div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span> </div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>            <span class="comment">// Cavern Dimensions Uniforms</span></div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernHeight&quot;</span>, cavernHeight);</div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernRadius&quot;</span>, cavernRadius);</div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernAngle&quot;</span>, cavernAngle);</div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernElevation&quot;</span>, cavernElevation);</div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span> </div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>            <span class="comment">// Head Tracking Uniforms</span></div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>            material.SetVector(<span class="stringliteral">&quot;_HeadPosition&quot;</span>, head.transform.localPosition);</div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span> </div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>            <span class="comment">// Stereoscopic Rendering Uniforms</span></div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>            material.SetInteger(<span class="stringliteral">&quot;_IsStereoscopic&quot;</span>, stereoMode == <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Stereo ? 1 : 0);</div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>            material.SetInteger(<span class="stringliteral">&quot;_EnableHighAccuracy&quot;</span>, enableHighAccuracy ? 1 : 0);</div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>            material.SetFloat(<span class="stringliteral">&quot;_InterpupillaryDistance&quot;</span>, interpupillaryDistance);</div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        }</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><span class="comment">            /******************* Looking North *******************/</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            monoMask |= frontMask;</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            westMask |= frontMask | (enableConvergence ? rightMask : 0); <span class="comment">// Left Eye</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            eastMask |= frontMask | (enableConvergence ? leftMask : 0); <span class="comment">// Right Eye</span></div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="comment">            /******************* Looking South *******************/</span></div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>                monoMask |= backMask;</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>                eastMask |= backMask; <span class="comment">// Left Eye</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>                westMask |= backMask; <span class="comment">// Right Eye</span></div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>            }</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span> </div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="comment">            /******************* Looking East *******************/</span></div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + northEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>                monoMask |= rightMask;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>                northMask |= rightMask | (enableConvergence ? backMask : 0); <span class="comment">// Left Eye</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>                southMask |= rightMask | (enableConvergence ? frontMask : 0); <span class="comment">// Right Eye</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>            }</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="comment">            /******************* Looking West *******************/</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>            <span class="keywordflow">if</span> (Vector3.Angle(headOffset + northWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f ||</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>                Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) &lt; cavernAngle * 0.5f) {</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>                monoMask |= leftMask;</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>                southMask |= leftMask | (enableConvergence ? frontMask : 0); <span class="comment">// Left Eye</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>                northMask |= leftMask | (enableConvergence ? backMask : 0); <span class="comment">// Right Eye</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>            }</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span> </div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="comment">            /******************* Top &amp; Bottom Faces *******************/</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>                Mathf.Abs(northWestBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>                Mathf.Abs(southEastBoundary.z) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>                Mathf.Abs(southWestBoundary.z) &lt; Mathf.Abs(screenTop)) {</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>                monoMask |= topMask;</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>                eastMask |= topMask;</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>                westMask |= topMask;</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>            }</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>                Mathf.Abs(northWestBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>                Mathf.Abs(southEastBoundary.z) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>                Mathf.Abs(southWestBoundary.z) &lt; Mathf.Abs(screenBottom)) {</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>                monoMask |= bottomMask;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>                eastMask |= bottomMask;</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                westMask |= bottomMask;</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>            }</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                Mathf.Abs(northWestBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>                Mathf.Abs(southEastBoundary.x) &lt; Mathf.Abs(screenTop) ||</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>                Mathf.Abs(southWestBoundary.x) &lt; Mathf.Abs(screenTop)) {</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>                monoMask |= topMask;</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>                northMask |= topMask;</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>                southMask |= topMask;</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>            }</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>            <span class="keywordflow">if</span> (Mathf.Abs(northEastBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>                Mathf.Abs(northWestBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>                Mathf.Abs(southEastBoundary.x) &lt; Mathf.Abs(screenBottom) ||</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>                Mathf.Abs(southWestBoundary.x) &lt; Mathf.Abs(screenBottom)) {</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>                monoMask |= topMask;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>                northMask |= bottomMask;</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>                southMask |= bottomMask;</div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>            }</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>        }</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> RenderEyes() {</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>            <span class="comment">// If clampHeadPosition is true, limit the head position to be within the bounds of the circle.</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>            <span class="keywordflow">if</span> (clampHeadPosition) {</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>                Vector2 horizontalPosition = <span class="keyword">new</span> Vector2(head.transform.localPosition.x, head.transform.localPosition.z);</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>                <span class="keywordflow">if</span> (horizontalPosition.sqrMagnitude &gt; clampHeadRatio * clampHeadRatio * cavernRadius * cavernRadius) {</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>                    horizontalPosition = horizontalPosition.normalized * clampHeadRatio * cavernRadius;</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>                    head.transform.localPosition = <span class="keyword">new</span> Vector3(horizontalPosition.x, head.transform.localPosition.y, horizontalPosition.y);</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>                }</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>            }</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>            <span class="comment">// Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera&#39;s rotation.</span></div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>            <span class="comment">// Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world&#39;s axes instead.</span></div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>            <span class="keywordtype">int</span> monoMask = 0; <span class="keywordtype">int</span> northMask = 0; <span class="keywordtype">int</span> southMask = 0; <span class="keywordtype">int</span> eastMask = 0; <span class="keywordtype">int</span> westMask = 0;</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>            GetRenderFaces(out monoMask, out northMask, out southMask, out eastMask, out westMask);</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>            <span class="keywordflow">switch</span> (stereoMode) {</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>                <span class="keywordflow">case</span> <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Mono:</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>                    eye.stereoSeparation = 0.0f;</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>                    eye.transform.rotation = gameObject.transform.rotation; <span class="comment">// Set eye&#39;s global orientation to the screen&#39;s orientation, regardless of the head&#39;s orientation.</span></div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>                    eye.transform.localPosition = Vector3.zero;</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.North], monoMask, Camera.MonoOrStereoscopicEye.Left);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>                <span class="keywordflow">case</span> <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Stereo:</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>                    eye.stereoSeparation = 0.0f;</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>                    eye.transform.rotation = gameObject.transform.rotation; <span class="comment">// Set eye&#39;s global orientation to the screen&#39;s orientation, regardless of the head&#39;s orientation.</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * 0.5f);</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.North], northMask, Camera.MonoOrStereoscopicEye.Left);</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(0.0f, 0.0f, interpupillaryDistance * -0.5f);</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.South], southMask, Camera.MonoOrStereoscopicEye.Right);</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(interpupillaryDistance * 0.5f, 0.0f, 0.0f);</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.East], eastMask, Camera.MonoOrStereoscopicEye.Right);</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>                    eye.transform.localPosition = <span class="keyword">new</span> Vector3(interpupillaryDistance * -0.5f, 0.0f, 0.0f);</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>                    eye.RenderToCubemap(cubemaps[(<span class="keywordtype">int</span>)CubemapIndex.West], westMask, Camera.MonoOrStereoscopicEye.Left);</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>                    eye.transform.localPosition = Vector3.zero;</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>            }</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>            <span class="comment">// Cavern Dimensions Uniforms</span></div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernHeight&quot;</span>, cavernHeight);</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernRadius&quot;</span>, cavernRadius);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernAngle&quot;</span>, cavernAngle);</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>            material.SetFloat(<span class="stringliteral">&quot;_CavernElevation&quot;</span>, cavernElevation);</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span> </div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>            <span class="comment">// Head Tracking Uniforms</span></div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>            material.SetVector(<span class="stringliteral">&quot;_HeadPosition&quot;</span>, head.transform.localPosition);</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span> </div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>            <span class="comment">// Stereoscopic Rendering Uniforms</span></div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>            material.SetInteger(<span class="stringliteral">&quot;_EnableStereoscopic&quot;</span>, stereoMode == <a class="code hl_enumeration" href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">StereoscopicMode</a>.Stereo ? 1 : 0);</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>            material.SetInteger(<span class="stringliteral">&quot;_EnableConvergence&quot;</span>, enableConvergence ? 1 : 0);</div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>            material.SetFloat(<span class="stringliteral">&quot;_InterpupillaryDistance&quot;</span>, interpupillaryDistance);</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>        }</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span> </div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnBeginContextRendering(ScriptableRenderContext context, List&lt;Camera&gt; cameras) { }</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span> </div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnEndContextRendering(ScriptableRenderContext context, List&lt;Camera&gt; cameras) { }</div>
 <div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span> </div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnBeginContextRendering(ScriptableRenderContext context, List&lt;Camera&gt; cameras) { }</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }</div>
 <div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span> </div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnEndContextRendering(ScriptableRenderContext context, List&lt;Camera&gt; cameras) { }</div>
-<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span> </div>
-<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }</div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span> </div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {</div>
-<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>            <span class="keywordflow">if</span> (camera == eye) {</div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>                Graphics.Blit(<span class="keyword">null</span>, material);</div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>            }</div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>        }</div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>    }</div>
-<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>}</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        <span class="keyword">private</span> <span class="keywordtype">void</span> OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>            <span class="keywordflow">if</span> (camera == eye) {</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>                Graphics.Blit(<span class="keyword">null</span>, material);</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>            }</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>        }</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>    }</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>}</div>
 <div class="ttc" id="aclassSpelunx_1_1CavernRenderer_html"><div class="ttname"><a href="../../db/d6f/classSpelunx_1_1CavernRenderer.html">Spelunx.CavernRenderer</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d7b/CavernRenderer_8cs_source.html#l00007">CavernRenderer.cs:7</a></div></div>
 <div class="ttc" id="aclassSpelunx_1_1CavernRenderer_html_a0148e81d317f0781cca5980cbdbc136b"><div class="ttname"><a href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136b">Spelunx.CavernRenderer.StereoscopicMode</a></div><div class="ttdeci">StereoscopicMode</div><div class="ttdef"><b>Definition:</b> <a href="../../d8/d7b/CavernRenderer_8cs_source.html#l00008">CavernRenderer.cs:8</a></div></div>
 <div class="ttc" id="aclassSpelunx_1_1CavernRenderer_html_a0148e81d317f0781cca5980cbdbc136ba5d9b47bd3b65072e0d5daf55f01da086"><div class="ttname"><a href="../../db/d6f/classSpelunx_1_1CavernRenderer.html#a0148e81d317f0781cca5980cbdbc136ba5d9b47bd3b65072e0d5daf55f01da086">Spelunx.CavernRenderer.StereoscopicMode.Mono</a></div><div class="ttdeci">@ Mono</div></div>
