@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Rendering.Universal;
 
 namespace Spelunx {
     public class CavernRenderer : MonoBehaviour {
@@ -43,6 +44,16 @@ namespace Spelunx {
         /// Increase accuracy at the cost of significant performance.
         [SerializeField] private bool enableConvergence = false;
 
+        // All these are mostly just exposed for testing atm
+        // Temporary, for evaluating RG
+        public bool UseRenderGraph = false;
+        // Maybe you don't want to expose this?
+        public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRendering;
+        private CavernRenderPass cavernRenderPass;
+        // Need to create a dummy camera due to how URP handles queuing passes
+        private Camera dummyCamera;
+
+
         [Header("Head Tracking")]
         /// If set to true, the ear will follow the head.
         [SerializeField] private bool tetherEar = true;
@@ -80,16 +91,24 @@ namespace Spelunx {
 
         private void OnEnable() {
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
+            
             RenderPipelineManager.endContextRendering += OnEndContextRendering;
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+
+            cavernRenderPass = new CavernRenderPass();
+            // Todo: Dynamically update setup, if settings changed
+            cavernRenderPass.Setup(material, cubemaps);
+            cavernRenderPass.renderPassEvent = renderPassEvent;
         }
 
         private void OnDisable() {
             RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
+            
             RenderPipelineManager.endContextRendering -= OnEndContextRendering;
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+            
         }
 
         private void Awake() {
@@ -111,6 +130,18 @@ namespace Spelunx {
             material.SetTexture("_CubemapSouth", cubemaps[(int)CubemapIndex.South]);
             material.SetTexture("_CubemapEast", cubemaps[(int)CubemapIndex.East]);
             material.SetTexture("_CubemapWest", cubemaps[(int)CubemapIndex.West]);
+
+            if(UseRenderGraph)
+            {
+                // Create a dummy camera, parented to the "eye" camera
+                // Prevents wasted draw calls for base scene
+                // Todo: figure out best paradigm for handling this at runtime and edit time
+                dummyCamera = new GameObject("Dummy Camera").AddComponent<Camera>();
+                dummyCamera.transform.SetParent(eye.transform);
+                dummyCamera.CopyFrom(eye);
+                dummyCamera.cullingMask = 0;
+                eye.enabled = false;
+            }
         }
 
         private void Start() {
@@ -123,7 +154,7 @@ namespace Spelunx {
             }
 
             RenderEyes();
-
+            // Todo: pass anything to render pass that may have changed
 #if UNITY_EDITOR
             // In editor mode, blit to the screen viewer.
             Graphics.Blit(null, screenViewerTexture, material);
@@ -383,11 +414,30 @@ namespace Spelunx {
 
         private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
 
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
+            if(UseRenderGraph)
+            {
+                if(camera.cameraType != CameraType.Game)
+                {
+                    return;
+                }
+                if(camera == dummyCamera)
+                {
+                    
+                    camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
+                }
+            }
 
-        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-            if (camera == eye) {
-                Graphics.Blit(null, material);
+        }
+
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if(!UseRenderGraph)
+            {
+                if(camera == eye)
+                {
+                    Graphics.Blit(null, material);
+                }
             }
         }
     }

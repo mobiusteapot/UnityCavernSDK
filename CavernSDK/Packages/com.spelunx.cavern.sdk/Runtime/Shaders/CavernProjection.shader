@@ -15,6 +15,8 @@ Shader "Spelunx/CavernProjection" {
             "RenderPipeline" = "UniversalPipeline"
             "RenderType"="Opaque"
         }
+        Cull Off 
+        ZWrite Off
 
         Pass {
             Name "Cavern Projection Mapping"

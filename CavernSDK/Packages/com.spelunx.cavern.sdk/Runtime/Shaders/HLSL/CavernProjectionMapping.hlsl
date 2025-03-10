@@ -2,10 +2,16 @@
 #ifndef CAVERN_PROJECTION_HLSL
 #define CAVERN_PROJECTION_HLSL
 
+        #define SHADERPASS SHADERPASS_BLIT
+
+
 // Include URP library functions.
 // URP library functions can be found via the Unity Editor in "Packages/Universal RP/Shader Library/".
 // HLSL shader files for URP are in the "Packages/com.unity.render-pipelines.universal/ShaderLibrary/" directory in your project.
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
+
 
 // Textures Uniforms
 TEXTURECUBE(_CubemapNorth); // Also used for monoscopic rendering.
@@ -43,12 +49,15 @@ float _InterpupillaryDistance;
 struct Attributes { // We can name this struct anything we want.
     float3 positionOS : POSITION; // Position in object space.
     float2 uv : TEXCOORD0; // Material texture UVs.
+    uint vertexID : SV_VertexID;
+    UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 // Data passed from the vertex function to the fragment function.
 struct Vert2Frag { // We can name this struct anything we want.
     float4 positionCS : SV_POSITION; // Clip space position must have the semantics SV_POSITION.
     float2 uv : TEXCOORD0; // Render texture UV coordinates.
+    UNITY_VERTEX_OUTPUT_STEREO
 };
 
 // The vertex function, runs once per vertex.
@@ -57,9 +66,10 @@ Vert2Frag Vertex(Attributes input) {
     VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS);
 
     Vert2Frag output;
-    output.positionCS = positionInputs.positionCS; // Set the clip space position.
-    output.uv = input.uv;
-
+    //output.positionCS = positionInputs.positionCS; // Set the clip space position.
+    output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+    //output.uv = input.uv;
+    output.uv = GetFullScreenTriangleTexCoord(input.vertexID);
     return output;
 }
 
@@ -100,6 +110,7 @@ float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 i
 // The fragment function, runs once per pixel on the screen.
 // It must have a float4 return type and have the SV_TARGET semantic.
 float4 Fragment(Vert2Frag input) : SV_TARGET {
+    
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
     // For monoscopic rendering, both halves will render the same thing.
