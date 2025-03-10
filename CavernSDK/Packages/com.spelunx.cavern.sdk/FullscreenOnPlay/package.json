@@ -1,0 +1,16 @@
+{
+  "name": "com.mobtp.fullscreengameview",
+  "displayName": "Fullscreen Game View",
+  "version": "1.0.0",
+  "unity": "6000.0",
+  "description": "A package that allows toggling Unity\ufffds Game View into fullscreen mode. Tested in Unity 6000.0.34f1. Relies on Reflection and Harmony, so it might brake in the future.",
+  "author": {
+    "name": "Ezra Hill",
+    "email": "ezra@mobiusteapot.com"
+  },
+  "keywords": [
+    "fullscreen",
+    "gameview",
+    "editor"
+  ]
+}
