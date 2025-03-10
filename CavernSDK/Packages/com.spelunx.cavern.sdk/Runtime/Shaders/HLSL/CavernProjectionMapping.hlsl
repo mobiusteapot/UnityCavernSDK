@@ -35,7 +35,7 @@ float3 _HeadPosition;
 
 // Stereoscopic Rendering Uniforms
 int _EnableStereoscopic;
-int _EnableConvergence;
+int _EnableConvergence; // Add a toggle for convergence because it results in more faces needing to be rendered for honestly not much visible difference.
 float _InterpupillaryDistance;
 
 // Vertex attributes.
@@ -105,18 +105,16 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     // For monoscopic rendering, both halves will render the same thing.
     const bool isLeftEye = 0.5f < input.uv.y;
 
-    float2 ratio = input.uv;
-    // Convert the UV.x from the [0, 1] range to the [-1, 1] range.
-    ratio.x = ratio.x * 2.0f - 1.0f;
+    float2 uv = input.uv;
     // For the left eye, convert the UV's y component from the [0.5, 1] range to the [0, 1] range.
     // For the right eye, convert the UV's y component from the [0, 0.5] range to the [0, 1] range.
-    ratio.y = isLeftEye ? (ratio.y - 0.5) * 2.0f : ratio.y * 2.0f;
+    uv.y = isLeftEye ? (uv.y - 0.5) * 2.0f : uv.y * 2.0f;
 
     // Find the angle of the fragment on screen. Take note that angle 0 points down the Z-axis, not the X-axis.
-    float fragmentAngle = ratio.x * _CavernAngle * 0.5f;
+    float fragmentAngle = (uv.x * 2.0f - 1.0f) * _CavernAngle * 0.5f; // (uv.x * 2 - 1) converts the uv.x from the [0, 1] range to the [-1, 1] range.
     // Find the direction from the head to the fragment.
     float3 headToScreen = float3(_CavernRadius * sin(radians(fragmentAngle)),
-                                 _CavernElevation + _CavernHeight * ratio.y,
+                                 _CavernElevation + _CavernHeight * uv.y,
                                  _CavernRadius * cos(radians(fragmentAngle))) - _HeadPosition;
 
     // Monoscopic mode.
@@ -128,6 +126,7 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
     const float3 ipdOffsetZ = float3(0.0f, 0.0f, _InterpupillaryDistance * 0.5f);
     const float3 ipdOffsetX = float3(_InterpupillaryDistance * 0.5f, 0.0f, 0.0f);
     
+    // Because the head might not be in the centre of the screen, we want to find the fragment's angle relative to the head's position, not the centre.
     const float3 forwardDir = float3(0.0f, 0.0f, 1.0f);
     float3 headToScreenXZ = normalize(float3(headToScreen.x, 0.0f, headToScreen.z));
     float fragmentRelativeAngle = degrees(acos(dot(forwardDir, headToScreenXZ))) * ((0.0f < headToScreenXZ.x) ? 1.0f : -1.0f);

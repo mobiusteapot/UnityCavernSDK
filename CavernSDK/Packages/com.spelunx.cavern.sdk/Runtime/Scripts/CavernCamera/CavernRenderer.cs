@@ -130,7 +130,12 @@ namespace Spelunx {
 #endif
         }
 
+        // Find out which faces of the cubemaps should be rendered. We want the minimum number of faces to reduce the rendering workload.
+        // General approach: For front, back, left and right faces, look at the Cavern from the top-down view, so that it looks like a circle.
+        // "Slice" the circle into 4 quadrants using 2 lines that form an X, with the player's head being the intersection of the 2 lines.
+        // Then for each quadrant, determine which faces of each cubemap can be seen. Those are the faces we want to render.
         private void GetRenderFaces(out int monoMask, out int northMask, out int southMask, out int eastMask, out int westMask) {
+            // These are the built in bitmasks for Unity's cubemap faces.
             const int rightMask = 1 << (int)CubemapFace.PositiveX;
             const int leftMask = 1 << (int)CubemapFace.NegativeX;
             const int topMask = 1 << (int)CubemapFace.PositiveY;
@@ -138,31 +143,93 @@ namespace Spelunx {
             const int frontMask = 1 << (int)CubemapFace.PositiveZ;
             const int backMask = 1 << (int)CubemapFace.NegativeZ;
 
+            // Let's initalise all the output to 0.
             monoMask = 0; northMask = 0; southMask = 0; eastMask = 0; westMask = 0;
 
             Vector3 headPosition = head.transform.localPosition;
+
+            /*
+                Imagine this circle to be the Cavern screen. (Let's use a complete circle because this function should
+                generalise to a circle of any angle, even though the Cavern is only 270 degrees.)
+                         , - ~ ~ ~ - ,
+                     , '               ' ,
+                   ,                       ,
+                  ,                         ,
+                 ,                           ,
+                 ,                           ,
+                 ,                           ,
+                  ,                         ,
+                   ,                       ,
+                     ,                  , '
+                       ' - , _ _ _ ,  '
+
+                // Now we want to "slice" the circle. I know my ASCII art is terrible, bear with me.
+                // I put all my skill points into programming and have none left for art.
+
+                                \        /
+ North-West Boundary -> , - ~ ~  \ - ,  /
+                     , '          \    / , <- North-East Boundary
+                   ,               \  /    ,
+                  ,                  O      , <- The intersection of the 2 lines is the head position. It can be off-centre.
+                 ,                  / \      ,
+                 ,                 /   \     ,
+                 ,                /     \    ,
+                  ,              /       \  ,
+                   ,            /         \, <- South-East Boundary
+                     ,         /        , '\
+ South-West Boundary ->' - , _/_ _ ,  '     \
+                             /               \
+
+                // The circle is sliced into 4 quadrants, each being 90 degrees. (The ASCII art is not to scale. Just pretend it is.)
+                // The places where the straight lines intersect with the circle are called boundaries (becauses I couldn't come up with a better name).
+            */
             Vector3 southWestBoundary = Vector3.zero;
             Vector3 northEastBoundary = Vector3.zero;
             Vector3 northWestBoundary = Vector3.zero;
             Vector3 southEastBoundary = Vector3.zero;
+
+            /*
+            To find the boundaries, just remember our secondary school linear algebra.
+            Note that our cubemaps are always taken from the head's position, we take the head to always be at (0, 0).
+            Instead, we "move" the screen by -HeadPosition,
+
+            Let (a, b) be the centre of the circle.
+            Circle Equation: (x - a)^2 + (y - b)^2 = r^2.  ---- (1)
+            South West to North East Line Equation: y = x  ---- (2)
+            North West to South East Line Equation: y = -x ---- (3)
+
+            Substitute (2) into (1):
+            (x - a)^2 + (x - b)^2 = r^2
+            x^2 - x(a + b) - 0.5(r^2 - a^2 - b^2) = 0
+            Solve this quadratic equation to get our intersection points for the South-West to North-East line and the circle.
+
+            Substitute (3) into (1):
+            (x - a)^2 + (-x - b)^2 = r^2
+            x^2 - x(a - b) - 0.5(r^2 - a^2 - b^2) = 0
+            Solve this quadratic equation to get our intersection points for the North-West to South-East line and the circle.
+            */
             // Get North-East and South-West boundaries where the sampled cubemap switches for stereoscopic rendering.
             List<float> xIntersectSouthWestToNorthEast = MathsUtil.SolveQuadraticEquation(
                 1.0f,
                 headPosition.x + headPosition.z,
                 -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
+
+            // If there is only one solution to the quadratic equation, then there is only 1 point of intersection.
+            if (xIntersectSouthWestToNorthEast.Count == 1) {
+                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
+                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
+            }
+            // Else there are 2 points of intersection.
+            else if (xIntersectSouthWestToNorthEast.Count == 2) {
+                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[1], 0.0f, xIntersectSouthWestToNorthEast[1]);
+                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
+            }
+
             // Get North-West and South-East boundaries where the sampled cubemap switches for stereoscopic rendering.
             List<float> xIntersectNorthWestToSouthEast = MathsUtil.SolveQuadraticEquation(
                 1.0f,
                 headPosition.x - headPosition.z,
                 -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
-            if (xIntersectSouthWestToNorthEast.Count == 1) {
-                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
-                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
-            } else if (xIntersectSouthWestToNorthEast.Count == 2) {
-                northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[1], 0.0f, xIntersectSouthWestToNorthEast[1]);
-                southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
-            }
-
             if (xIntersectNorthWestToSouthEast.Count == 1) {
                 northWestBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
                 southEastBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
@@ -173,9 +240,22 @@ namespace Spelunx {
 
             // For edge cases, assume that the top and bottom faces are not visible.
             // It should be correct for most cases if the Cavern has sane dimensions.
+
             // Edge Case 1: Head is moved out of the screen area and there are no intersects.
             // This means that the screen is entirely in one quadrant relative to the head.
             if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count == 0) {
+                /*
+                 \     /
+                  \   /
+                   \ /
+                    O <- Head (Not to scale.)
+                   / \
+                  /   \
+                 /     \
+                   --
+                 |    | <- Screen (Not to scale.)
+                   --
+                 */
                 // Screen is entirely south of the head.
                 if (0.0f < headPosition.z &&
                     Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z)) {
@@ -185,6 +265,18 @@ namespace Spelunx {
                     return;
                 }
 
+                /*
+                   --
+                 |    | <- Screen (Not to scale.)
+                   --
+                 \     /
+                  \   /
+                   \ /
+                    O <- Head (Not to scale.)
+                   / \
+                  /   \
+                 /     \
+                 */
                 // Screen is entirely north of the head.
                 if (headPosition.z < 0.0f &&
                     Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z)) {
@@ -194,7 +286,7 @@ namespace Spelunx {
                     return;
                 }
 
-                // Screen is entirely east of the head.
+                // Screen is entirely east of the head. (No more drawings, you should get the point by now.)
                 if (headPosition.x < 0.0f &&
                     Mathf.Abs(headPosition.z) < Mathf.Abs(headPosition.x)) {
                     monoMask |= rightMask;
@@ -215,6 +307,20 @@ namespace Spelunx {
 
             // Edge Case 2: Head is moved out of the screen and only the South-West to North-East line intersects.
             if (xIntersectSouthWestToNorthEast.Count > 0 && xIntersectNorthWestToSouthEast.Count == 0) {
+                /*
+                     \     /
+                      \   /
+                       \ /
+                        O <- Head (Not to scale.)
+                       / \
+                      /   \
+                     /     \
+                    /
+                  --
+                | /  | <- Screen (Not to scale.)
+                 /--
+                /
+                */
                 // Screen is entirely south-west of the head.
                 if (Vector3.Dot(new Vector3(1.0f, 1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask |= (backMask | leftMask);
@@ -225,6 +331,20 @@ namespace Spelunx {
                     return;
                 }
 
+                /*
+                            /
+                          --
+                        | /  | <- Screen (Not to scale.)
+                         /--
+                        /
+                 \     /
+                  \   /
+                   \ /
+                    O <- Head (Not to scale.)
+                   / \
+                  /   \
+                 /     \
+                 */
                 // Screen is entirely north-east of the head.
                 if (Vector3.Dot(new Vector3(-1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask = (frontMask | rightMask);
@@ -238,7 +358,7 @@ namespace Spelunx {
 
             // Edge Case 3: Head is moved out of the screen and only the North-West to South-East line intersects.
             if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count > 0) {
-                // Screen is entirely north-west of the head.
+                // Screen is entirely north-west of the head. (Imagine the above drawings but for the North-West to South-East line.)
                 if (Vector3.Dot(new Vector3(1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask = (frontMask | leftMask);
                     eastMask |= frontMask;
@@ -260,6 +380,9 @@ namespace Spelunx {
             }
 
             // Regular Case: The head is within the screen area.
+            // Take note that if we want more accurate rendering, that is to have the 2 eyes converge, more faces need to be rendered.
+            // Personally I don't notice much difference in terms of accuracy in real world experience, but it does cost quite a bit of performance.
+            // Therefore I added a toggle for it, and set it to false by default.
             float screenTop = cavernElevation + cavernHeight - headPosition.y;
             float screenBottom = cavernElevation - headPosition.y;
             Vector3 headOffset = new Vector3(headPosition.x, 0.0f, headPosition.z);
