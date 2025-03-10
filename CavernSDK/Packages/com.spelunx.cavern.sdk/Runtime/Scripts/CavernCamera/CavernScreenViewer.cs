@@ -1,6 +1,7 @@
 using UnityEngine;
 
-namespace Spelunx {
+namespace Spelunx
+{
 
     /// <summary>
     /// A preview screen to simulate the Cavern screen in the editor's Scene window.
@@ -8,7 +9,8 @@ namespace Spelunx {
     [RequireComponent(typeof(CavernRenderer))]
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
-    public class CavernScreenViewer : MonoBehaviour {
+    public class CavernScreenViewer : MonoBehaviour
+    {
         public enum EyeView { LeftEye, RightEye };
 
         /// <summary>
@@ -18,7 +20,8 @@ namespace Spelunx {
 
         public EyeView GetEyeView() { return eyeView; }
 
-        private void LateUpdate() {
+        private void LateUpdate()
+        {
 #if UNITY_EDITOR
             // Update render texture.
             GetComponent<MeshRenderer>().material.mainTexture = GetComponent<CavernRenderer>().GetScreenViewerTexture();
@@ -28,7 +31,8 @@ namespace Spelunx {
         /// \*brief
         /// Generate a curved screen mesh.
         /// \*warning Ensure that the mesh's material disables back-face culling!
-        private static Mesh GenerateMesh(float cavernRadius, float cavernHeight, float cavernElevation, float cavernAngle, EyeView eyeView) {
+        private static Mesh GenerateMesh(float cavernRadius, float cavernHeight, float cavernElevation, float cavernAngle, EyeView eyeView)
+        {
             Mesh mesh = new Mesh();
 
             // Have about one panel every 10 degrees. A reasonable number.
@@ -41,7 +45,7 @@ namespace Spelunx {
             int[] indices = new int[numPanels * 6];
 
             /********************************************** Generate inner surface. **********************************************/
-            
+
             float cavernBottomHeight = cavernElevation;
             float cavernTopHeight = cavernHeight + cavernElevation;
 
@@ -51,7 +55,8 @@ namespace Spelunx {
             float deltaAngle = cavernAngle / (float)numPanels;
 
             // Create vertices of surface.
-            for (int i = 0; i <= numPanels; i++) {
+            for (int i = 0; i <= numPanels; i++)
+            {
                 float ratio = (float)i / (float)numPanels;
                 float currAngle = (ratio - 0.5f) * cavernAngle;
 
@@ -71,7 +76,8 @@ namespace Spelunx {
             // Assign indices of each panel.
             // Each panel is a quad made up of 2 triangles.
             // Unity uses a CLOCKWISE WINDING ORDER for its triangles.
-            for (int i = 0;  i < numPanels; ++i) {
+            for (int i = 0; i < numPanels; ++i)
+            {
                 // Triangle 1
                 indices[i * 6] = i * 2;
                 indices[i * 6 + 1] = i * 2 + 2;
@@ -82,7 +88,7 @@ namespace Spelunx {
                 indices[i * 6 + 4] = i * 2 + 2;
                 indices[i * 6 + 5] = i * 2 + 3;
             }
-            
+
             mesh.name = "Cavern Screen Viewer Mesh";
             mesh.vertices = positions;
             mesh.normals = normals;
@@ -96,7 +102,8 @@ namespace Spelunx {
         /// <summary>
         ///  Generate a mesh in the dimensions of the screen, as set in the CavernRenderer component.
         /// </summary>
-        public void GenerateMesh() {
+        public void GenerateMesh()
+        {
             CavernRenderer cavernRenderer = GetComponent<CavernRenderer>();
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = GenerateMesh(cavernRenderer.GetCavernRadius(), cavernRenderer.GetCavernHeight(), cavernRenderer.GetCavernElevation(), cavernRenderer.GetCavernAngle(), eyeView);
@@ -105,7 +112,8 @@ namespace Spelunx {
         /// <summary>
         /// Clear the screen's mesh.
         /// </summary>
-        public void ClearMesh() {
+        public void ClearMesh()
+        {
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = new Mesh();
         }
