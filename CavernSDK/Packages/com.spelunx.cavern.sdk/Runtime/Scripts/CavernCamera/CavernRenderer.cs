@@ -42,6 +42,8 @@ namespace Spelunx {
         [SerializeField, Range(-0.5f, 0.5f)] private float cavernElevation = 0.0f;
         /// Increase accuracy at the cost of significant performance.
         [SerializeField] private bool enableConvergence = false;
+        /// Software support for swapping the left and right eyes. (Off - Left Eye On Top, On - Right Eye On Top)
+        [SerializeField] private bool swapEyes = false;
 
         [Header("Head Tracking")]
         /// If set to true, the ear will follow the head.
@@ -500,6 +502,7 @@ namespace Spelunx {
             material.SetInteger("_EnableStereoscopic", stereoMode == StereoscopicMode.Stereo ? 1 : 0);
             material.SetInteger("_EnableConvergence", enableConvergence ? 1 : 0);
             material.SetFloat("_InterpupillaryDistance", interpupillaryDistance);
+            material.SetInteger("_SwapEyes", swapEyes ? 1 : 0);
         }
 
         private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
