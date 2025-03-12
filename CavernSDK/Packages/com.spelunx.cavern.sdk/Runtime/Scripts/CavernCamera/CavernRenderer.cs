@@ -44,14 +44,14 @@ namespace Spelunx {
         /// Increase accuracy at the cost of significant performance.
         [SerializeField] private bool enableConvergence = false;
 
-        // All these are mostly just exposed for testing atm
-        // Temporary, for evaluating RG
+        // RenderGraph is opt-in for the time being, in case bugs crop up
+        [Header("Render Graph Settings"), Tooltip("At a future time, non-RG rendering will be disabled.")]
         public bool UseRenderGraph = false;
-        // Maybe you don't want to expose this?
+        // It will likely make sense later to not expose this
         public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRendering;
         private CavernRenderPass cavernRenderPass;
-        // Need to create a dummy camera due to how URP handles queuing passes
-        private Camera dummyCamera;
+        /// Camera which is only used for display out
+        private Camera outputCamera;
 
 
         [Header("Head Tracking")]
@@ -133,14 +133,16 @@ namespace Spelunx {
 
             if(UseRenderGraph)
             {
-                // Create a dummy camera, parented to the "eye" camera
+                // Create an output camera, parented to the "eye" camera
                 // Prevents wasted draw calls for base scene
-                // Todo: figure out best paradigm for handling this at runtime and edit time
-                dummyCamera = new GameObject("Dummy Camera").AddComponent<Camera>();
-                dummyCamera.transform.SetParent(eye.transform);
-                dummyCamera.CopyFrom(eye);
-                dummyCamera.cullingMask = 0;
+                // Todo: should this camera always be part of the rig? Is it more or less confusing for it to stay hidden?
+                outputCamera = new GameObject("Output Camera").AddComponent<Camera>();
+                outputCamera.CopyFrom(eye);
+                outputCamera.transform.SetParent(eye.transform);
+                outputCamera.cullingMask = 0;
                 eye.enabled = false;
+                // Need to tell the shader to use UVs that make sense for RG
+                material.EnableKeyword("RENDERGRAPH_ENABLED");
             }
         }
 
@@ -421,13 +423,11 @@ namespace Spelunx {
                 {
                     return;
                 }
-                if(camera == dummyCamera)
+                if(camera == outputCamera)
                 {
-                    
                     camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
                 }
             }
-
         }
 
         private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)

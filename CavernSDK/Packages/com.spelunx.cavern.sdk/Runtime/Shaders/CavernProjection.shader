@@ -22,6 +22,8 @@ Shader "Spelunx/CavernProjection" {
             Name "Cavern Projection Mapping"
 
             HLSLPROGRAM // Begin HLSL code.
+            // Define keywords for shader branches
+            #pragma multi_compile _ RENDERGRAPH_ENABLED
 
             // Tell the shader to find the function named "Vertex" in our HLSL code, and use it as the vertex function.
 		    #pragma vertex Vertex

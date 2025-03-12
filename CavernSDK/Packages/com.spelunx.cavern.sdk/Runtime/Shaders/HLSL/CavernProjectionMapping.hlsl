@@ -2,16 +2,14 @@
 #ifndef CAVERN_PROJECTION_HLSL
 #define CAVERN_PROJECTION_HLSL
 
-        #define SHADERPASS SHADERPASS_BLIT
-
+#ifdef RENDERGRAPH_ENABLED
+#define SHADERPASS SHADERPASS_BLIT
+#endif
 
 // Include URP library functions.
 // URP library functions can be found via the Unity Editor in "Packages/Universal RP/Shader Library/".
 // HLSL shader files for URP are in the "Packages/com.unity.render-pipelines.universal/ShaderLibrary/" directory in your project.
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
-
 
 // Textures Uniforms
 TEXTURECUBE(_CubemapNorth); // Also used for monoscopic rendering.
@@ -46,7 +44,8 @@ float _InterpupillaryDistance;
 
 // Vertex attributes.
 // Fields are automatically populated according to their semantic. (https://docs.unity3d.com/Manual/SL-VertexProgramInputs.html)
-struct Attributes { // We can name this struct anything we want.
+struct Attributes
+{ // We can name this struct anything we want.
     float3 positionOS : POSITION; // Position in object space.
     float2 uv : TEXCOORD0; // Material texture UVs.
     uint vertexID : SV_VertexID;
@@ -54,53 +53,69 @@ struct Attributes { // We can name this struct anything we want.
 };
 
 // Data passed from the vertex function to the fragment function.
-struct Vert2Frag { // We can name this struct anything we want.
+struct Vert2Frag
+{ // We can name this struct anything we want.
     float4 positionCS : SV_POSITION; // Clip space position must have the semantics SV_POSITION.
     float2 uv : TEXCOORD0; // Render texture UV coordinates.
     UNITY_VERTEX_OUTPUT_STEREO
 };
 
 // The vertex function, runs once per vertex.
-Vert2Frag Vertex(Attributes input) {
+Vert2Frag Vertex(Attributes input)
+{
     // Helper function from ShaderVariableFunctions.hlsl in the URP package
     VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS);
 
     Vert2Frag output;
-    //output.positionCS = positionInputs.positionCS; // Set the clip space position.
+    
+    // If using the RenderGraph rendering path, use FullScreenTriangle uvs
+#ifdef RENDERGRAPH_ENABLED
     output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
-    //output.uv = input.uv;
     output.uv = GetFullScreenTriangleTexCoord(input.vertexID);
+    // If using the non-RenderGraph rendering branch, use regular UVs
+#else 
+    output.uv = input.uv;
+    output.positionCS = positionInputs.positionCS; // Set the clip space position.
+ #endif
     return output;
 }
 
-float4 SampleLeftEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX) {
+float4 SampleLeftEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX)
+{
     // Physcial screen rear quadrant relative to head position.
-    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f) {
+    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapEast, sampler_CubemapEast, _EnableConvergence ? (headToScreen - ipdOffsetX) : headToScreen);
     }
     // Physcial screen left quadrant relative to head position.
-    if (fragmentRelativeAngle < -45.0f) {
+    if (fragmentRelativeAngle < -45.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, _EnableConvergence ? (headToScreen + ipdOffsetZ) : headToScreen);
     }
     // Physcial screen right quadrant relative to head position.
-    if (fragmentRelativeAngle > 45.0f)  {
+    if (fragmentRelativeAngle > 45.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, _EnableConvergence ? (headToScreen - ipdOffsetZ) : headToScreen);
     }
     // Physcial screen front quadrant relative to head position.
     return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, _EnableConvergence ? (headToScreen + ipdOffsetX) : headToScreen);
 }
 
-float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX) {
+float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 ipdOffsetZ, float3 ipdOffsetX)
+{
     // Physcial screen rear quadrant relative to head position.
-    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f) {
+    if (fragmentRelativeAngle > 135.0f || fragmentRelativeAngle < -135.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapWest, sampler_CubemapWest, _EnableConvergence ? (headToScreen + ipdOffsetX) : headToScreen);
     }
     // Physcial screen left quadrant relative to head position.
-    if (fragmentRelativeAngle < -45.0f) {
+    if (fragmentRelativeAngle < -45.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, _EnableConvergence ? (headToScreen - ipdOffsetZ) : headToScreen);
     }
     // Physcial screen right quadrant relative to head position.
-    if (fragmentRelativeAngle > 45.0f) {
+    if (fragmentRelativeAngle > 45.0f)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapSouth, sampler_CubemapSouth, _EnableConvergence ? (headToScreen + ipdOffsetZ) : headToScreen);
     }
     // Physcial screen front quadrant relative to head position.
@@ -109,8 +124,8 @@ float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 i
 
 // The fragment function, runs once per pixel on the screen.
 // It must have a float4 return type and have the SV_TARGET semantic.
-float4 Fragment(Vert2Frag input) : SV_TARGET {
-    
+float4 Fragment(Vert2Frag input) : SV_TARGET
+{
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
     // For monoscopic rendering, both halves will render the same thing.
@@ -131,7 +146,8 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
                                  _CavernRadius * cos(radians(fragmentAngle))) - _HeadPosition;
 
     // Monoscopic mode.
-    if (!_EnableStereoscopic) {
+    if (!_EnableStereoscopic)
+    {
         return SAMPLE_TEXTURECUBE(_CubemapNorth, sampler_CubemapNorth, headToScreen);
     }
 
