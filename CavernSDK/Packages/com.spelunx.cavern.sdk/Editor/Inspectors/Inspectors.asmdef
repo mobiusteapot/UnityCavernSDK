@@ -1,5 +1,5 @@
 {
-	"name": "Interactions",
+	"name": "Inspectors",
 	"rootNamespace": "",
     "references": [
 		"CavernCamera"

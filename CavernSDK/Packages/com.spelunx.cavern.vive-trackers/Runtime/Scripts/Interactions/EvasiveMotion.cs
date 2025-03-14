@@ -4,7 +4,7 @@ namespace SpelunxVive
 {
     public class EvasiveMotion : MonoBehaviour
     {
-        [SerializeField] private Transform source; // The transform the object reacts to
+        [SerializeField] private Transform target; // The transform the object reacts to
         [SerializeField] private float triggerDistance = 2.0f; // Distance at which it moves away
         [SerializeField] private float shyDistance = 3.0f; // How far it moves away
         [SerializeField] private float moveSpeed = 3.0f; // Speed of movement
@@ -19,13 +19,13 @@ namespace SpelunxVive
         void Update()
         {
             float distance = Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z),
-                                            new Vector3(source.position.x, 0, source.position.z));
+                                            new Vector3(target.position.x, 0, target.position.z));
 
             if (distance < triggerDistance)
             {
                 // Get the direction away from the source (XZ plane only)
                 Vector3 directionAway = (new Vector3(transform.position.x, 0, transform.position.z) -
-                                        new Vector3(source.position.x, 0, source.position.z)).normalized;
+                                        new Vector3(target.position.x, 0, target.position.z)).normalized;
 
                 // Calculate new target position, keeping Y the same
                 Vector3 targetPosition = new Vector3(origin.x, transform.position.y, origin.z) + directionAway * shyDistance;
@@ -36,7 +36,7 @@ namespace SpelunxVive
         }
 
         public void SetTarget(Transform t) {
-            source = t;
+            target = t;
         }
     }
 }

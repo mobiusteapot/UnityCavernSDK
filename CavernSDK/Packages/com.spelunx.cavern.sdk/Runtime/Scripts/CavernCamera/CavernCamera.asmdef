@@ -1,8 +1,8 @@
 {
-	"name": "Interactions",
+	"name": "CavernCamera",
 	"rootNamespace": "",
     "references": [
-		"CavernCamera"
+		"Utility"
 	],
     "includePlatforms": [],
 	"excludePlatforms": [],

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+using Spelunx;
 
 namespace SpelunxVive
 {
@@ -64,7 +65,7 @@ namespace SpelunxVive
             EditorGUILayout.HelpBox("Object matches the source object's position. Contains an adjustable offset to allow following source object from a set distance away.", MessageType.Info);
             if (GUILayout.Button("Add Follow Motion"))
             {
-                // AddInteraction(typeof(FollowMotion));
+                AddInteraction(typeof(FollowMotion));
                 Debug.Log("follow motion button pressed");
             }
 
@@ -73,18 +74,18 @@ namespace SpelunxVive
             EditorGUILayout.HelpBox("Object mirrors the source object's position with the CAVERN screen functioning as the mirror surface it reflects across. Contains a deadzone where the reflection doesn't change to prevent spinning with an adjustable radius.", MessageType.Info);
             if (GUILayout.Button("Add CAVERN Mirror"))
             {
-                // AddInteraction(typeof(CavernMirrorMotion));
+                AddInteraction(typeof(CavernMirrorMotion));
                 Debug.Log("CAVERN mirror button pressed");
             }
 
-            GUILayout.Space(10);
-            GUILayout.Label("Mirror Position Across Axis");
-            EditorGUILayout.HelpBox("Object mirrors the source object's position reflected across a user determined axis.", MessageType.Info);
-            if (GUILayout.Button("Add Axis Mirror"))
-            {
-                // AddInteraction(typeof(MirrorFromAxis));
-                Debug.Log("axis mirror button pressed");
-            }
+            // GUILayout.Space(10);
+            // GUILayout.Label("Mirror Position Across Axis");
+            // EditorGUILayout.HelpBox("Object mirrors the source object's position reflected across a user determined axis.", MessageType.Info);
+            // if (GUILayout.Button("Add Axis Mirror"))
+            // {
+            //     AddInteraction(typeof(MirrorFromAxis));
+            //     Debug.Log("axis mirror button pressed");
+            // }
 
             GUILayout.Space(10);
             GUILayout.Label("Evasive Motion");
@@ -103,6 +104,11 @@ namespace SpelunxVive
                 if (obj != null)
                 {
                     obj.AddComponent(interaction);
+                    // if(interaction == typeof(CavernMirrorMotion)) {
+                    //     CavernMirrorMotion c = obj.GetComponent<CavernMirrorMotion>();
+                    //     CavernRenderer cavernCam;
+                    //     c.SetCamera(cavernCam);
+                    // }
                     // Debug.Log("added: " + interaction);
                 }
             }
