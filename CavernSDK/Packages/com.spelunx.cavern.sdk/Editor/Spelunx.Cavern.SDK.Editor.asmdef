@@ -2,7 +2,8 @@
     "name": "Spelunx.Cavern.SDK.Editor",
     "rootNamespace": "Spelunx",
     "references": [
-        "Spelunx.Cavern.SDK"
+        "Spelunx.Cavern.SDK",
+        "CavernCamera"
     ],
     "includePlatforms": [
         "Editor"

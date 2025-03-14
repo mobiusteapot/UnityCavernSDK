@@ -1,13 +1,11 @@
 {
-    "name": "Spelunx.CAVERN.Vive.Editor",
-    "rootNamespace": "",
+	"name": "CavernCamera",
+	"rootNamespace": "",
     "references": [
-        "Interactions"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
+		"Utility"
+	],
+    "includePlatforms": [],
+	"excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
