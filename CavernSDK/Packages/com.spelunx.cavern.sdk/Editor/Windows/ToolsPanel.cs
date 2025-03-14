@@ -35,7 +35,7 @@ namespace Spelunx
 
                 // sets speaker mode to 5.1 surround
                 audioConfigs = AudioSettings.GetConfiguration();
-                audioConfigs.speakerMode = AudioSpeakerMode.Mode5point1;
+                audioConfigs.speakerMode = AudioSpeakerMode.Mode7point1;
                 AudioSettings.Reset(audioConfigs);
 
                 // removes any default main cameras in scene (but preserves any cameras not tagged as MainCamera)

@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEditor;
+using System;
 
 namespace SpelunxVive
 {
     public class Window : EditorWindow
     {
-        private Object viveManager;
-        private Object viveTracker;
+        private UnityEngine.Object viveManager;
+        private UnityEngine.Object viveTracker;
         private GameObject newViveManager;
         private int trackerCount;
 
@@ -23,7 +24,8 @@ namespace SpelunxVive
 
             trackerCount = GameObject.FindGameObjectsWithTag("ViveTracker").Length;
             GUILayout.Label("Current trackers in scene: " + trackerCount);
-
+          
+            // Add Vive Tracker to Scene
             if (GUILayout.Button("Add new Vive Tracker"))
             {
                 // load from GUI input
@@ -51,6 +53,58 @@ namespace SpelunxVive
 
                 // instantiate a new vive tracker
                 PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
+            }
+            
+            GUILayout.Space(20);
+            GUILayout.Label("Tracker Interaction Building Blocks", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("A collection of interactions using Vive Trackers.", MessageType.Info);
+
+            GUILayout.Space(10);
+            GUILayout.Label("Follow Motion");
+            EditorGUILayout.HelpBox("Object matches the source object's position. Contains an adjustable offset to allow following source object from a set distance away.", MessageType.Info);
+            if (GUILayout.Button("Add Follow Motion"))
+            {
+                // AddInteraction(typeof(FollowMotion));
+                Debug.Log("follow motion button pressed");
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Mirror Position in CAVERN");
+            EditorGUILayout.HelpBox("Object mirrors the source object's position with the CAVERN screen functioning as the mirror surface it reflects across. Contains a deadzone where the reflection doesn't change to prevent spinning with an adjustable radius.", MessageType.Info);
+            if (GUILayout.Button("Add CAVERN Mirror"))
+            {
+                // AddInteraction(typeof(CavernMirrorMotion));
+                Debug.Log("CAVERN mirror button pressed");
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Mirror Position Across Axis");
+            EditorGUILayout.HelpBox("Object mirrors the source object's position reflected across a user determined axis.", MessageType.Info);
+            if (GUILayout.Button("Add Axis Mirror"))
+            {
+                // AddInteraction(typeof(MirrorFromAxis));
+                Debug.Log("axis mirror button pressed");
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Evasive Motion");
+            EditorGUILayout.HelpBox("Object moves away from an user determined target when it's within a distance (preserves height, y position value unchanged). Contains adjustable trigger distance, move away distance, and move away speed.", MessageType.Info);
+            if (GUILayout.Button("Add Evasive Motion"))
+            {
+                AddInteraction(typeof(EvasiveMotion));     
+                // Debug.Log("retreat button pressed");
+            }
+        }
+        
+        private void AddInteraction(Type interaction) {
+            foreach (GameObject obj in Selection.gameObjects)
+            {
+                // Debug.Log("Selected: " + obj.name);
+                if (obj != null)
+                {
+                    obj.AddComponent(interaction);
+                    // Debug.Log("added: " + interaction);
+                }
             }
         }
     }
