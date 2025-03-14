@@ -20,12 +20,12 @@ namespace Spelunx
         void Update()
         {
             if (target == null) return;
-            Vector3 newDirection = (target.position - transform.position).normalized;
-            float newRadius = (2 * cavernRenderer.GetCavernRadius() - (Vector3.Distance(target.position, transform.position)));
+            Vector3 newDirection = (new Vector3(target.position.x, 0, target.position.z) - new Vector3(cavernRenderer.transform.position.x, 0, cavernRenderer.transform.position.z)).normalized;
+            float newRadius = (2 * cavernRenderer.GetCavernRadius() - (Vector3.Distance(target.position, cavernRenderer.transform.position)));
             if (newRadius > deadZoneRadius)
             {
                 Vector3 newVector = newDirection * newRadius;
-                transform.position = new Vector3(newVector.x, target.position.y, newVector.z); // ignore original y value so it will be copy the target
+                transform.position = cavernRenderer.transform.position + new Vector3(newVector.x, target.position.y, newVector.z); // ignore original y value so it will be copy the target
             }
         }
 
