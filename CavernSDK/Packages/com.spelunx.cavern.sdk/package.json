@@ -32,7 +32,8 @@
   ],
   "dependencies": {
     "com.unity.render-pipelines.universal": "17.0.3",
-    "com.unity.xr.openxr": "1.14.0"
+    "com.unity.xr.openxr": "1.14.0",
+    "com.unity.inputsystem": "1.11.2"
   },
   "hideInEditor": false
 }
