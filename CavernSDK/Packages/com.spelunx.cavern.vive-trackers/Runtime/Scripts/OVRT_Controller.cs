@@ -3,9 +3,9 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
-using static Spelunx.OVRT.OVRT_TrackedObject;
+using static Spelunx.Vive.OVRT_TrackedObject;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     public sealed class OVRT_Controller : OVRT_TrackedDevice
     {

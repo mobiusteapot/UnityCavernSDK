@@ -12,7 +12,7 @@ using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     /// <summary>
     /// Manages connection to OpenVR and dispatches new poses and events.

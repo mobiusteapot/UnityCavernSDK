@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SpelunxVive
+namespace Spelunx.Vive
 {
     public class EvasiveMotion : MonoBehaviour
     {

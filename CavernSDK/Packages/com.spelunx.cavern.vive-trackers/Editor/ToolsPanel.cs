@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEditor;
 using System;
-using Spelunx;
 
-namespace SpelunxVive
+namespace Spelunx.Vive
 {
-    public class Window : EditorWindow
+    public class ToolsPanel : EditorWindow
     {
         private UnityEngine.Object viveManager;
         private UnityEngine.Object viveTracker;
@@ -15,7 +14,7 @@ namespace SpelunxVive
         [MenuItem("CAVERN/Vive Trackers")]
         public static void ShowWindow()
         {
-            GetWindow<Window>("Vive Tracker Tools");
+            GetWindow<ToolsPanel>("Vive Tracker Tools");
         }
 
         void OnGUI()

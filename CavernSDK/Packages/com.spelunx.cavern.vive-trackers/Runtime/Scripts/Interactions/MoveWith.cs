@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Spelunx
+namespace Spelunx.Vive
 {
     public class MoveWith : MonoBehaviour
     {
