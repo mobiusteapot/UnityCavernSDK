@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     public abstract class OVRT_TrackedDevice : MonoBehaviour
     {

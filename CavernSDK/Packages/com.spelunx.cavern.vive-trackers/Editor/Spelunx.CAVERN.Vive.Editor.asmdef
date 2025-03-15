@@ -1,8 +1,9 @@
 {
     "name": "Spelunx.CAVERN.Vive.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "Spelunx.Vive",
     "references": [
-        "Interactions"
+        "Spelunx.Cavern.SDK.Editor",
+        "Spelunx.Vive.Tracking"
     ],
     "includePlatforms": [
         "Editor"

@@ -1,7 +1,6 @@
-using Spelunx;
 using UnityEngine;
 
-namespace SpelunxVive
+namespace Spelunx.Vive
 {
     /*
      * This script assumes the CAVERN screen is a mirror, and the object holding this script will be mirrored.

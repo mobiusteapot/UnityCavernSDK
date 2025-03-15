@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SpelunxVive
+namespace Spelunx.Vive
 {
     /*
      * This script copies the movement of the target with an optional offset (x, y, z)

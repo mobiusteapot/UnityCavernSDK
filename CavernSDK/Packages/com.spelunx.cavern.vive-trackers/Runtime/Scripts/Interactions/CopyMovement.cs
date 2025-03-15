@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SpelunxVive
+namespace Spelunx.Vive
 {
     /*
      * The object with this script attached will copy the movement of the source it is following
