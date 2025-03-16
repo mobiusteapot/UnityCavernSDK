@@ -1,7 +1,7 @@
 using UnityEngine;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
 	public static class OVRT_Utils
 	{

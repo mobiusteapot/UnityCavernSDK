@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 975013845174002959}
+  - component: {fileID: 3320647608110622589}
   m_Layer: 0
   m_Name: CavernSetup
   m_TagString: Untagged
@@ -32,6 +33,52 @@ Transform:
   - {fileID: 8680908265520161431}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3320647608110622589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7710098884710572722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 222d48aa832a2a24b8bb1b5f439bb071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputs:
+  - m_Name: Element 0
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: 867320ae-e9dc-47b7-926b-777248879fc8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: ffe97a43-acba-4605-a5bc-01a00a28aaef
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Element 0
+      m_Flags: 0
+    m_Flags: 0
+  quit:
+    m_Name: Quit
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: c85ae7d6-16b2-402f-81bd-7752b310e69a
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d7e0ada1-015d-471b-b1b1-68a734cc890a
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Quit
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1001 &2808701907505350114
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,7 +1,10 @@
 {
     "name": "Spelunx.CAVERN.Vive.Editor",
-    "rootNamespace": "",
-    "references": [],
+    "rootNamespace": "Spelunx.Vive",
+    "references": [
+        "Spelunx.Cavern.SDK.Editor",
+        "Spelunx.Vive.Tracking"
+    ],
     "includePlatforms": [
         "Editor"
     ],

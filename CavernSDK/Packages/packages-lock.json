@@ -6,7 +6,8 @@
       "source": "embedded",
       "dependencies": {
         "com.unity.render-pipelines.universal": "17.0.3",
-        "com.unity.xr.openxr": "1.14.0"
+        "com.unity.xr.openxr": "1.14.0",
+        "com.unity.inputsystem": "1.11.2"
       }
     },
     "com.spelunx.cavern.vive-trackers": {
@@ -15,7 +16,7 @@
       "source": "embedded",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2",
-        "com.spelunx.cavern.sdk": "0.1.9",
+        "com.spelunx.cavern.sdk": "0.1.10",
         "com.unity.xr.openxr": "1.14.0",
         "com.spelunx.valvesoftware.unity.openvr": "1.2.5"
       }

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     public static class OVRT_Events
     {
