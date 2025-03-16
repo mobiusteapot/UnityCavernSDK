@@ -686,11 +686,28 @@ namespace Spelunx
 
         private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
 
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
+            if(UseRenderGraph)
+            {
+                if(camera.cameraType != CameraType.Game)
+                {
+                    return;
+                }
+                if(camera == outputCamera)
+                {
+                    camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
+                }
+            }
+        }
 
-        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-            if (camera == eye) {
-                Graphics.Blit(null, material);
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if(!UseRenderGraph)
+            {
+                if(camera == eye)
+                {
+                    Graphics.Blit(null, material);
+                }
             }
         }
     }
