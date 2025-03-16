@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.Rendering.Universal;
 
 namespace Spelunx
@@ -22,7 +21,7 @@ namespace Spelunx
             VeryHigh = 8192,
         }
 
-        private enum CubemapIndex
+        public enum CubemapIndex
         {
             North = 0, // Also used for monoscopic.
             South,
@@ -49,14 +48,13 @@ namespace Spelunx
         /// Increase accuracy at the cost of significant performance.
         [SerializeField] private bool enableConvergence = false;
 
-        // RenderGraph is opt-in for the time being, in case bugs crop up
-        [Header("Render Graph Settings"), Tooltip("At a future time, non-RG rendering will be disabled.")]
+        // RenderGraph is opt-in for the time being, in case bugs crop up.
+        // If stable, it may make sense to remove these options and always use RenderGraph.
+        [Header("Render Graph Settings"), Tooltip("In a future update, RenderGraph may be always enabled")]
         public bool UseRenderGraph = false;
         // It will likely make sense later to not expose this
         public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRendering;
         private CavernRenderPass cavernRenderPass;
-        /// Camera which is only used for display out
-        private Camera outputCamera;
 
         /// Software support for swapping the left and right eyes. (Off - Left Eye On Top, On - Right Eye On Top)
         [SerializeField] private bool swapEyes = false;
@@ -78,6 +76,7 @@ namespace Spelunx
         [SerializeField] private AudioListener ear;
         [SerializeField] private Shader shader;
         [SerializeField] private Material previewMat; // the material used on CAVERN preview
+        [SerializeField] private Camera screenOutCamera; // The screen out/UI camera (needs to be separate from the controlled Cavern camera)
 
         // Internal variables.
         private RenderTexture[] cubemaps;
@@ -108,9 +107,7 @@ namespace Spelunx
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
 
             cavernRenderPass = new CavernRenderPass();
-            // Todo: Dynamically update setup, if settings changed
-            cavernRenderPass.Setup(material, cubemaps);
-            cavernRenderPass.renderPassEvent = renderPassEvent;
+            UpdateRenderGraphEnabled();
         }
 
         private void OnDisable()
@@ -145,19 +142,6 @@ namespace Spelunx
             material.SetTexture("_CubemapEast", cubemaps[(int)CubemapIndex.East]);
             material.SetTexture("_CubemapWest", cubemaps[(int)CubemapIndex.West]);
 
-            if(UseRenderGraph)
-            {
-                // Create an output camera, parented to the "eye" camera
-                // Prevents wasted draw calls for base scene
-                // Todo: should this camera always be part of the rig? Is it more or less confusing for it to stay hidden?
-                outputCamera = new GameObject("Output Camera").AddComponent<Camera>();
-                outputCamera.CopyFrom(eye);
-                outputCamera.transform.SetParent(eye.transform);
-                outputCamera.cullingMask = 0;
-                eye.enabled = false;
-                // Need to tell the shader to use UVs that make sense for RG
-                material.EnableKeyword("RENDERGRAPH_ENABLED");
-            }
         }
 
         private void Start()
@@ -253,7 +237,7 @@ namespace Spelunx
             }
 
             previewMat.SetPass(0);
-            if (UnityEditor.EditorApplication.isPlaying)
+            if(UnityEditor.EditorApplication.isPlaying)
             {
                 previewMat.mainTexture = screenViewerTexture;
             }
@@ -261,6 +245,7 @@ namespace Spelunx
             {
                 previewMat.mainTexture = null;
             }
+
             // We need to use Graphics.DrawMeshNow instead of Gizmos.DrawMesh so we can get a texture on it
             Graphics.DrawMeshNow(previewMesh, transform.position, transform.rotation);
         }
@@ -274,8 +259,10 @@ namespace Spelunx
             }
 
             RenderEyes();
-            // Todo: pass anything to render pass that may have changed
+
 #if UNITY_EDITOR
+            // In editor mode, support dynamically changing if RenderGraph is enabled.
+            UpdateRenderGraphEnabled();
             // In editor mode, blit to the screen viewer.
             Graphics.Blit(null, screenViewerTexture, material);
 #endif
@@ -682,6 +669,26 @@ namespace Spelunx
             material.SetInteger("_SwapEyes", swapEyes ? 1 : 0);
         }
 
+        private void UpdateRenderGraphEnabled()
+        {
+            if(UseRenderGraph)
+            {
+                // Only have the screen out camera render
+                eye.enabled = false;
+                screenOutCamera.enabled = true;
+                // Need to tell the shader to use UVs that make sense for RG
+                material.EnableKeyword("RENDERGRAPH_ENABLED");
+                cavernRenderPass.Setup(material, cubemaps);
+                cavernRenderPass.renderPassEvent = renderPassEvent;
+            }
+            else
+            {
+                eye.enabled = true;
+                screenOutCamera.enabled = false;
+                material.DisableKeyword("RENDERGRAPH_ENABLED");
+            }
+        }
+
         private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
 
         private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
@@ -693,7 +700,7 @@ namespace Spelunx
                 {
                     return;
                 }
-                if(camera == outputCamera)
+                if(camera == screenOutCamera)
                 {
                     camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
                 }

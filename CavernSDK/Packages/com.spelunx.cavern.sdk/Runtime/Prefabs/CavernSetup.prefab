@@ -45,23 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 222d48aa832a2a24b8bb1b5f439bb071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputs:
-  - m_Name: Element 0
-    m_Type: 1
-    m_ExpectedControlType: Button
-    m_Id: 867320ae-e9dc-47b7-926b-777248879fc8
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: ffe97a43-acba-4605-a5bc-01a00a28aaef
-      m_Path: <Keyboard>/escape
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Element 0
-      m_Flags: 0
-    m_Flags: 0
   quit:
     m_Name: Quit
     m_Type: 0

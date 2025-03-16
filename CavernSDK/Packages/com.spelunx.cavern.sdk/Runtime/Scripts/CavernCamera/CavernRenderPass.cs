@@ -3,10 +3,11 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
+using static Spelunx.CavernRenderer;
 
 namespace Spelunx
 {
-    // Todo: Execute to game view in edit mode?
+
     public class CavernRenderPass : ScriptableRenderPass
     {
 
@@ -26,6 +27,10 @@ namespace Spelunx
         public void Setup(Material material, RenderTexture[] cubemaps)
         {
             blitMaterial = material;
+            material.SetTexture("_CubemapNorth", cubemaps[(int)CubemapIndex.North]);
+            material.SetTexture("_CubemapSouth", cubemaps[(int)CubemapIndex.South]);
+            material.SetTexture("_CubemapEast", cubemaps[(int)CubemapIndex.East]);
+            material.SetTexture("_CubemapWest", cubemaps[(int)CubemapIndex.West]);
             this.cubemaps = cubemaps;
         }
         // Currently unimplemented
