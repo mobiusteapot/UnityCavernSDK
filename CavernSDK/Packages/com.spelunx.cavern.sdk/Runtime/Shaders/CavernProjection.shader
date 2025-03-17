@@ -33,5 +33,20 @@ Shader "Spelunx/CavernProjection" {
 
             ENDHLSL // End HLSL code.
         }
+
+        Pass {
+            Name "Cavern Screen Preview"
+
+            HLSLPROGRAM
+
+            #pragma multi_compile _ RENDERGRAPH_ENABLED
+            //#pragma skip_variants RENDERGRAPH_ENABLED
+            #pragma vertex Vertex
+            #pragma fragment Fragment
+
+            #include "HLSL/CavernProjectionMapping.hlsl"
+
+            ENDHLSL
+        }
     }
 }

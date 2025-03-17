@@ -127,7 +127,7 @@ float4 SampleRightEye(float3 headToScreen, float fragmentRelativeAngle, float3 i
 // It must have a float4 return type and have the SV_TARGET semantic.
 float4 Fragment(Vert2Frag input) : SV_TARGET
 {
-
+    
     // Split the screen into 2 halves, top and bottom.
     // For stereoscopic rendering, the top will render the left eye, the bottom will render the right eye.
     // For monoscopic rendering, both halves will render the same thing.

@@ -5,6 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace Spelunx
 {
+    [ExecuteAlways]
     public class CavernRenderer : MonoBehaviour
     {
         public enum StereoscopicMode
@@ -231,9 +232,10 @@ namespace Spelunx
 
             if (screenViewerTexture == null)
             {
-                screenViewerTexture = new RenderTexture(512, 512, 32, RenderTextureFormat.ARGB32); // Use a low resolution to minimise performance affected by debugging.
+                screenViewerTexture = new RenderTexture(512, 512, 0, RenderTextureFormat.ARGB32); // Use a low resolution to minimise performance affected by debugging.
                 screenViewerTexture.dimension = TextureDimension.Tex2D;
                 screenViewerTexture.wrapMode = TextureWrapMode.Clamp;
+                screenViewerTexture.Create();
             }
 
             previewMat.SetPass(0);
@@ -264,7 +266,11 @@ namespace Spelunx
             // In editor mode, support dynamically changing if RenderGraph is enabled.
             UpdateRenderGraphEnabled();
             // In editor mode, blit to the screen viewer.
-            Graphics.Blit(null, screenViewerTexture, material);
+            if(!UseRenderGraph)
+            {
+                // In RG, this is handled by the RenderPass
+                Graphics.Blit(null, screenViewerTexture, material);
+            }
 #endif
         }
 
@@ -680,6 +686,9 @@ namespace Spelunx
                 material.EnableKeyword("RENDERGRAPH_ENABLED");
                 cavernRenderPass.Setup(material, cubemaps);
                 cavernRenderPass.renderPassEvent = renderPassEvent;
+#if UNITY_EDITOR
+                cavernRenderPass.SetupScreenViewer(material, screenViewerTexture);
+#endif
             }
             else
             {
