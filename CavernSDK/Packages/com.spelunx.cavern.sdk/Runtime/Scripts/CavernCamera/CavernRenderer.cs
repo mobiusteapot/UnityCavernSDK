@@ -5,7 +5,6 @@ using UnityEngine.Rendering.Universal;
 
 namespace Spelunx
 {
-    [ExecuteAlways]
     public class CavernRenderer : MonoBehaviour
     {
         public enum StereoscopicMode

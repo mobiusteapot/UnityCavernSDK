@@ -10,12 +10,8 @@ namespace Spelunx
 
     public class CavernRenderPass : ScriptableRenderPass
     {
-
-
-
         private const string PassName = "CavernRenderPass";
         private Material blitMaterial;
-        // Todo: Move some of the relevant setup for specifically texture/material setup from CavernRenderer to here
 
         private bool hasScreenViewer = false;
         private RenderTexture screenViewerTexture;
