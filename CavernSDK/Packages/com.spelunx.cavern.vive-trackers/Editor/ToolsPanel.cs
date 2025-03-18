@@ -69,7 +69,7 @@ namespace Spelunx.Vive
             if (GUILayout.Button("Add Follow Motion"))
             {
                 AddInteraction(typeof(FollowMotion));
-                Debug.Log("follow motion button pressed");
+                // Debug.Log("follow motion button pressed");
             }
 
             GUILayout.Space(10);
@@ -78,7 +78,7 @@ namespace Spelunx.Vive
             if (GUILayout.Button("Add CAVERN Mirror"))
             {
                 AddInteraction(typeof(CavernMirrorMotion));
-                Debug.Log("CAVERN mirror button pressed");
+                // Debug.Log("CAVERN mirror button pressed");
             }
 
             // GUILayout.Space(10);
