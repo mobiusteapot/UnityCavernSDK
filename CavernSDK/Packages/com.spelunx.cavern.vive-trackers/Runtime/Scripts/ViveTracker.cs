@@ -150,5 +150,12 @@ namespace Spelunx.Vive
             IsValid = false;
             IsConnected = false;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, 0.2f);
+        }
+#endif
     }
 }

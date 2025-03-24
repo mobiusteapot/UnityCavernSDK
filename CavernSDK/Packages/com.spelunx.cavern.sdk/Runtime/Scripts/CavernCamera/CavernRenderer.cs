@@ -131,6 +131,8 @@ namespace Spelunx
         {
         }
 
+        #region Cavern Preview
+#if UNITY_EDITOR
         // This method is called whenever a setting is changed in the inspector
         // Or at the beginning of scene mode rendering
         // If any of the CAVERN size settings are changed, we need to regenerate the mesh
@@ -231,7 +233,8 @@ namespace Spelunx
             // We need to use Graphics.DrawMeshNow instead of Gizmos.DrawMesh so we can get a texture on it
             Graphics.DrawMeshNow(previewMesh, transform.position, transform.rotation);
         }
-
+#endif
+        #endregion
         private void Update()
         {
             if (tetherEar)
@@ -247,7 +250,7 @@ namespace Spelunx
             Graphics.Blit(null, screenViewerTexture, material);
 #endif
         }
-
+        #region Face culling
         // Find out which faces of the cubemaps should be rendered. We want the minimum number of faces to reduce the rendering workload.
         // General approach: For front, back, left and right faces, look at the Cavern from the top-down view, so that it looks like a circle.
         // "Slice" the circle into 4 quadrants using 2 lines that form an X, with the player's head being the intersection of the 2 lines.
@@ -592,7 +595,8 @@ namespace Spelunx
                 southMask |= bottomMask;
             }
         }
-
+        #endregion
+        #region Rendering Eyes
         private void RenderEyes()
         {
             // If clampHeadPosition is true, limit the head position to be within the bounds of the circle.
@@ -663,4 +667,5 @@ namespace Spelunx
             }
         }
     }
+    #endregion
 }
