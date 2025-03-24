@@ -1,26 +1,29 @@
 using UnityEditor;
 
-[InitializeOnLoad]
-public class AutoActivateFullscreenPreview
+namespace Spelunx.Fullscreen
 {
-    public const string IsFullscreenPreviewEnabledKey = "Fullscreen On Play";
-
-    static AutoActivateFullscreenPreview()
+    [InitializeOnLoad]
+    public class AutoActivateFullscreenPreview
     {
-        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-    }
+        public const string IsFullscreenPreviewEnabledKey = "Fullscreen On Play";
 
-    private static void OnPlayModeStateChanged(PlayModeStateChange state)
-    {
-        if(EditorPrefs.GetBool(IsFullscreenPreviewEnabledKey, false))
+        static AutoActivateFullscreenPreview()
         {
-            if(state == PlayModeStateChange.EnteredPlayMode)
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (EditorPrefs.GetBool(IsFullscreenPreviewEnabledKey, false))
             {
-                FullscreenGameView.SetFullscreen(true);
-            }
-            if(state == PlayModeStateChange.ExitingPlayMode)
-            {
-                FullscreenGameView.SetFullscreen(false);
+                if (state == PlayModeStateChange.EnteredPlayMode)
+                {
+                    FullscreenGameView.SetFullscreen(true);
+                }
+                if (state == PlayModeStateChange.ExitingPlayMode)
+                {
+                    FullscreenGameView.SetFullscreen(false);
+                }
             }
         }
     }
