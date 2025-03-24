@@ -1,6 +1,6 @@
 // Header Guards
-#ifndef CAVERN_PROJECTION_HLSL
-#define CAVERN_PROJECTION_HLSL
+#ifndef CAVERN_PROJECTION_MAPPING_HLSL
+#define CAVERN_PROJECTION_MAPPING_HLSL
 
 // Include URP library functions.
 // URP library functions can be found via the Unity Editor in "Packages/Universal RP/Shader Library/".
@@ -135,4 +135,4 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
         : SampleRightEye(headToScreen, fragmentRelativeAngle, ipdOffsetZ, ipdOffsetX);
 }
 
-#endif // CAVERN_PROJECTION_HLSL
+#endif // CAVERN_PROJECTION_MAPPING_HLSL

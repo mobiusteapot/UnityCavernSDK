@@ -2,13 +2,7 @@ Shader "Spelunx/CavernProjection" {
     // Properties are options set per material, exposed by the material inspector.
     // By convention, properties' names are declared _PropertyName("Label In Inspector", Type) = Value.
     // List of property types: https://docs.unity3d.com/Manual/SL-Properties.html
-    Properties {
-        [Header(Projection Options)]
-        _CubemapLeft ("Cubemap Left", Cube) = "" {} // Also used for monoscopic rendering.
-        _CubemapRight ("Cubemap Right", Cube) = "" {}
-        _CubemapFront ("Cubemap Front", Cube) = "" {}
-        _CubemapBack ("Cubemap Back", Cube) = "" {}
-    }
+    Properties { }
 
     SubShader {
         Tags {

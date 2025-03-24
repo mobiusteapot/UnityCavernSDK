@@ -97,12 +97,14 @@ MonoBehaviour:
   swapEyes: 0
   tetherEar: 1
   clampHeadPosition: 1
-  clampHeadRatio: 0.8
+  clampHeadRatio: 0.9
+  previewEye: 0
+  previewResolution: 512
   head: {fileID: 5213595555020570760}
   eye: {fileID: 5900885314504736604}
   ear: {fileID: 5105509885875884984}
   shader: {fileID: 4800000, guid: d250a68325f512d4082683a9f6882f49, type: 3}
-  previewMat: {fileID: 2100000, guid: b687738e93364794695ed6802e47aefd, type: 2}
+  previewMaterial: {fileID: 2100000, guid: b687738e93364794695ed6802e47aefd, type: 2}
 --- !u!1 &4855443922684551042
 GameObject:
   m_ObjectHideFlags: 0
