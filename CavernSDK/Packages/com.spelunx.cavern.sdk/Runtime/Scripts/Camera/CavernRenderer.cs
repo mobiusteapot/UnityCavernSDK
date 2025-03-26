@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 using UnityEditor;
 
@@ -66,16 +67,18 @@ namespace Spelunx {
 
         [Header("References (Do NOT edit!)")]
         [SerializeField] private Transform head;
-        [SerializeField] private Camera eye;
+        [SerializeField] private Camera eye; // Ensure that UI culling mask is unset.
+        [SerializeField] private Camera guiCamera; // Ensure that ONLY UI culling mask is set.
         [SerializeField] private AudioListener ear;
         [SerializeField] private Shader shader;
-        [SerializeField] private Material previewMaterial; // the material used on CAVERN preview
+        [SerializeField] private Material previewMaterial;
 
         // Internal variables.
         private Material material = null;
         private RenderTexture[] cubemaps = null;
         private Mesh previewMesh = null;
         private RenderTexture previewTexture = null;
+        private CavernRenderPass cavernRenderPass;
 
         public CubemapResolution GetCubemapResolution() { return cubemapResolution; }
         public StereoscopicMode GetStereoscopicMode() { return stereoMode; }
@@ -88,26 +91,31 @@ namespace Spelunx {
         public GameObject GetHead() { return head.gameObject; }
         public GameObject GetEye() { return eye.gameObject; }
         public GameObject GetEar() { return ear.gameObject; }
+        public GameObject GetGUICamera() { return guiCamera.gameObject; }
 
         private void OnEnable() {
-            RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
-            RenderPipelineManager.endContextRendering += OnEndContextRendering;
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
         }
 
         private void OnDisable() {
-            RenderPipelineManager.beginContextRendering -= OnBeginContextRendering;
-            RenderPipelineManager.endContextRendering -= OnEndContextRendering;
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         }
 
         private void Awake() {
-            CreateCubemaps(true);
-            CreateMaterial(true);
-            CreatePreviewMesh(true);
-            CreatePreviewTexture(true);
+            CreateCubemaps();
+            CreateMaterial();
+            CreatePreviewMesh();
+            CreatePreviewTexture();
+            cavernRenderPass = new CavernRenderPass(material);
+        }
+
+        private void Start() {
+            // Since we are using the eye to render to cubemaps, we want to disable it here, so that it
+            // doesn't do a "normal" render to the screen, which will be a waste since we are overriding it.
+            // Instead, we will "highjack" the GUI camera insert a render pass into the URP RenderGraph to render the eye to the screen.
+            eye.enabled = false;
         }
 
         private void Update() {
@@ -130,7 +138,6 @@ namespace Spelunx {
 #if UNITY_EDITOR
             // In editor mode, blit to the screen viewer.
             if (previewTexture != null && material != null) {
-                Debug.Log("Blit");
                 Graphics.Blit(null, previewTexture, material);
             }
 #endif // UNITY_EDITOR
@@ -500,9 +507,7 @@ namespace Spelunx {
             material.SetInteger("_SwapEyes", swapEyes ? 1 : 0);
         }
 
-        private void CreateCubemaps(bool forceReplace = false) {
-            if (!forceReplace && cubemaps != null) { return; }
-
+        private void CreateCubemaps() {
             cubemaps = new RenderTexture[(int)CubemapIndex.Num];
             for (int i = 0; i < (int)CubemapIndex.Num; ++i) {
                 cubemaps[i] = new RenderTexture((int)cubemapResolution, (int)cubemapResolution, 32, RenderTextureFormat.ARGB32);
@@ -511,9 +516,7 @@ namespace Spelunx {
             }
         }
 
-        private void CreateMaterial(bool forceReplace = false) {
-            if (!forceReplace && material != null) { return; }
-
+        private void CreateMaterial() {
             material = new Material(shader);
             material.SetTexture("_CubemapNorth", cubemaps[(int)CubemapIndex.North]);
             material.SetTexture("_CubemapSouth", cubemaps[(int)CubemapIndex.South]);
@@ -524,9 +527,7 @@ namespace Spelunx {
         /// \*brief
         /// Generate a curved screen mesh.
         /// \*warning Ensure that the mesh's material disables back-face culling!
-        private void CreatePreviewMesh(bool forceReplace = false) {
-            if (!forceReplace && previewMesh != null) { return; }
-
+        private void CreatePreviewMesh() {
             previewMesh = new Mesh();
 
             // Have about one panel every 10 degrees. A reasonable number.
@@ -588,34 +589,26 @@ namespace Spelunx {
             previewMesh.triangles = indices;
         }
 
-        private void CreatePreviewTexture(bool forceReplace = false) {
-            if (!forceReplace && previewTexture != null) { return; }
-
+        private void CreatePreviewTexture() {
             previewTexture = new RenderTexture((int)previewResolution, (int)previewResolution, 32, RenderTextureFormat.ARGB32);
             previewTexture.dimension = TextureDimension.Tex2D;
             previewTexture.wrapMode = TextureWrapMode.Clamp;
         }
 
-        private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
-
-        private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras) { }
-
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) { }
-
-        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-            if (camera == eye) {
-                Graphics.Blit(null, material);
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
+            // "Highjack" the GUI camera insert a render pass into the URP RenderGraph to render the output.
+            if (camera == guiCamera) {
+                camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
             }
         }
 
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) { }
+
 #if UNITY_EDITOR
-        // This method is called whenever a setting is changed in the inspector, or at the beginning of scene mode rendering.
-        // If any of the CAVERN size settings are changed, we need to regenerate the mesh.
         private void OnValidate() {
-            CreateCubemaps(true);
-            CreateMaterial(true);
-            CreatePreviewMesh(true);
-            CreatePreviewTexture(true);
+            // This method is called whenever a setting is changed in the inspector, or at the beginning of scene mode rendering.
+            // If any of the Cavern size settings are changed, we need to regenerate the mesh.
+            CreatePreviewMesh();
         }
 
         private void OnDrawGizmos() {
