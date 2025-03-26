@@ -1,6 +1,9 @@
 // Header Guards
-#ifndef CAVERN_PROJECTION_HLSL
-#define CAVERN_PROJECTION_HLSL
+#ifndef CAVERN_PROJECTION_MAPPING_HLSL
+#define CAVERN_PROJECTION_MAPPING_HLSL
+
+// Define Built-In Macros
+#define SHADERPASS SHADERPASS_BLIT
 
 // Include URP library functions.
 // URP library functions can be found via the Unity Editor in "Packages/Universal RP/Shader Library/".
@@ -44,12 +47,15 @@ int _SwapEyes;
 struct Attributes { // We can name this struct anything we want.
     float3 positionOS : POSITION; // Position in object space.
     float2 uv : TEXCOORD0; // Material texture UVs.
+    uint vertexID : SV_VertexID;
+    UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 // Data passed from the vertex function to the fragment function.
 struct Vert2Frag { // We can name this struct anything we want.
     float4 positionCS : SV_POSITION; // Clip space position must have the semantics SV_POSITION.
     float2 uv : TEXCOORD0; // Render texture UV coordinates.
+    UNITY_VERTEX_OUTPUT_STEREO
 };
 
 // The vertex function, runs once per vertex.
@@ -57,10 +63,10 @@ Vert2Frag Vertex(Attributes input) {
     // Helper function from ShaderVariableFunctions.hlsl in the URP package
     VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS);
 
+    // Since this shader is only ever used for blitting, use FullScreenTriangle functions.
     Vert2Frag output;
-    output.positionCS = positionInputs.positionCS; // Set the clip space position.
-    output.uv = input.uv;
-
+    output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+    output.uv = GetFullScreenTriangleTexCoord(input.vertexID);
     return output;
 }
 
@@ -135,4 +141,4 @@ float4 Fragment(Vert2Frag input) : SV_TARGET {
         : SampleRightEye(headToScreen, fragmentRelativeAngle, ipdOffsetZ, ipdOffsetX);
 }
 
-#endif // CAVERN_PROJECTION_HLSL
+#endif // CAVERN_PROJECTION_MAPPING_HLSL
