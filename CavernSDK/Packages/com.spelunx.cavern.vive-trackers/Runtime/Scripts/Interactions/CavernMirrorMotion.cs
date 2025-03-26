@@ -27,6 +27,16 @@ namespace Spelunx.Vive
                 Vector3 newVector = newDirection * newRadius;
                 transform.position = cavernRenderer.transform.position + new Vector3(newVector.x, target.position.y, newVector.z); // ignore original y value so it will be copy the target
             }
+            MirrorRotation();
+        }
+
+        void MirrorRotation()
+        {
+            Vector3 mirrorNormal = (transform.position - cavernRenderer.transform.position).normalized; // Normal of the mirror plane
+            Vector3 reflectedForward = -Vector3.Reflect(target.forward, mirrorNormal);
+            Vector3 reflectedUp = Vector3.Reflect(target.up, mirrorNormal);
+
+            transform.rotation = Quaternion.LookRotation(reflectedForward, reflectedUp);
         }
 
         public void SetTarget(Transform target)
