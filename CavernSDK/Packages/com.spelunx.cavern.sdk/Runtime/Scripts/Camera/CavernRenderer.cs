@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
-using UnityEditor;
+
 
 namespace Spelunx {
     [ExecuteInEditMode]
@@ -96,11 +96,19 @@ namespace Spelunx {
         private void OnEnable() {
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+#if UNITY_EDITOR
+            UnityEditor.SceneManagement.EditorSceneManager.sceneSaved += OnSceneSaved;
+            UnityEditor.EditorApplication.delayCall += OnEditorDelayCall;
+#endif
         }
 
         private void OnDisable() {
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+#if UNITY_EDITOR
+            UnityEditor.SceneManagement.EditorSceneManager.sceneSaved -= OnSceneSaved;
+            UnityEditor.EditorApplication.delayCall -= OnEditorDelayCall;
+#endif
         }
 
         private void Awake() {
@@ -609,6 +617,17 @@ namespace Spelunx {
             // This method is called whenever a setting is changed in the inspector, or at the beginning of scene mode rendering.
             // If any of the Cavern size settings are changed, we need to regenerate the mesh.
             CreatePreviewMesh();
+        }
+
+        // The cubemap render targets get cleaned up by Unity's garbage collector on scene save or assembly reload. The material needs to have it's texture references restored. 
+        private void OnSceneSaved(UnityEngine.SceneManagement.Scene scene)
+        {
+            CreateMaterial();
+        }
+
+        private void OnEditorDelayCall()
+        {
+            CreateMaterial();
         }
 
         private void OnDrawGizmos() {
