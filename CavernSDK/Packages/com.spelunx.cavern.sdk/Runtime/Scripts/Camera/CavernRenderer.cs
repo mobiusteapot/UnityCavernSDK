@@ -67,8 +67,8 @@ namespace Spelunx {
 
         [Header("References (Do NOT edit!)")]
         [SerializeField] private Transform head;
-        [SerializeField] private Camera eye; // Ensure that UI culling mask is unset.
-        [SerializeField] private Camera guiCamera; // Ensure that ONLY UI culling mask is set.
+        [SerializeField] private Camera eye; // Ensure that UI culling mask is unset. Ensure that Output > Target Eye is set to None in the Inspector, or it'll render a blank screen on the Cavern PC! No I don't know why.
+        [SerializeField] private Camera guiCamera; // Ensure that ONLY UI culling mask is set. Ensure that Output > Target Eye is set to None in the Inspector, or it'll render a blank screen on the Cavern PC! No I don't know why.
         [SerializeField] private AudioListener ear;
         [SerializeField] private Shader shader;
         [SerializeField] private Material previewMaterial;
