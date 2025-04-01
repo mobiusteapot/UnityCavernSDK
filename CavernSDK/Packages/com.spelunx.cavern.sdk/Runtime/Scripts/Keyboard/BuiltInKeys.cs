@@ -10,24 +10,32 @@ namespace Spelunx
     {
         public override string Action_Map_Name => "Cavern Renderer";
         private DebugManager d;
-
+        private const float IPD_CHANGE = 0.001f;
         public override void SetupInputActions(InputActionMap actionMap)
         {
             RegisterAction(actionMap, "Quit", "<Keyboard>/Escape");
-            RegisterAction(actionMap, "SwapEyes", "<Keyboard>/e");
-            RegisterAction(actionMap, "StereoMonoToggle", "<Keyboard>/t");
-            RegisterAction(actionMap, "MuteToggle", "<Keyboard>/m");
-            RegisterAction(actionMap, "MouseMove", "<Mouse>/delta");
+            RegisterAction(actionMap, "Swap Eyes", "<Keyboard>/e");
+            RegisterAction(actionMap, "Stereo/Mono Toggle", "<Keyboard>/t");
+            RegisterAction(actionMap, "Mute Toggle", "<Keyboard>/m");
+            RegisterAction(actionMap, "Mouse Move", "<Mouse>/delta");
+
+            RegisterAction(actionMap, "Help", "<Keyboard>/h");
+
+            RegisterAction(actionMap, "Increase IPD", "<Keyboard>/rightArrow");
+            RegisterAction(actionMap, "Decrease IPD", "<Keyboard>/leftArrow");
         }
 
         public override void BindInputActions(DebugManager d, InputActionMap actionMap)
         {
             this.d = d;
             actionMap.FindAction("Quit").performed += QuitAction;
-            actionMap.FindAction("SwapEyes").performed += SwapEyesAction;
-            actionMap.FindAction("StereoMonoToggle").performed += MonoStereoAction;
-            actionMap.FindAction("MuteToggle").performed += MuteToggleAction;
-            actionMap.FindAction("MouseMove").performed += OnMouseMove;
+            actionMap.FindAction("Swap Eyes").performed += SwapEyesAction;
+            actionMap.FindAction("Stereo/Mono Toggle").performed += MonoStereoAction;
+            actionMap.FindAction("Mute Toggle").performed += MuteToggleAction;
+            actionMap.FindAction("Mouse Move").performed += OnMouseMove;
+            actionMap.FindAction("Help").performed += HelpAction;
+            actionMap.FindAction("Increase IPD").performed += IncreaseIPDAction;
+            actionMap.FindAction("Decrease IPD").performed += DecreaseIPDAction;
             StartHideMouse();
         }
 
@@ -70,6 +78,23 @@ namespace Spelunx
         {
             AudioListener l = GameObject.FindFirstObjectByType<AudioListener>();
             l.enabled = !l.enabled;
+        }
+
+        void HelpAction(InputAction.CallbackContext ctx)
+        {
+
+        }
+
+        void IncreaseIPDAction(InputAction.CallbackContext ctx)
+        {
+            CavernRenderer cavern = GameObject.FindFirstObjectByType<CavernRenderer>();
+            cavern.IPD += IPD_CHANGE;
+        }
+
+        void DecreaseIPDAction(InputAction.CallbackContext ctx)
+        {
+            CavernRenderer cavern = GameObject.FindFirstObjectByType<CavernRenderer>();
+            cavern.IPD -= IPD_CHANGE;
         }
 
 

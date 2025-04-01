@@ -18,7 +18,7 @@ namespace Spelunx
         [SerializeField]
         private InputActionMap actions;
 
-        [SerializeField, SerializeReference]
+        [SerializeField, SerializeReference, HideInInspector]
         private List<KeyManager> keyManagers = new();
 
         public void AddKeyManager(KeyManager man)

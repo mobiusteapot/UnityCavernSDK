@@ -88,7 +88,18 @@ namespace Spelunx
 
         public CubemapResolution GetCubemapResolution() { return cubemapResolution; }
         public StereoscopicMode GetStereoscopicMode() { return stereoMode; }
-        public float GetIPD() { return interpupillaryDistance; }
+        public float IPD
+        {
+            get => interpupillaryDistance;
+            set
+            {
+                if (0.055f <= value && 0.075f >= value)
+                {
+
+                    interpupillaryDistance = value;
+                }
+            }
+        }
         public float GetCavernHeight() { return cavernHeight; }
         public float GetCavernRadius() { return cavernRadius; }
         public float GetCavernAngle() { return cavernAngle; }
