@@ -1,51 +1,58 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
+using UnityEditor;
+using UnityEngine.Events;
+using UnityEditor.Events;
 
 namespace Spelunx
 {
     public class DebugManager : MonoBehaviour
     {
-
-
         // [SerializeField]
-        // private List<InputAction> inputs;
-        // private InputActionMap actions;
-
-        // InputActionMap a;
+        // private InputActionAsset actions;
 
         [SerializeField]
-        private InputAction quit;
+        private InputActionMap actions;
 
-        // public void RegisterInput(string name, InputAction act)
-        // {
-        //     // Don't add the action if the map already has it
-        //     if(actions.Contains(act)){
-        //         return;
-        //     }
-        //     actions.AddAction(name, act);
-        // }
+        [SerializeField, SerializeReference]
+        private List<KeyManager> keyManagers = new();
+
+        public void AddKeyManager(KeyManager man)
+        {
+            if (!keyManagers.Any(item => item.Action_Map_Name == man.Action_Map_Name))
+            {
+                // SerializedObject so = new SerializedObject(this);
+                // SerializedProperty p = so.FindProperty("keyManagers");
+                // p;
+                keyManagers.Add(man);
+                man.SetupInputActions(actions);
+                // so.Update();
+                // so.ApplyModifiedPropertiesWithoutUndo();
+                // PrefabUtility.RecordPrefabInstancePropertyModifications(keyManagers);
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        void OnEnable()
+        {
+            actions.Enable();
+        }
+
+        void OnDisable()
+        {
+            actions.Disable();
+        }
 
         void Awake()
         {
-            quit.performed += QuitAction;
-            quit.Enable();
-            // a.AddAction();
-            // a.
-            // foreach (InputAction act in inputs)
-            // {
-            //     act.Enable();
-            // }
-        }
-        public void QuitAction(InputAction.CallbackContext ctx)
-        {
-#if UNITY_EDITOR
-            // UnityEditor.EditorApplication.isPlaying = false;
-            UnityEditor.EditorApplication.ExitPlaymode();
-#else
-            Application.Quit();
-#endif
+            foreach (KeyManager manager in keyManagers)
+            {
+                manager.BindInputActions(this, actions);
+            }
         }
     }
 }

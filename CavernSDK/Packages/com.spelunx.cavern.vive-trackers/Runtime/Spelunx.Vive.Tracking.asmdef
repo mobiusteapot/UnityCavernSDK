@@ -3,7 +3,8 @@
     "rootNamespace": "Spelunx.Vive",
     "references": [
         "Unity.XR.OpenVR",
-        "Spelunx.Cavern.SDK"
+        "Spelunx.Cavern.SDK",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor",

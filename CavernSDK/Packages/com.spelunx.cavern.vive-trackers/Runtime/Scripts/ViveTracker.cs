@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
@@ -74,6 +75,8 @@ namespace Spelunx.Vive
             }
         }
 
+        private bool doCalibration = false;
+
         private void OnNewBoundPose(string binding, TrackedDevicePose_t pose, int deviceIndex)
         {
             if (this.binding.ToString() != binding)
@@ -101,10 +104,11 @@ namespace Spelunx.Vive
             if (origin != null)
             {
                 transform.position = origin.transform.TransformPoint(rigidTransform.pos);
-                if (Input.GetKey(KeyCode.C))
+                if (doCalibration)
                 {
                     // calibrate
                     rotationAlignment = Quaternion.Inverse(origin.rotation * rigidTransform.rot);
+                    doCalibration = false;
                 }
                 transform.rotation = origin.rotation * rigidTransform.rot * rotationAlignment;
             }
@@ -113,6 +117,12 @@ namespace Spelunx.Vive
                 transform.localPosition = rigidTransform.pos;
                 transform.localRotation = rigidTransform.rot;
             }
+        }
+
+        // Calibrate vive trackers on the next pose frame
+        public void Calibrate()
+        {
+            doCalibration = true;
         }
 
         private void OnTrackerRolesChanged()

@@ -9,8 +9,8 @@ namespace Spelunx.Vive
      */
     public class FollowMotion : MonoBehaviour
     {
-        [SerializeField] private Transform target = null;  // the target to follow (usually vive tracker)
-        private Vector3 offset = Vector3.zero;
+        [SerializeField, Tooltip("The target to follow. Usually a vive tracker.")] private Transform target = null;  // the target to follow (usually vive tracker)
+        [SerializeField, Tooltip("The offset vector from the target position.")] private Vector3 offset = Vector3.zero;
 
         private void Start()
         {

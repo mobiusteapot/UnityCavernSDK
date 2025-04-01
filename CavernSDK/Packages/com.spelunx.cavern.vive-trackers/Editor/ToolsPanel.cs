@@ -28,7 +28,7 @@ namespace Spelunx.Vive
 
             trackerCount = GameObject.FindGameObjectsWithTag("ViveTracker").Length;
             GUILayout.Label("Current trackers in scene: " + trackerCount);
-          
+
             // === Add Vive Tracker to Scene ===
             if (GUILayout.Button("Add new Vive Tracker"))
             {
@@ -40,24 +40,26 @@ namespace Spelunx.Vive
                 viveTracker = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTracker.prefab", typeof(GameObject));
                 // Debug.Log("vive setup: " + viveManager.name + " " + viveTracker.name);
                 // Debug.Log("Got " + objToSpawn.name + objToSpawn.GetType());
-                
+
                 // check if vive tracker manager is already present
                 if (GameObject.FindGameObjectsWithTag("ViveManager").Length == 0)
                 {
                     newViveManager = (GameObject)PrefabUtility.InstantiatePrefab(viveManager as GameObject);
-                    
+
                     // set vive manager to be in the CAVERN setup folder in the scene hierarchy
                     GameObject cavernSetup = GameObject.Find("CavernSetup");
                     if (cavernSetup != null)
                     {
                         newViveManager.GetComponent<Transform>().parent = cavernSetup.transform;
                     }
+                    // load in the debug keys
+                    cavernSetup.GetComponent<DebugManager>().AddKeyManager(new ViveDebugKeys());
                 }
 
                 // instantiate a new vive tracker
                 PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
             }
-            
+
             //=== interaction building blocks ===
             GUILayout.Space(20);
             GUILayout.Label("Tracker Interaction Building Blocks", EditorStyles.boldLabel);
@@ -95,12 +97,13 @@ namespace Spelunx.Vive
             EditorGUILayout.HelpBox("Object moves away from an user determined target when it's within a distance (preserves height, y position value unchanged). Contains adjustable trigger distance, move away distance, and move away speed.", MessageType.Info);
             if (GUILayout.Button("Add Evasive Motion"))
             {
-                AddInteraction(typeof(EvasiveMotion));     
+                AddInteraction(typeof(EvasiveMotion));
                 // Debug.Log("retreat button pressed");
             }
         }
-        
-        private void AddInteraction(Type interaction) {
+
+        private void AddInteraction(Type interaction)
+        {
             foreach (GameObject obj in Selection.gameObjects)
             {
                 // Debug.Log("Selected: " + obj.name);
