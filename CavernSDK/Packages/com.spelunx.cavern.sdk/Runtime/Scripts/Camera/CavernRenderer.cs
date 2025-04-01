@@ -466,7 +466,7 @@ namespace Spelunx {
                 Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenBottom) ||
                 Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenBottom) ||
                 Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenBottom)) {
-                monoMask |= topMask;
+                monoMask |= bottomMask;
                 northMask |= bottomMask;
                 southMask |= bottomMask;
             }
