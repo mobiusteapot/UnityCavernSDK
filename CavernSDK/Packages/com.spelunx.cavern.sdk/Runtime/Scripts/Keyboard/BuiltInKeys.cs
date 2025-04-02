@@ -99,15 +99,19 @@ namespace Spelunx
 
 
         #region Cursor Hiding
+
+        // We hide the cursor when it's not moving.
+        // We use coroutines instead of an update loop because most of the time the mouse isn't going to be moving
+        // And this saves on compute cost in that case (although it's slightly worse if the mouse is moving often)
         void StartHideMouse()
         {
             hideMouseCoroutine = HideMouse();
-            d.StartCoroutine(hideMouseCoroutine);
+            d.StartCoroutine(hideMouseCoroutine); // This isn't a unity gameobject, so it can't run coroutines. Run them in the debugmanager object instead.
         }
         IEnumerator hideMouseCoroutine = null;
         IEnumerator HideMouse()
         {
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(3); // after three seconds, hide the mouse
             Cursor.visible = false;
         }
 
