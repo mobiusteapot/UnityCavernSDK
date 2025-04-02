@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
-using UnityEditor;
+
 
 namespace Spelunx
 {
@@ -69,7 +69,7 @@ namespace Spelunx
         [Header("Preview")]
         [SerializeField] private CubemapResolution previewResolution = CubemapResolution.VeryLow;
         [SerializeField] private PreviewEye previewEye = PreviewEye.Left;
-        [SerializeField, Tooltip("Should the CAVERN preview live update?")] private bool liveRender = true;
+        [SerializeField, Tooltip("Should the CAVERN preview live update?")] private bool livePreview = true;
 
         [Header("References (Do NOT edit!)")]
         [SerializeField] private Transform head;
@@ -131,12 +131,20 @@ namespace Spelunx
         {
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+#if UNITY_EDITOR
+            UnityEditor.SceneManagement.EditorSceneManager.sceneSaved += OnSceneSaved;
+            UnityEditor.EditorApplication.delayCall += OnEditorDelayCall;
+#endif
         }
 
         private void OnDisable()
         {
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+#if UNITY_EDITOR
+            UnityEditor.SceneManagement.EditorSceneManager.sceneSaved -= OnSceneSaved;
+            UnityEditor.EditorApplication.delayCall -= OnEditorDelayCall;
+#endif
         }
 
         private void Awake()
@@ -158,13 +166,7 @@ namespace Spelunx
 
         private void Update()
         {
-#if UNITY_EDITOR
-            // Don't render if we aren't playing and aren't showing a preview
-            if (!EditorApplication.isPlaying && !liveRender)
-            {
-                return;
-            }
-#endif
+
             // If clampHeadPosition is true, limit the head position to be within the bounds of the circle.
             if (clampHeadPosition)
             {
@@ -182,15 +184,19 @@ namespace Spelunx
                 ear.gameObject.transform.rotation = head.transform.rotation;
             }
 
-            RenderEyes();
-
 #if UNITY_EDITOR
-            // In editor mode, blit to the screen viewer.
-            if (previewTexture != null && material != null)
+            // Only render if we are playing and or showing a live preview.
+            if (UnityEditor.EditorApplication.isPlaying || livePreview)
             {
-                Graphics.Blit(null, previewTexture, material);
+                RenderEyes();
+                if (previewTexture != null && material != null)
+                {
+                    Graphics.Blit(null, previewTexture, material);
+                }
             }
-#endif // UNITY_EDITOR
+#else
+            RenderEyes();
+#endif
         }
 
         // Find out which faces of the cubemaps should be rendered. We want the minimum number of faces to reduce the rendering workload.
@@ -477,8 +483,8 @@ namespace Spelunx
                 Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f)
             {
                 monoMask |= backMask;
-                eastMask |= backMask; // Left Eye
-                westMask |= backMask; // Right Eye
+                eastMask |= backMask; // Left Eye, no need to account for convergence because that is already handled in 'Looking North'.
+                westMask |= backMask; // Right Eye, no need to account for convergence because that is already handled in 'Looking North'.
             }
 
             /******************* Looking East *******************/
@@ -500,39 +506,39 @@ namespace Spelunx
             }
 
             /******************* Top & Bottom Faces *******************/
-            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenTop) ||
-                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenTop) ||
-                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenTop) ||
+            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenTop) || // Looking North
+                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenTop) || // Looking North
+                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenTop) || // Looking South
                 Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenTop))
-            {
+            { // Looking South
                 monoMask |= topMask;
                 eastMask |= topMask;
                 westMask |= topMask;
             }
-            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenBottom) ||
-                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenBottom) ||
-                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenBottom) ||
+            if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenBottom) || // Looking North
+                Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenBottom) || // Looking North
+                Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenBottom) || // Looking South
                 Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenBottom))
-            {
+            { // Looking South
                 monoMask |= bottomMask;
                 eastMask |= bottomMask;
                 westMask |= bottomMask;
             }
-            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenTop) ||
-                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenTop) ||
-                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenTop) ||
+            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenTop) || // Looking East
+                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenTop) || // Looking East
+                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenTop) || // Looking West
                 Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenTop))
-            {
+            { // Looking West
                 monoMask |= topMask;
                 northMask |= topMask;
                 southMask |= topMask;
             }
-            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenBottom) ||
-                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenBottom) ||
-                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenBottom) ||
+            if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenBottom) || // Looking East
+                Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenBottom) || // Looking East
+                Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenBottom) || // Looking West
                 Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenBottom))
-            {
-                monoMask |= topMask;
+            { // Looking West
+                monoMask |= bottomMask;
                 northMask |= bottomMask;
                 southMask |= bottomMask;
             }
@@ -697,6 +703,17 @@ namespace Spelunx
             CreatePreviewMesh();
         }
 
+        // The cubemap render targets get cleaned up by Unity's garbage collector on scene save or assembly reload. The material needs to have it's texture references restored. 
+        private void OnSceneSaved(UnityEngine.SceneManagement.Scene scene)
+        {
+            CreateMaterial();
+        }
+
+        private void OnEditorDelayCall()
+        {
+            CreateMaterial();
+        }
+
         private void OnDrawGizmos()
         {
             if (previewMaterial == null)
@@ -704,14 +721,7 @@ namespace Spelunx
                 Debug.LogAssertion("CavernRenderer: Preview material cannot be null!");
             }
             previewMaterial.SetPass(0);
-            if (liveRender)
-            {
-                previewMaterial.mainTexture = previewTexture;
-            }
-            else
-            {
-                previewMaterial.mainTexture = null;
-            }
+            previewMaterial.mainTexture = livePreview ? previewTexture : null;
 
             // We need to use Graphics.DrawMeshNow instead of Gizmos.DrawMesh so we can get a texture on it.
             Graphics.DrawMeshNow(previewMesh, transform.position, transform.rotation);
