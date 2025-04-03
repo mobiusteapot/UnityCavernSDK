@@ -1,21 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using System;
 using UnityEngine.InputSystem;
+
 namespace Spelunx.Vive
 {
-    [Serializable]
-    public class ViveDebugKeys : KeyManager
+    [DisallowMultipleComponent]
+    public class ViveDebugKeys : MonoBehaviour, IDebugKeys
     {
-        public override string Action_Map_Name => "Vive Trackers";
+        [Header("Input Actions")]
+        [SerializeField, Tooltip("Calibrate the rotations of all vive trackers. Hold them upright in the center of the CAVERN and pointed towards the center of the screen.")]
+        private InputAction calibrate = new("Calibrate", InputActionType.Value, "<Keyboard>/c");
 
-        public override void SetupInputActions(InputActionMap actionMap)
+        public List<(string Key, string Description)> KeyDescriptions()
         {
-            RegisterAction(actionMap, "CalibrateViveRotation", "<Keyboard>/c");
+            return new(){
+                (calibrate.GetBindingDisplayString(), "Calibrate the rotation of all vive trackers."),
+            };
         }
 
-        public override void BindInputActions(DebugManager d, InputActionMap actionMap)
+        // enable the input actions on play mode start
+        void OnEnable()
         {
-            actionMap.FindAction("CalibrateViveRotation").performed += CalibrateAction;
+            calibrate.Enable();
+        }
+
+
+        // disable the input actions on play mode stop
+        void OnDisable()
+        {
+            calibrate.Disable();
+        }
+
+        // bind the proper callbacks to each action.performed
+        // using the saved key managers
+        // This must happen in play mode, not in edit mode, or it won't work.
+        void Awake()
+        {
+            calibrate.performed += CalibrateAction;
         }
 
         void CalibrateAction(InputAction.CallbackContext ctx)
@@ -26,5 +48,4 @@ namespace Spelunx.Vive
             }
         }
     }
-
 }

@@ -41,7 +41,7 @@ namespace Spelunx
         [SerializeField] private StereoscopicMode stereoMode = StereoscopicMode.Mono;
         [SerializeField] private CubemapResolution cubemapResolution = CubemapResolution.Mid;
         /// Interpupillary Distance (IPD) in metres.
-        [SerializeField, Range(0.055f, 0.075f)] private float interpupillaryDistance = 0.065f;
+        [SerializeField, Range(0.055f, 10000000.075f)] private float interpupillaryDistance = 0.065f;
         /// Cavern physical screen height in metres.
         [SerializeField, Min(0.1f)] private float cavernHeight = 2.0f;
         /// Cavern physical screen radius in metres.

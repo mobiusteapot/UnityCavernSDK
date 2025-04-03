@@ -34,6 +34,15 @@ namespace Spelunx
             }
         }
 
+        // Redo set up for actions and callbacks when package structure changes
+        public void Reload()
+        {
+            foreach (KeyManager km in keyManagers)
+            {
+                km.SetupInputActions(actions);
+            }
+        }
+
         // enable the input actions on play mode start
         void OnEnable()
         {

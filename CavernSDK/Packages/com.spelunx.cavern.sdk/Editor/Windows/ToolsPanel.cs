@@ -34,7 +34,7 @@ namespace Spelunx
                 newCavernSetup = (GameObject)PrefabUtility.InstantiatePrefab(cavernSetup as GameObject);
 
                 // load in the debug keys
-                newCavernSetup.GetComponent<DebugManager>().AddKeyManager(new BuiltInKeys());
+                // newCavernSetup.GetComponent<DebugManager>().AddKeyManager(new BuiltInKeys());
 
                 // sets speaker mode to 5.1 surround
                 audioConfigs = AudioSettings.GetConfiguration();

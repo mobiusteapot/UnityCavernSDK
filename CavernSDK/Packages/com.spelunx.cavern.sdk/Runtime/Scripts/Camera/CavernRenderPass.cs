@@ -4,18 +4,22 @@ using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
 
-namespace Spelunx {
+namespace Spelunx
+{
     // Todo: Execute to game view in edit mode?
-    public class CavernRenderPass : ScriptableRenderPass {
+    public class CavernRenderPass : ScriptableRenderPass
+    {
         private Material blitMaterial;
 
-        public CavernRenderPass(Material blitMaterial) {
+        public CavernRenderPass(Material blitMaterial)
+        {
             this.blitMaterial = blitMaterial;
             this.requiresIntermediateTexture = true;
             this.renderPassEvent = RenderPassEvent.AfterRendering;
         }
 
-        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData) {
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
             const string name = "CavernRenderPass";
 
             // Get source.

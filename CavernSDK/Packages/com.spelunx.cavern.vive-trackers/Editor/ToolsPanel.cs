@@ -53,7 +53,8 @@ namespace Spelunx.Vive
                         newViveManager.GetComponent<Transform>().parent = cavernSetup.transform;
                     }
                     // load in the debug keys
-                    cavernSetup.GetComponent<DebugManager>().AddKeyManager(new ViveDebugKeys());
+                    cavernSetup.AddComponent<ViveDebugKeys>();
+                    // cavernSetup.GetComponent<DebugManager>().AddKeyManager(new ViveDebugKeys());
                 }
 
                 // instantiate a new vive tracker
