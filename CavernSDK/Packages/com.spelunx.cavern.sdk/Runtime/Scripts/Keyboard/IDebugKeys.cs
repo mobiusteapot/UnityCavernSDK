@@ -7,5 +7,7 @@ namespace Spelunx
     public interface IDebugKeys
     {
         public List<(string Key, string Description)> KeyDescriptions();
+
+        public void DoExtraGUI();
     }
 }

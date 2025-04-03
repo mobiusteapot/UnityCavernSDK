@@ -394,9 +394,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.data[0].m_Id
+      value: 4212f46c-2dc9-4e8f-be97-f662c34e4fd8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.data[1].m_Id
+      value: 22500a8b-f2f8-42e9-972e-b974c655c3bd
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.data[0].m_Path
+      value: <Keyboard>/escape
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.data[1].m_Path
+      value: <Keyboard>/q
+      objectReference: {fileID: 0}
+    - target: {fileID: 2083550966300434981, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
+      propertyPath: quit.m_SingletonActionBindings.Array.data[1].m_Action
+      value: Quit
+      objectReference: {fileID: 0}
     - target: {fileID: 5639151482491832928, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
       propertyPath: stereoMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5639151482491832928, guid: 30a8445daaaaf614993d0afac6a24721, type: 3}
       propertyPath: interpupillaryDistance

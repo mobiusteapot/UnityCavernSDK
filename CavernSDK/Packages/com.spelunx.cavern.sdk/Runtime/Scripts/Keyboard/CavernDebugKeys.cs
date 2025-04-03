@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Spelunx
@@ -33,6 +34,7 @@ namespace Spelunx
         // used to render the help debug window
         private List<string> helpKeys = new();
         private List<string> helpDescriptions = new();
+        private UnityAction extraGUICalls;
         private bool showHelp = false;
 
         public List<(string Key, string Description)> KeyDescriptions()
@@ -46,6 +48,11 @@ namespace Spelunx
                 (increaseIPD.GetBindingDisplayString(), "Increase IPD"),
                 (decreaseIPD.GetBindingDisplayString(), "Decrease IPD")
             };
+        }
+
+        public void DoExtraGUI()
+        {
+            GUILayout.Label($"Framerate: {1 / Time.deltaTime} fps");
         }
 
         // enable the input actions on play mode start
@@ -103,6 +110,7 @@ namespace Spelunx
                     helpKeys.Add(d.Key);
                     helpDescriptions.Add(d.Description);
                 }
+                extraGUICalls += manager.DoExtraGUI;
             }
         }
 
@@ -193,6 +201,7 @@ namespace Spelunx
             if (!showHelp) return;
             GUILayout.BeginArea(new Rect(40, 40, 500, 500), GUI.skin.box);
             // GUILayout.Box("Debug Info");
+            GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
             foreach (string key in helpKeys)
@@ -208,6 +217,8 @@ namespace Spelunx
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
+            extraGUICalls.Invoke();
+            GUILayout.EndVertical();
             GUILayout.EndArea();
         }
 
