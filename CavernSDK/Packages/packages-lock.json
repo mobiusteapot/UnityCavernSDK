@@ -1,5 +1,20 @@
 {
   "dependencies": {
+    "com.spelunx.cavern.orbbec.libs": {
+      "version": "file:com.spelunx.cavern.orbbec.libs",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.spelunx.cavern.orbbec.sdk": {
+      "version": "file:com.spelunx.cavern.orbbec.sdk",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.spelunx.cavern.sdk": "0.1.16",
+        "com.spelunx.cavern.orbbec.libs": "0.0.1"
+      }
+    },
     "com.spelunx.cavern.sdk": {
       "version": "file:com.spelunx.cavern.sdk",
       "depth": 0,

@@ -1,0 +1,18 @@
+{
+    "name": "Spelunx.Cavern.Orbbec.SDK.Editor",
+    "rootNamespace": "Spelunx.Orbbec",
+    "references": [
+        "Spelunx.Cavern.SDK"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
