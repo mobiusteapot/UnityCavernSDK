@@ -52,7 +52,7 @@ namespace Spelunx
 
         public void DoExtraGUI()
         {
-            GUILayout.Label($"Framerate: {1 / Time.deltaTime} fps");
+            GUILayout.Label($"Framerate: {(int)(1 / Time.unscaledDeltaTime)} fps");
         }
 
         // enable the input actions on play mode start

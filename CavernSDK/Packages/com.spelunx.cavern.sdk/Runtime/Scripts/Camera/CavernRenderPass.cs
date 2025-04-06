@@ -18,6 +18,11 @@ namespace Spelunx
             this.renderPassEvent = RenderPassEvent.AfterRendering;
         }
 
+        public void SetMaterial(Material material)
+        {
+            blitMaterial = material;
+        }
+
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             const string name = "CavernRenderPass";

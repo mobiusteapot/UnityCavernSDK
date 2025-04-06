@@ -61,6 +61,14 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Quit
       m_Flags: 0
+    - m_Name: 
+      m_Id: 1880a5e9-8b8f-4480-a178-d3910093986d
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Quit
+      m_Flags: 0
     m_Flags: 0
   help:
     m_Name: Help

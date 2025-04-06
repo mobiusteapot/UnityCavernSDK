@@ -128,7 +128,7 @@ namespace Unity.XR.OpenVR
     {
         private static List<XRDisplaySubsystemDescriptor> s_DisplaySubsystemDescriptors = new List<XRDisplaySubsystemDescriptor>();
         private static List<XRInputSubsystemDescriptor> s_InputSubsystemDescriptors = new List<XRInputSubsystemDescriptor>();
-        
+
 
         public XRDisplaySubsystem displaySubsystem
         {
@@ -153,7 +153,7 @@ namespace Unity.XR.OpenVR
 #endif
 
 
-//this only works at the right time in editor. In builds we use a different method (reading the asset manually)
+            //this only works at the right time in editor. In builds we use a different method (reading the asset manually)
 #if UNITY_EDITOR
             OpenVRSettings settings = OpenVRSettings.GetSettings();
             if (settings != null)
@@ -182,17 +182,17 @@ namespace Unity.XR.OpenVR
 
                 userDefinedSettings.actionManifestPath = settings.ActionManifestFileRelativeFilePath;
 
-                SetUserDefinedSettings(userDefinedSettings); 
+                SetUserDefinedSettings(userDefinedSettings);
             }
 #endif
-            
+
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "OpenVR Display");
 
             EVRInitError result = GetInitializationResult();
             if (result != EVRInitError.None)
             {
                 DestroySubsystem<XRDisplaySubsystem>();
-                Debug.LogError("<b>[OpenVR]</b> Could not initialize OpenVR. Error code: " + result.ToString());
+                // Debug.LogError("<b>[OpenVR]</b> Could not initialize OpenVR. Error code: " + result.ToString());
                 return false;
             }
 
@@ -370,12 +370,12 @@ namespace Unity.XR.OpenVR
 
                             Debug.Log("<b>[OpenVR]</b> Mirror View Mode changed via file to: " + mode.ToString());
                             OpenVRSettings.SetMirrorViewMode((ushort)mode); //bypass the local set.
-                            
+
                         }
                     }
                 }
             }
-            catch 
+            catch
             { }
         }
 
@@ -386,7 +386,7 @@ namespace Unity.XR.OpenVR
             running = false;
             CleanupTick();
             CleanupReloadWatcher();
-            DestroyMirrorModeWatcher();            
+            DestroyMirrorModeWatcher();
 
             StopSubsystem<XRInputSubsystem>();
             StopSubsystem<XRDisplaySubsystem>(); //display actually does vrshutdown
@@ -411,7 +411,7 @@ namespace Unity.XR.OpenVR
             RegisterTickCallback(null);
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto )]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         struct UserDefinedSettings
         {
             public ushort stereoRenderingMode;

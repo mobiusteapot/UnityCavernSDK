@@ -61,7 +61,7 @@ namespace Spelunx.Vive
 
             if (!File.Exists(steamVrSettingsPath))
             {
-                Debug.LogWarning("[OVRT] Could not find SteamVR configuration file!");
+                Debug.LogWarning("[ViveTrackers] Could not find SteamVR configuration file!");
                 return trackerBindings;
             }
 
@@ -149,7 +149,7 @@ namespace Spelunx.Vive
         {
             if (!OpenVR.IsRuntimeInstalled())
             {
-                Debug.LogError("[OVRT] SteamVR runtime not installed!");
+                // Debug.LogError("[OVRT] SteamVR runtime not installed!");
                 return;
             }
 
@@ -168,7 +168,7 @@ namespace Spelunx.Vive
             if (initError != EVRInitError.None)
             {
                 var initErrorString = OpenVR.GetStringForHmdError(initError);
-                Debug.LogError($"[OVRT] Could not initialize OpenVR tracking: {initErrorString}");
+                Debug.LogError($"[ViveTrackers] Could not initialize OpenVR tracking: {initErrorString}");
                 return;
             }
 
@@ -191,10 +191,10 @@ namespace Spelunx.Vive
             }
             else
             {
-                Debug.LogWarning($"[OVRT] Could not find {openVrPathsConfigPath}!");
+                Debug.LogWarning($"[ViveTrackers] Could not find {openVrPathsConfigPath}!");
             }
 
-            Debug.Log($"[OVRT] Initialized OpenVR tracking.");
+            Debug.Log($"[ViveTrackers] Initialized OpenVR tracking.");
 
             UpdateSteamVrTrackerBindings();
         }
@@ -374,7 +374,7 @@ namespace Spelunx.Vive
 
                     if (error != EVRInitError.None)
                     {
-                        Debug.LogError("[OVRT] Could not initialize OpenVR tracking: " + error.ToString());
+                        Debug.LogError("[ViveTrackers] Could not initialize OpenVR tracking: " + error.ToString());
                         return false;
                     }
 
