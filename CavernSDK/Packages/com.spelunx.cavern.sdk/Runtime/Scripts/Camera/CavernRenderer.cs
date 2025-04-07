@@ -4,19 +4,15 @@ using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 
 
-namespace Spelunx
-{
+namespace Spelunx {
     [ExecuteInEditMode]
-    public class CavernRenderer : MonoBehaviour
-    {
-        public enum StereoscopicMode
-        {
+    public class CavernRenderer : MonoBehaviour {
+        public enum StereoscopicMode {
             Mono, // Monoscopic mode. No 3D effect.
             Stereo, // Stereoscopic mode. Gives a 3D-movie effect when wearing 3D glasses.
         }
 
-        public enum CubemapResolution
-        {
+        public enum CubemapResolution {
             VeryLow = 512,
             Low = 1024,
             Mid = 2048,
@@ -26,8 +22,7 @@ namespace Spelunx
 
         public enum PreviewEye { Left, Right }
 
-        private enum CubemapIndex
-        {
+        private enum CubemapIndex {
             North = 0, // Also used for monoscopic.
             South,
             East,
@@ -88,13 +83,10 @@ namespace Spelunx
 
         public CubemapResolution GetCubemapResolution() { return cubemapResolution; }
         public StereoscopicMode GetStereoscopicMode() { return stereoMode; }
-        public float IPD
-        {
+        public float IPD {
             get => interpupillaryDistance;
-            set
-            {
-                if (0.05f <= value && 0.08f >= value)
-                {
+            set {
+                if (0.05f <= value && 0.08f >= value) {
 
                     interpupillaryDistance = value;
                 }
@@ -110,25 +102,20 @@ namespace Spelunx
         public GameObject GetEar() { return ear.gameObject; }
         public GameObject GetGUICamera() { return guiCamera.gameObject; }
 
-        public void SetStereoscopicMode(StereoscopicMode mode)
-        {
+        public void SetStereoscopicMode(StereoscopicMode mode) {
             stereoMode = mode;
         }
 
-        public bool SwapEyes
-        {
-            get
-            {
+        public bool SwapEyes {
+            get {
                 return swapEyes;
             }
-            set
-            {
+            set {
                 swapEyes = value;
             }
         }
 
-        private void OnEnable()
-        {
+        private void OnEnable() {
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
 #if UNITY_EDITOR
@@ -137,8 +124,7 @@ namespace Spelunx
 #endif
         }
 
-        private void OnDisable()
-        {
+        private void OnDisable() {
             RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
 #if UNITY_EDITOR
@@ -147,8 +133,7 @@ namespace Spelunx
 #endif
         }
 
-        private void Awake()
-        {
+        private void Awake() {
             CreateCubemaps();
             CreateMaterial();
             CreatePreviewMesh();
@@ -156,41 +141,34 @@ namespace Spelunx
             cavernRenderPass = new CavernRenderPass(material);
         }
 
-        private void Start()
-        {
+        private void Start() {
             // Since we are using the eye to render to cubemaps, we want to disable it here, so that it
             // doesn't do a "normal" render to the screen, which will be a waste since we are overriding it.
             // Instead, we will "highjack" the GUI camera insert a render pass into the URP RenderGraph to render the eye to the screen.
             eye.enabled = false;
         }
 
-        private void Update()
-        {
+        private void Update() {
 
             // If clampHeadPosition is true, limit the head position to be within the bounds of the circle.
-            if (clampHeadPosition)
-            {
+            if (clampHeadPosition) {
                 Vector2 horizontalPosition = new Vector2(head.transform.localPosition.x, head.transform.localPosition.z);
-                if (horizontalPosition.sqrMagnitude > clampHeadRatio * clampHeadRatio * cavernRadius * cavernRadius)
-                {
+                if (horizontalPosition.sqrMagnitude > clampHeadRatio * clampHeadRatio * cavernRadius * cavernRadius) {
                     horizontalPosition = horizontalPosition.normalized * clampHeadRatio * cavernRadius;
                     head.transform.localPosition = new Vector3(horizontalPosition.x, head.transform.localPosition.y, horizontalPosition.y);
                 }
             }
 
-            if (tetherEar)
-            {
+            if (tetherEar) {
                 ear.gameObject.transform.position = head.transform.position;
                 ear.gameObject.transform.rotation = head.transform.rotation;
             }
 
 #if UNITY_EDITOR
             // Only render if we are playing and or showing a live preview.
-            if (UnityEditor.EditorApplication.isPlaying || livePreview)
-            {
+            if (UnityEditor.EditorApplication.isPlaying || livePreview) {
                 RenderEyes();
-                if (previewTexture != null && material != null)
-                {
+                if (previewTexture != null && material != null) {
                     Graphics.Blit(null, previewTexture, material);
                 }
             }
@@ -203,8 +181,7 @@ namespace Spelunx
         // General approach: For front, back, left and right faces, look at the Cavern from the top-down view, so that it looks like a circle.
         // "Slice" the circle into 4 quadrants using 2 lines that form an X, with the player's head being the intersection of the 2 lines.
         // Then for each quadrant, determine which faces of each cubemap can be seen. Those are the faces we want to render.
-        private void GetRenderFaces(out int monoMask, out int northMask, out int southMask, out int eastMask, out int westMask)
-        {
+        private void GetRenderFaces(out int monoMask, out int northMask, out int southMask, out int eastMask, out int westMask) {
             // These are the built in bitmasks for Unity's cubemap faces.
             const int rightMask = 1 << (int)CubemapFace.PositiveX;
             const int leftMask = 1 << (int)CubemapFace.NegativeX;
@@ -285,14 +262,12 @@ namespace Spelunx
                 -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
 
             // If there is only one solution to the quadratic equation, then there is only 1 point of intersection.
-            if (xIntersectSouthWestToNorthEast.Count == 1)
-            {
+            if (xIntersectSouthWestToNorthEast.Count == 1) {
                 northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
                 southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
             }
             // Else there are 2 points of intersection.
-            else if (xIntersectSouthWestToNorthEast.Count == 2)
-            {
+            else if (xIntersectSouthWestToNorthEast.Count == 2) {
                 northEastBoundary = new Vector3(xIntersectSouthWestToNorthEast[1], 0.0f, xIntersectSouthWestToNorthEast[1]);
                 southWestBoundary = new Vector3(xIntersectSouthWestToNorthEast[0], 0.0f, xIntersectSouthWestToNorthEast[0]);
             }
@@ -302,13 +277,10 @@ namespace Spelunx
                 1.0f,
                 headPosition.x - headPosition.z,
                 -0.5f * (cavernRadius * cavernRadius - headPosition.x * headPosition.x - headPosition.z * headPosition.z));
-            if (xIntersectNorthWestToSouthEast.Count == 1)
-            {
+            if (xIntersectNorthWestToSouthEast.Count == 1) {
                 northWestBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
                 southEastBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
-            }
-            else if (xIntersectNorthWestToSouthEast.Count == 2)
-            {
+            } else if (xIntersectNorthWestToSouthEast.Count == 2) {
                 northWestBoundary = new Vector3(xIntersectNorthWestToSouthEast[0], 0.0f, -xIntersectNorthWestToSouthEast[0]);
                 southEastBoundary = new Vector3(xIntersectNorthWestToSouthEast[1], 0.0f, -xIntersectNorthWestToSouthEast[1]);
             }
@@ -318,8 +290,7 @@ namespace Spelunx
 
             // Edge Case 1: Head is moved out of the screen area and there are no intersects.
             // This means that the screen is entirely in one quadrant relative to the head.
-            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count == 0)
-            {
+            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count == 0) {
                 /*
                  \     /
                   \   /
@@ -334,8 +305,7 @@ namespace Spelunx
                  */
                 // Screen is entirely south of the head.
                 if (0.0f < headPosition.z &&
-                    Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z))
-                {
+                    Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z)) {
                     monoMask |= backMask;
                     eastMask |= backMask;
                     westMask |= backMask;
@@ -356,8 +326,7 @@ namespace Spelunx
                  */
                 // Screen is entirely north of the head.
                 if (headPosition.z < 0.0f &&
-                    Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z))
-                {
+                    Mathf.Abs(headPosition.x) < Mathf.Abs(headPosition.z)) {
                     monoMask |= frontMask;
                     eastMask |= frontMask;
                     westMask |= frontMask;
@@ -366,8 +335,7 @@ namespace Spelunx
 
                 // Screen is entirely east of the head. (No more drawings, you should get the point by now.)
                 if (headPosition.x < 0.0f &&
-                    Mathf.Abs(headPosition.z) < Mathf.Abs(headPosition.x))
-                {
+                    Mathf.Abs(headPosition.z) < Mathf.Abs(headPosition.x)) {
                     monoMask |= rightMask;
                     northMask |= rightMask;
                     southMask |= rightMask;
@@ -376,8 +344,7 @@ namespace Spelunx
 
                 // Screen is entirely west of the head.
                 if (headPosition.x > 0.0f &&
-                    Mathf.Abs(headPosition.z) < Mathf.Abs(headPosition.x))
-                {
+                    Mathf.Abs(headPosition.z) < Mathf.Abs(headPosition.x)) {
                     monoMask |= leftMask;
                     northMask |= leftMask;
                     southMask |= leftMask;
@@ -386,8 +353,7 @@ namespace Spelunx
             }
 
             // Edge Case 2: Head is moved out of the screen and only the South-West to North-East line intersects.
-            if (xIntersectSouthWestToNorthEast.Count > 0 && xIntersectNorthWestToSouthEast.Count == 0)
-            {
+            if (xIntersectSouthWestToNorthEast.Count > 0 && xIntersectNorthWestToSouthEast.Count == 0) {
                 /*
                      \     /
                       \   /
@@ -403,8 +369,7 @@ namespace Spelunx
                 /
                 */
                 // Screen is entirely south-west of the head.
-                if (Vector3.Dot(new Vector3(1.0f, 1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f)
-                {
+                if (Vector3.Dot(new Vector3(1.0f, 1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask |= (backMask | leftMask);
                     eastMask |= backMask;
                     westMask |= backMask;
@@ -428,8 +393,7 @@ namespace Spelunx
                  /     \
                  */
                 // Screen is entirely north-east of the head.
-                if (Vector3.Dot(new Vector3(-1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f)
-                {
+                if (Vector3.Dot(new Vector3(-1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask = (frontMask | rightMask);
                     eastMask |= frontMask;
                     westMask |= frontMask;
@@ -440,11 +404,9 @@ namespace Spelunx
             }
 
             // Edge Case 3: Head is moved out of the screen and only the North-West to South-East line intersects.
-            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count > 0)
-            {
+            if (xIntersectSouthWestToNorthEast.Count == 0 && xIntersectNorthWestToSouthEast.Count > 0) {
                 // Screen is entirely north-west of the head. (Imagine the above drawings but for the North-West to South-East line.)
-                if (Vector3.Dot(new Vector3(1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f)
-                {
+                if (Vector3.Dot(new Vector3(1.0f, -1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask = (frontMask | leftMask);
                     eastMask |= frontMask;
                     westMask |= frontMask;
@@ -454,8 +416,7 @@ namespace Spelunx
                 }
 
                 // Screen is entirely south-east of the head.
-                if (Vector3.Dot(new Vector3(-1.0f, 1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f)
-                {
+                if (Vector3.Dot(new Vector3(-1.0f, 1.0f), new Vector2(headPosition.x, headPosition.z)) > 1.0f) {
                     monoMask = (backMask | rightMask);
                     eastMask |= backMask;
                     westMask |= backMask;
@@ -480,8 +441,7 @@ namespace Spelunx
 
             /******************* Looking South *******************/
             if (Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f ||
-                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f)
-            {
+                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
                 monoMask |= backMask;
                 eastMask |= backMask; // Left Eye, no need to account for convergence because that is already handled in 'Looking North'.
                 westMask |= backMask; // Right Eye, no need to account for convergence because that is already handled in 'Looking North'.
@@ -489,8 +449,7 @@ namespace Spelunx
 
             /******************* Looking East *******************/
             if (Vector3.Angle(headOffset + northEastBoundary, Vector3.forward) < cavernAngle * 0.5f ||
-                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f)
-            {
+                Vector3.Angle(headOffset + southEastBoundary, Vector3.forward) < cavernAngle * 0.5f) {
                 monoMask |= rightMask;
                 northMask |= rightMask | (enableConvergence ? backMask : 0); // Left Eye
                 southMask |= rightMask | (enableConvergence ? frontMask : 0); // Right Eye
@@ -498,8 +457,7 @@ namespace Spelunx
 
             /******************* Looking West *******************/
             if (Vector3.Angle(headOffset + northWestBoundary, Vector3.forward) < cavernAngle * 0.5f ||
-                Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f)
-            {
+                Vector3.Angle(headOffset + southWestBoundary, Vector3.forward) < cavernAngle * 0.5f) {
                 monoMask |= leftMask;
                 southMask |= leftMask | (enableConvergence ? frontMask : 0); // Left Eye
                 northMask |= leftMask | (enableConvergence ? backMask : 0); // Right Eye
@@ -509,8 +467,7 @@ namespace Spelunx
             if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenTop) || // Looking North
                 Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenTop) || // Looking North
                 Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenTop) || // Looking South
-                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenTop))
-            { // Looking South
+                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenTop)) { // Looking South
                 monoMask |= topMask;
                 eastMask |= topMask;
                 westMask |= topMask;
@@ -518,8 +475,7 @@ namespace Spelunx
             if (Mathf.Abs(northEastBoundary.z) < Mathf.Abs(screenBottom) || // Looking North
                 Mathf.Abs(northWestBoundary.z) < Mathf.Abs(screenBottom) || // Looking North
                 Mathf.Abs(southEastBoundary.z) < Mathf.Abs(screenBottom) || // Looking South
-                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenBottom))
-            { // Looking South
+                Mathf.Abs(southWestBoundary.z) < Mathf.Abs(screenBottom)) { // Looking South
                 monoMask |= bottomMask;
                 eastMask |= bottomMask;
                 westMask |= bottomMask;
@@ -527,8 +483,7 @@ namespace Spelunx
             if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenTop) || // Looking East
                 Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenTop) || // Looking East
                 Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenTop) || // Looking West
-                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenTop))
-            { // Looking West
+                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenTop)) { // Looking West
                 monoMask |= topMask;
                 northMask |= topMask;
                 southMask |= topMask;
@@ -536,22 +491,19 @@ namespace Spelunx
             if (Mathf.Abs(northEastBoundary.x) < Mathf.Abs(screenBottom) || // Looking East
                 Mathf.Abs(southEastBoundary.x) < Mathf.Abs(screenBottom) || // Looking East
                 Mathf.Abs(northWestBoundary.x) < Mathf.Abs(screenBottom) || // Looking West
-                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenBottom))
-            { // Looking West
+                Mathf.Abs(southWestBoundary.x) < Mathf.Abs(screenBottom)) { // Looking West
                 monoMask |= bottomMask;
                 northMask |= bottomMask;
                 southMask |= bottomMask;
             }
         }
 
-        private void RenderEyes()
-        {
+        private void RenderEyes() {
             // Use Camera.MonoOrStereoscopicEye.Left or Camera.MonoOrStereoscopicEye.Right to ensure that the cubemap follows the camera's rotation.
             // Camera.MonoOrStereoscopicEye.Mono renders the cubemap to be aligned to the world's axes instead.
             int monoMask = 0; int northMask = 0; int southMask = 0; int eastMask = 0; int westMask = 0;
             GetRenderFaces(out monoMask, out northMask, out southMask, out eastMask, out westMask);
-            switch (stereoMode)
-            {
+            switch (stereoMode) {
                 case StereoscopicMode.Mono:
                     eye.stereoSeparation = 0.0f;
                     eye.transform.rotation = gameObject.transform.rotation; // Set eye's global orientation to the screen's orientation, regardless of the head's orientation.
@@ -589,19 +541,16 @@ namespace Spelunx
             material.SetInteger("_SwapEyes", swapEyes ? 1 : 0);
         }
 
-        private void CreateCubemaps()
-        {
+        private void CreateCubemaps() {
             cubemaps = new RenderTexture[(int)CubemapIndex.Num];
-            for (int i = 0; i < (int)CubemapIndex.Num; ++i)
-            {
+            for (int i = 0; i < (int)CubemapIndex.Num; ++i) {
                 cubemaps[i] = new RenderTexture((int)cubemapResolution, (int)cubemapResolution, 32, RenderTextureFormat.ARGB32);
                 cubemaps[i].dimension = TextureDimension.Cube;
                 cubemaps[i].wrapMode = TextureWrapMode.Clamp;
             }
         }
 
-        private void CreateMaterial()
-        {
+        private void CreateMaterial() {
             material = new Material(shader);
             material.SetTexture("_CubemapNorth", cubemaps[(int)CubemapIndex.North]);
             material.SetTexture("_CubemapSouth", cubemaps[(int)CubemapIndex.South]);
@@ -613,8 +562,7 @@ namespace Spelunx
         /// \*brief
         /// Generate a curved screen mesh.
         /// \*warning Ensure that the mesh's material disables back-face culling!
-        private void CreatePreviewMesh()
-        {
+        private void CreatePreviewMesh() {
             previewMesh = new Mesh();
 
             // Have about one panel every 10 degrees. A reasonable number.
@@ -637,8 +585,7 @@ namespace Spelunx
             float deltaAngle = cavernAngle / (float)numPanels;
 
             // Create vertices of surface.
-            for (int i = 0; i <= numPanels; i++)
-            {
+            for (int i = 0; i <= numPanels; i++) {
                 float ratio = (float)i / (float)numPanels;
                 float currAngle = (ratio - 0.5f) * cavernAngle;
 
@@ -658,8 +605,7 @@ namespace Spelunx
             // Assign indices of each panel.
             // Each panel is a quad made up of 2 triangles.
             // Unity uses a CLOCKWISE WINDING ORDER for its triangles.
-            for (int i = 0; i < numPanels; ++i)
-            {
+            for (int i = 0; i < numPanels; ++i) {
                 // Triangle 1
                 indices[i * 6] = i * 2;
                 indices[i * 6 + 1] = i * 2 + 2;
@@ -678,18 +624,15 @@ namespace Spelunx
             previewMesh.triangles = indices;
         }
 
-        private void CreatePreviewTexture()
-        {
+        private void CreatePreviewTexture() {
             previewTexture = new RenderTexture((int)previewResolution, (int)previewResolution, 32, RenderTextureFormat.ARGB32);
             previewTexture.dimension = TextureDimension.Tex2D;
             previewTexture.wrapMode = TextureWrapMode.Clamp;
         }
 
-        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
-        {
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
             // "Highjack" the GUI camera insert a render pass into the URP RenderGraph to render the output.
-            if (camera == guiCamera)
-            {
+            if (camera == guiCamera) {
                 camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(cavernRenderPass);
             }
         }
@@ -697,28 +640,23 @@ namespace Spelunx
         private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) { }
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
+        private void OnValidate() {
             // This method is called whenever a setting is changed in the inspector, or at the beginning of scene mode rendering.
             // If any of the Cavern size settings are changed, we need to regenerate the mesh.
             CreatePreviewMesh();
         }
 
         // The cubemap render targets get cleaned up by Unity's garbage collector on scene save or assembly reload. The material needs to have it's texture references restored. 
-        private void OnSceneSaved(UnityEngine.SceneManagement.Scene scene)
-        {
+        private void OnSceneSaved(UnityEngine.SceneManagement.Scene scene) {
             CreateMaterial();
         }
 
-        private void OnEditorDelayCall()
-        {
+        private void OnEditorDelayCall() {
             CreateMaterial();
         }
 
-        private void OnDrawGizmos()
-        {
-            if (previewMaterial == null)
-            {
+        private void OnDrawGizmos() {
+            if (previewMaterial == null) {
                 Debug.LogAssertion("CavernRenderer: Preview material cannot be null!");
             }
             previewMaterial.SetPass(0);

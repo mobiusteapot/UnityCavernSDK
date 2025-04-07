@@ -74,7 +74,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Ignore Orbecc Library Binaries
-/Packages/com.spelunx.cavern.orbbec.libs
 /directml.dll
 /dnn_model_2_0_op11.onnx
 /onnxruntime.dll
