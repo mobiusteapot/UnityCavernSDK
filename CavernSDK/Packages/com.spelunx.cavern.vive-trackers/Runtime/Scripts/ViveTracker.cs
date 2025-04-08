@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     public sealed class ViveTracker : OVRT_TrackedDevice
     {
@@ -74,6 +75,8 @@ namespace Spelunx.OVRT
             }
         }
 
+        private bool doCalibration = false;
+
         private void OnNewBoundPose(string binding, TrackedDevicePose_t pose, int deviceIndex)
         {
             if (this.binding.ToString() != binding)
@@ -96,15 +99,16 @@ namespace Spelunx.OVRT
 
             IsValid = true;
 
-            var rigidTransform = new OVRT.OVRT_Utils.RigidTransform(pose.mDeviceToAbsoluteTracking);
+            var rigidTransform = new OVRT_Utils.RigidTransform(pose.mDeviceToAbsoluteTracking);
 
             if (origin != null)
             {
                 transform.position = origin.transform.TransformPoint(rigidTransform.pos);
-                if (Input.GetKey(KeyCode.C))
+                if (doCalibration)
                 {
                     // calibrate
                     rotationAlignment = Quaternion.Inverse(origin.rotation * rigidTransform.rot);
+                    doCalibration = false;
                 }
                 transform.rotation = origin.rotation * rigidTransform.rot * rotationAlignment;
             }
@@ -113,6 +117,12 @@ namespace Spelunx.OVRT
                 transform.localPosition = rigidTransform.pos;
                 transform.localRotation = rigidTransform.rot;
             }
+        }
+
+        // Calibrate vive trackers on the next pose frame
+        public void Calibrate()
+        {
+            doCalibration = true;
         }
 
         private void OnTrackerRolesChanged()
@@ -135,20 +145,27 @@ namespace Spelunx.OVRT
 
         private void OnEnable()
         {
-            OVRT.OVRT_Events.NewBoundPose.AddListener(_onNewBoundPoseAction);
-            OVRT.OVRT_Events.TrackedDeviceConnected.AddListener(_onDeviceConnectedAction);
-            OVRT.OVRT_Events.TrackerRolesChanged.AddListener(_onTrackerRolesChanged);
-            OVRT.OVRT_Events.ButtonPressed.AddListener(OnButtonPressed);
+            OVRT_Events.NewBoundPose.AddListener(_onNewBoundPoseAction);
+            OVRT_Events.TrackedDeviceConnected.AddListener(_onDeviceConnectedAction);
+            OVRT_Events.TrackerRolesChanged.AddListener(_onTrackerRolesChanged);
+            OVRT_Events.ButtonPressed.AddListener(OnButtonPressed);
         }
 
         private void OnDisable()
         {
-            OVRT.OVRT_Events.NewBoundPose.RemoveListener(_onNewBoundPoseAction);
-            OVRT.OVRT_Events.TrackedDeviceConnected.RemoveListener(_onDeviceConnectedAction);
-            OVRT.OVRT_Events.TrackerRolesChanged.RemoveListener(_onTrackerRolesChanged);
-            OVRT.OVRT_Events.ButtonPressed.RemoveListener(OnButtonPressed);
+            OVRT_Events.NewBoundPose.RemoveListener(_onNewBoundPoseAction);
+            OVRT_Events.TrackedDeviceConnected.RemoveListener(_onDeviceConnectedAction);
+            OVRT_Events.TrackerRolesChanged.RemoveListener(_onTrackerRolesChanged);
+            OVRT_Events.ButtonPressed.RemoveListener(OnButtonPressed);
             IsValid = false;
             IsConnected = false;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, 0.2f);
+        }
+#endif
     }
 }

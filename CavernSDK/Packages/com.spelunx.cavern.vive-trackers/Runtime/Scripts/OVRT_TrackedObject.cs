@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     /// <summary>
     /// Maps tracked OpenVR poses to transform by device index.

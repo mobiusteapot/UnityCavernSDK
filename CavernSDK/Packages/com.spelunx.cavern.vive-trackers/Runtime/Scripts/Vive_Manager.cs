@@ -12,7 +12,7 @@ using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using Valve.VR;
 
-namespace Spelunx.OVRT
+namespace Spelunx.Vive
 {
     /// <summary>
     /// Manages connection to OpenVR and dispatches new poses and events.
@@ -61,7 +61,7 @@ namespace Spelunx.OVRT
 
             if (!File.Exists(steamVrSettingsPath))
             {
-                Debug.LogWarning("[OVRT] Could not find SteamVR configuration file!");
+                Debug.LogWarning("[ViveTrackers] Could not find SteamVR configuration file!");
                 return trackerBindings;
             }
 
@@ -149,7 +149,7 @@ namespace Spelunx.OVRT
         {
             if (!OpenVR.IsRuntimeInstalled())
             {
-                Debug.LogError("[OVRT] SteamVR runtime not installed!");
+                // Debug.LogError("[OVRT] SteamVR runtime not installed!");
                 return;
             }
 
@@ -168,7 +168,7 @@ namespace Spelunx.OVRT
             if (initError != EVRInitError.None)
             {
                 var initErrorString = OpenVR.GetStringForHmdError(initError);
-                Debug.LogError($"[OVRT] Could not initialize OpenVR tracking: {initErrorString}");
+                Debug.LogError($"[ViveTrackers] Could not initialize OpenVR tracking: {initErrorString}");
                 return;
             }
 
@@ -191,10 +191,10 @@ namespace Spelunx.OVRT
             }
             else
             {
-                Debug.LogWarning($"[OVRT] Could not find {openVrPathsConfigPath}!");
+                Debug.LogWarning($"[ViveTrackers] Could not find {openVrPathsConfigPath}!");
             }
 
-            Debug.Log($"[OVRT] Initialized OpenVR tracking.");
+            Debug.Log($"[ViveTrackers] Initialized OpenVR tracking.");
 
             UpdateSteamVrTrackerBindings();
         }
@@ -374,7 +374,7 @@ namespace Spelunx.OVRT
 
                     if (error != EVRInitError.None)
                     {
-                        Debug.LogError("[OVRT] Could not initialize OpenVR tracking: " + error.ToString());
+                        Debug.LogError("[ViveTrackers] Could not initialize OpenVR tracking: " + error.ToString());
                         return false;
                     }
 

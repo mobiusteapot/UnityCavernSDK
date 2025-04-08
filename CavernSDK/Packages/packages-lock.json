@@ -1,12 +1,29 @@
 {
   "dependencies": {
+    "com.spelunx.cavern.orbbec.libs": {
+      "version": "0.0.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm.etc.cmu.edu"
+    },
+    "com.spelunx.cavern.orbbec.sdk": {
+      "version": "file:com.spelunx.cavern.orbbec.sdk",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.spelunx.cavern.sdk": "0.1.16",
+        "com.spelunx.cavern.orbbec.libs": "0.0.2"
+      }
+    },
     "com.spelunx.cavern.sdk": {
       "version": "file:com.spelunx.cavern.sdk",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
         "com.unity.render-pipelines.universal": "17.0.3",
-        "com.unity.xr.openxr": "1.14.0"
+        "com.unity.xr.openxr": "1.14.0",
+        "com.unity.inputsystem": "1.11.2"
       }
     },
     "com.spelunx.cavern.vive-trackers": {
@@ -15,13 +32,13 @@
       "source": "embedded",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2",
-        "com.spelunx.cavern.sdk": "0.1.9",
+        "com.spelunx.cavern.sdk": "0.1.18",
         "com.unity.xr.openxr": "1.14.0",
-        "com.spelunx.valvesoftware.unity.openvr": "1.2.5"
+        "com.spelunx.valvesoftware.unity.openvr": "1.2.6"
       }
     },
     "com.spelunx.valvesoftware.unity.openvr": {
-      "version": "file:com.valve.openvr",
+      "version": "file:com.spelunx.valvesoftware.unity.openvr",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
@@ -40,7 +57,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.18",
+      "version": "1.8.19",
       "depth": 2,
       "source": "registry",
       "dependencies": {
@@ -78,7 +95,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.11.2",
+      "version": "1.13.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -116,7 +133,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "17.0.3",
+      "version": "17.0.4",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -131,12 +148,12 @@
       }
     },
     "com.unity.render-pipelines.universal": {
-      "version": "17.0.3",
+      "version": "17.0.4",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.3",
-        "com.unity.shadergraph": "17.0.3",
+        "com.unity.render-pipelines.core": "17.0.4",
+        "com.unity.shadergraph": "17.0.4",
         "com.unity.render-pipelines.universal-config": "17.0.3"
       }
     },
@@ -159,19 +176,19 @@
       }
     },
     "com.unity.searcher": {
-      "version": "4.9.2",
+      "version": "4.9.3",
       "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "17.0.3",
+      "version": "17.0.4",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.3",
-        "com.unity.searcher": "4.9.2"
+        "com.unity.render-pipelines.core": "17.0.4",
+        "com.unity.searcher": "4.9.3"
       }
     },
     "com.unity.test-framework": {
@@ -226,7 +243,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.legacyinputhelpers": {
-      "version": "2.1.11",
+      "version": "2.1.12",
       "depth": 1,
       "source": "registry",
       "dependencies": {

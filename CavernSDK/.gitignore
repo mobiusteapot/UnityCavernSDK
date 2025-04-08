@@ -8,6 +8,7 @@
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
+/[Ll]og/
 /[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
@@ -71,3 +72,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Ignore Orbecc Library Binaries
+/directml.dll
+/dnn_model_2_0_op11.onnx
+/onnxruntime.dll
+/onnxruntime_providers_cuda.dll
+/onnxruntime_providers_shared.dll
+/onnxruntime_providers_tensorrt.dll

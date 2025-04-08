@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 975013845174002959}
+  - component: {fileID: 2083550966300434981}
   - component: {fileID: 1206781191244348116}
   m_Layer: 0
   m_Name: CavernSetup
@@ -33,6 +34,163 @@ Transform:
   - {fileID: 8680908265520161431}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2083550966300434981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7710098884710572722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c194d3f8f728a134aae70c2aadee6534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quit:
+    m_Name: Quit
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: c376b36b-3cb9-4da8-80d7-f795659768b5
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 22500a8b-f2f8-42e9-972e-b974c655c3bd
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Quit
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 1880a5e9-8b8f-4480-a178-d3910093986d
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Quit
+      m_Flags: 0
+    m_Flags: 0
+  help:
+    m_Name: Help
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 0eb19067-3f46-4697-b812-bb2e25dce663
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 0fc90e57-0547-4752-8a2d-831ad6fc0366
+      m_Path: <Keyboard>/h
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Help
+      m_Flags: 0
+    m_Flags: 0
+  swapEyes:
+    m_Name: Swap Eyes
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 73bfbbc5-f12f-4769-8d06-59ec6aad4024
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 37c65631-966c-422e-ab35-479695645fd6
+      m_Path: <Keyboard>/e
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Swap Eyes
+      m_Flags: 0
+    m_Flags: 0
+  stereoMonoToggle:
+    m_Name: Stereo/Mono Toggle
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 2fa7f506-c68a-4891-8fc8-e15f0ade74ea
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: fceee647-6b0c-4e98-a39e-039e8979649c
+      m_Path: <Keyboard>/t
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Stereo/Mono Toggle
+      m_Flags: 0
+    m_Flags: 0
+  muteToggle:
+    m_Name: Mute Toggle
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 69faa97f-7b0e-4a75-b683-e434b2eeac5f
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 7b71b363-b874-4087-9049-21ce198572df
+      m_Path: <Keyboard>/m
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Mute Toggle
+      m_Flags: 0
+    m_Flags: 0
+  mouseMove:
+    m_Name: Mouse Move
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 261bdd3c-217c-4c86-893e-fd593500307a
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 90144f0c-5b4b-4f3f-93e4-95d11298dd64
+      m_Path: <Mouse>/delta
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Mouse Move
+      m_Flags: 0
+    m_Flags: 0
+  increaseIPD:
+    m_Name: Increase IPD
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 15236ac3-b9c7-49e3-9c84-902f1ec4ff14
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 78502c45-de50-4004-8863-af98bef75ab7
+      m_Path: <Keyboard>/rightArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Increase IPD
+      m_Flags: 0
+    m_Flags: 0
+  decreaseIPD:
+    m_Name: Decrease IPD
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4229930e-9f55-4cc7-a711-e2dab2e94caf
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 20ca4db1-5ec6-4b40-90d2-07c7f863d795
+      m_Path: <Keyboard>/leftArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Decrease IPD
+      m_Flags: 0
+    m_Flags: 0
+  IPD_CHANGE: 0.001
 --- !u!114 &1206781191244348116
 MonoBehaviour:
   m_ObjectHideFlags: 0
