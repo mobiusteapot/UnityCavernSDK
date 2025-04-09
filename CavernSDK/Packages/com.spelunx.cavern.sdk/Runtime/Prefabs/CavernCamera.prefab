@@ -101,6 +101,7 @@ MonoBehaviour:
   clampHeadRatio: 0.9
   previewResolution: 512
   previewEye: 0
+  livePreview: 1
   head: {fileID: 5213595555020570760}
   eye: {fileID: 5900885314504736604}
   guiCamera: {fileID: 8119683120021241555}
@@ -307,7 +308,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 32
+    m_Bits: 0
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
