@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 
 namespace Spelunx
@@ -85,6 +86,9 @@ namespace Spelunx
         private Mesh previewMesh = null;
         private RenderTexture previewTexture = null;
         private CavernRenderPass cavernRenderPass;
+
+        [HideInInspector]
+        public UnityEvent settingsChanged;
 
         public CubemapResolution GetCubemapResolution() { return cubemapResolution; }
         public StereoscopicMode GetStereoscopicMode() { return stereoMode; }
@@ -710,6 +714,7 @@ namespace Spelunx
             // This method is called whenever a setting is changed in the inspector, or at the beginning of scene mode rendering.
             // If any of the Cavern size settings are changed, we need to regenerate the mesh.
             CreatePreviewMesh();
+            settingsChanged.Invoke();
         }
 
         // The cubemap render targets get cleaned up by Unity's garbage collector on scene save or assembly reload. The material needs to have it's texture references restored. 
