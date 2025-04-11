@@ -4,13 +4,13 @@ using UnityEngine;
 namespace Spelunx.Orbbec {
     public class BodyTrackerManager : MonoBehaviour {
         // Handler for SkeletalTracking thread.
-        public BodyTracker bodyTracker;
+        public BodyTracker bodyTracker; // One for each skeleton on the screen.
 
         [Header("Settings")]
         [SerializeField] private SensorOrientation sensorOrientation;
 
         // Internal Variables
-        private SkeletalFrameDataProvider skeletalFrameDataProvider;
+        private SkeletalFrameDataProvider skeletalFrameDataProvider; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
         private FrameData frameData = new FrameData();
 
         private void Start() {

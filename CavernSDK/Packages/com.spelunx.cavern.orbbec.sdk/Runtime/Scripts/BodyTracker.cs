@@ -144,6 +144,7 @@ namespace Spelunx.Orbbec {
             }
         }
 
+        // This is poorly named. It should be named SetSkeletonTransform.
         public void RenderSkeleton(Body skeleton, int skeletonNumber) {
             for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
                 Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);

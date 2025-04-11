@@ -3,8 +3,7 @@ using System.IO;
 using UnityEngine;
 
 namespace Spelunx.Orbbec {
-    // IMPORTANT NOTE: I JUST COPIED THIS FROM THE AZURE SAMPLE. RIGHT NOW THIS DOES ABSOLUTELY JACK SHIT!
-    // TODO: Maybe actually make this thing do something one day, or just delete it.
+    // IMPORTANT NOTE: I JUST COPIED THIS FROM THE AZURE SAMPLE. I can't tell where it's used, but shit doesn't work without it.
     public class ConfigLoader : MonoBehaviour {
         public static ConfigLoader Instance { get; private set; }
         public Configs Configs { get; private set; } = new Configs();

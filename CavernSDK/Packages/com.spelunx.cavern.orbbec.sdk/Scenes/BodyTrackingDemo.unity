@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 35392578}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -5}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -395,7 +395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 210279053, guid: 019b917704c3c29478d778e143d411d2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 210279053, guid: 019b917704c3c29478d778e143d411d2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -429,6 +429,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3803803108349791092, guid: 019b917704c3c29478d778e143d411d2, type: 3}
+      propertyPath: drawSkeletons
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -460,10 +464,6 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4971976475630678120, guid: 91a05d6ce70c13e4aa27f7b85c0b4e2f, type: 3}
       propertyPath: bodyTracker
-      value: 
-      objectReference: {fileID: 1440388196}
-    - target: {fileID: 4971976475630678120, guid: 91a05d6ce70c13e4aa27f7b85c0b4e2f, type: 3}
-      propertyPath: bodyTrackerSkeleton
       value: 
       objectReference: {fileID: 1440388196}
     - target: {fileID: 5057526048607906537, guid: 91a05d6ce70c13e4aa27f7b85c0b4e2f, type: 3}
@@ -638,7 +638,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2214573917486499629, guid: 91890fe6817e3194d9f6b94d250fcaf3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2214573917486499629, guid: 91890fe6817e3194d9f6b94d250fcaf3, type: 3}
       propertyPath: m_LocalPosition.z

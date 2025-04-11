@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7744331341820289596}
   - component: {fileID: 4971976475630678120}
-  - component: {fileID: 5676030276149695801}
+  - component: {fileID: 4444805932908963434}
   m_Layer: 0
   m_Name: BodyTrackerManager
   m_TagString: Untagged
@@ -45,9 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71abc990c46f07c40ac230c12aa9636d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tracker: {fileID: 0}
+  bodyTracker: {fileID: 0}
   sensorOrientation: 0
---- !u!114 &5676030276149695801
+--- !u!114 &4444805932908963434
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
