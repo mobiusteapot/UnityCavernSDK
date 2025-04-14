@@ -11,7 +11,7 @@ namespace Spelunx
     {
         [Header("Input Actions")]
         [SerializeField, Tooltip("Quits the game or play mode")]
-        private InputAction quit = new("Quit", InputActionType.Value, "<Keyboard>/q");
+        private InputAction quit = new("Quit", InputActionType.Value, "<Keyboard>/Escape");
         [SerializeField, Tooltip("Opens the help debug window")]
         private InputAction help = new("Help", InputActionType.Value, "<Keyboard>/h");
         [SerializeField, Tooltip("Swaps the eyes on the stereoscopic glasses")]
