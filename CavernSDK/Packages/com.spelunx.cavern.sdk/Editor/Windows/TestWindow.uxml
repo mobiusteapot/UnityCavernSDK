@@ -1,0 +1,7 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.spelunx.cavern.sdk/Editor/Windows/TestWindow.uss?fileID=7433441132597879392&amp;guid=0956a4a1a79205046b1cf12f678aed55&amp;type=3#TestWindow" />
+    <engine:Label text="CAVERN Setup" class="custom-label" style="color: rgb(255, 162, 97);" />
+    <engine:Label text="Sets up scene for CAVERN development. Replaces default Unity camera with CAVERN camera rig. Contains audio listener and default sets audio speaker mode to support surround sound." tooltip="CAVERN Setup Info" style="flex-wrap: wrap; white-space: pre-wrap;" />
+    <engine:VisualElement tooltip="Image of Spelunx logo" style="flex-grow: 1; background-image: resource(&apos;spelunx&apos;); height: 417px; width: 198px; -unity-background-scale-mode: scale-to-fit; flex-wrap: wrap; align-self: flex-start; background-size: contain;" />
+    <engine:Button text="Add new CAVERN Setup" />
+</engine:UXML>
