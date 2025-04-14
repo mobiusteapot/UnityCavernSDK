@@ -81,5 +81,8 @@ crashlytics-build.properties
 /onnxruntime_providers_shared.dll
 /onnxruntime_providers_tensorrt.dll
 
-# Ignore StreamingAssets
-/StreamingAssets
+# Ignore certain annoying folders in Assets.
+/Assets/StreamingAssets
+/Assets/StreamingAssets.meta
+/Assets/XR
+/Assets/XR.meta
