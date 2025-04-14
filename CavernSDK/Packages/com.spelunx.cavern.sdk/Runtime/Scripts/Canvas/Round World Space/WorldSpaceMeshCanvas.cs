@@ -53,5 +53,9 @@ namespace Spelunx
         {
             shouldUpdateMesh = true;
         }
+
+        public void setCavernRenderer(CavernRenderer renderer) {
+            cavernRenderer = renderer;
+        }
     }
 }

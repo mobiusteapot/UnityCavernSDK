@@ -1,7 +1,5 @@
 {
   "dependencies": {
-<<<<<<< HEAD
-=======
     "com.spelunx.cavern.orbbec.libs": {
       "version": "0.0.3",
       "depth": 1,
@@ -18,7 +16,6 @@
         "com.spelunx.cavern.orbbec.libs": "0.0.3"
       }
     },
->>>>>>> canvas
     "com.spelunx.cavern.sdk": {
       "version": "file:com.spelunx.cavern.sdk",
       "depth": 0,
