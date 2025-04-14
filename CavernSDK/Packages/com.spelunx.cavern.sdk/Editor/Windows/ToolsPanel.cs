@@ -52,7 +52,7 @@ namespace Spelunx
                 }
                 scene = SceneManager.GetActiveScene();
                 bool isDirty = EditorSceneManager.MarkSceneDirty(scene);
-                Debug.Log(scene.name + isDirty);
+                // Debug.Log(scene.name + isDirty);
             }
 
 
@@ -63,7 +63,7 @@ namespace Spelunx
             EditorGUILayout.HelpBox("Creates a curved world space UI that matches the curvature of the CAVERN. This is used to wrap 2D visuals around the CAVERN.", MessageType.Info);
             if (GUILayout.Button("Add new RoundUI setup"))
             {
-                Debug.Log("round UI clicked");
+                // Debug.Log("round UI clicked");
                 cavernUI = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/CavernUI.prefab", typeof(GameObject));
                 newCavernUI = (GameObject)PrefabUtility.InstantiatePrefab(cavernUI as GameObject);
 
@@ -81,7 +81,7 @@ namespace Spelunx
                 // caverncamera is parent, set trans to 0, 0, 0
                 scene = SceneManager.GetActiveScene();
                 bool isDirty = EditorSceneManager.MarkSceneDirty(scene);
-                Debug.Log(isDirty);
+                // Debug.Log(isDirty);
             }
         }
     }
