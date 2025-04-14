@@ -108,6 +108,12 @@ MonoBehaviour:
   ear: {fileID: 5105509885875884984}
   shader: {fileID: 4800000, guid: d250a68325f512d4082683a9f6882f49, type: 3}
   previewMaterial: {fileID: 2100000, guid: b687738e93364794695ed6802e47aefd, type: 2}
+  settingsChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  uiDoublerTexture: {fileID: 0}
+  uiDoublerMaterial: {fileID: 0}
+  uiDoublerEyeOffset: 0
 --- !u!1 &4855443922684551042
 GameObject:
   m_ObjectHideFlags: 0
