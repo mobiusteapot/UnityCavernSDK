@@ -111,9 +111,6 @@ MonoBehaviour:
   settingsChanged:
     m_PersistentCalls:
       m_Calls: []
-  uiDoublerTexture: {fileID: 0}
-  uiDoublerMaterial: {fileID: 0}
-  uiDoublerEyeOffset: 0
 --- !u!1 &4855443922684551042
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,7 +251,7 @@ GameObject:
   - component: {fileID: 8119683120021241555}
   - component: {fileID: 2140903860953559328}
   m_Layer: 0
-  m_Name: GUI Camera
+  m_Name: RenderGraphCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
