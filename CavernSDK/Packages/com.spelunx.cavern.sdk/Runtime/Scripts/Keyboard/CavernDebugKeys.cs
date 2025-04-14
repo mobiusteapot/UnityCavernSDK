@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -11,7 +13,7 @@ namespace Spelunx
     {
         [Header("Input Actions")]
         [SerializeField, Tooltip("Quits the game or play mode")]
-        private InputAction quit = new("Quit", InputActionType.Value, "<Keyboard>/q");
+        private InputAction quit = new("Quit", InputActionType.Value, "<Keyboard>/Escape");
         [SerializeField, Tooltip("Opens the help debug window")]
         private InputAction help = new("Help", InputActionType.Value, "<Keyboard>/h");
         [SerializeField, Tooltip("Swaps the eyes on the stereoscopic glasses")]
@@ -26,16 +28,38 @@ namespace Spelunx
         private InputAction increaseIPD = new("Increase IPD", InputActionType.Value, "<Keyboard>/rightArrow");
         [SerializeField, Tooltip("Decreases the interpupillary distance")]
         private InputAction decreaseIPD = new("Decrease IPD", InputActionType.Value, "<Keyboard>/leftArrow");
+        [SerializeField, Tooltip("Increase the camera height")]
+        private InputAction increaseCameraHeight = new("Increase Camera Height", InputActionType.Value, "<Keyboard>/upArrow");
+        [SerializeField, Tooltip("Decreases the camera height")]
+        private InputAction decreaseCameraHeight = new("Decrease Camera Height", InputActionType.Value, "<Keyboard>/downArrow");
 
         [Header("Settings")]
         [SerializeField, Range(0, 0.01f), Tooltip("Amount to adjust interpupillary distance for stereo rendering")]
         private float IPD_CHANGE = 0.001f;
+        [SerializeField, Range(0, 0.5f), Tooltip("Amount to adjust camera height")]
+        private float CAMERA_HEIGHT_CHANGE = 0.0254f; // one inch
+        [SerializeField, Tooltip("The Head object that gets repositioned")]
+        private Transform headTrackingCamera;
+
+        [SerializeField, Tooltip("Skin for the GUI")]
+        private GUISkin guiSkin;
 
         // used to render the help debug window
         private List<string> helpKeys = new();
         private List<string> helpDescriptions = new();
         private UnityAction extraGUICalls;
-        private bool showHelp = false;
+
+        private enum HelpDisplay
+        {
+            Off = 0,
+            PC = 1,
+            CAVERN = 2
+        }
+        private HelpDisplay showHelp = HelpDisplay.Off;
+
+        // running average of framerates
+        private readonly int[] framerates = new int[100];
+        private int framerateIndex = 0;
 
         public List<(string Key, string Description)> KeyDescriptions()
         {
@@ -46,13 +70,19 @@ namespace Spelunx
                 (stereoMonoToggle.GetBindingDisplayString(), "Toggle rendering between stereo and mono"),
                 (muteToggle.GetBindingDisplayString(), "Mute all sounds"),
                 (increaseIPD.GetBindingDisplayString(), "Increase IPD"),
-                (decreaseIPD.GetBindingDisplayString(), "Decrease IPD")
+                (decreaseIPD.GetBindingDisplayString(), "Decrease IPD"),
+                (increaseCameraHeight.GetBindingDisplayString(), "Increase Camera Height"),
+                (decreaseCameraHeight.GetBindingDisplayString(), "Decrease Camera Height")
             };
         }
 
         public void DoExtraGUI()
         {
-            GUILayout.Label($"Framerate: {(int)(1 / Time.unscaledDeltaTime)} fps");
+            framerates[framerateIndex] = (int)(1 / Time.unscaledDeltaTime);
+            framerateIndex = (framerateIndex + 1) % framerates.Length;
+            int currentFramerate = (int)framerates.Average();
+            GUILayout.Label($"Framerate: {currentFramerate} fps");
+            GUILayout.Label($"Head height: {headTrackingCamera.localPosition.y} meters");
         }
 
         // enable the input actions on play mode start
@@ -66,6 +96,8 @@ namespace Spelunx
             mouseMove.Enable();
             increaseIPD.Enable();
             decreaseIPD.Enable();
+            increaseCameraHeight.Enable();
+            decreaseCameraHeight.Enable();
         }
 
 
@@ -80,6 +112,8 @@ namespace Spelunx
             mouseMove.Disable();
             increaseIPD.Disable();
             decreaseIPD.Disable();
+            increaseCameraHeight.Disable();
+            decreaseCameraHeight.Disable();
         }
 
         // bind the proper callbacks to each action.performed
@@ -95,6 +129,8 @@ namespace Spelunx
             mouseMove.performed += OnMouseMove;
             increaseIPD.performed += IncreaseIPDAction;
             decreaseIPD.performed += DecreaseIPDAction;
+            increaseCameraHeight.performed += IncreaseCameraHeightAction;
+            decreaseCameraHeight.performed += DecreaseCameraHeightAction;
         }
 
         void Start()
@@ -157,7 +193,20 @@ namespace Spelunx
 
         void HelpAction(InputAction.CallbackContext ctx)
         {
-            showHelp = !showHelp;
+            // cycle through the different help display types
+            switch (showHelp)
+            {
+                case HelpDisplay.Off:
+                    showHelp = HelpDisplay.PC;
+                    break;
+                case HelpDisplay.PC:
+                    showHelp = HelpDisplay.Off;
+                    break;
+                case HelpDisplay.CAVERN:
+                    showHelp = HelpDisplay.Off;
+                    break;
+            }
+            // showHelp = (HelpDisplay)(((int)showHelp + 1) % typeof(HelpDisplay).GetEnumValues().Length);
         }
 
         void IncreaseIPDAction(InputAction.CallbackContext ctx)
@@ -170,6 +219,16 @@ namespace Spelunx
         {
             CavernRenderer cavern = GetComponentInChildren<CavernRenderer>();
             cavern.IPD -= IPD_CHANGE;
+        }
+
+        void IncreaseCameraHeightAction(InputAction.CallbackContext ctx)
+        {
+            headTrackingCamera.localPosition = new(headTrackingCamera.localPosition.x, headTrackingCamera.localPosition.y + CAMERA_HEIGHT_CHANGE, headTrackingCamera.localPosition.z);
+        }
+
+        void DecreaseCameraHeightAction(InputAction.CallbackContext ctx)
+        {
+            headTrackingCamera.localPosition = new(headTrackingCamera.localPosition.x, headTrackingCamera.localPosition.y - CAMERA_HEIGHT_CHANGE, headTrackingCamera.localPosition.z);
         }
 
 
@@ -198,8 +257,24 @@ namespace Spelunx
         #region Debug GUI
         void OnGUI()
         {
-            if (!showHelp) return;
-            GUILayout.BeginArea(new Rect(40, 40, 500, 500), GUI.skin.box);
+            switch (showHelp)
+            {
+                case HelpDisplay.Off:
+                    return;
+                case HelpDisplay.PC:
+                    PCGui();
+                    break;
+                case HelpDisplay.CAVERN:
+
+                    break;
+            }
+
+        }
+
+        void PCGui()
+        {
+            GUI.skin = guiSkin;
+            GUILayout.BeginArea(new Rect(40, 40, 1000, 1000), GUI.skin.box);
             // GUILayout.Box("Debug Info");
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
@@ -220,6 +295,11 @@ namespace Spelunx
             extraGUICalls.Invoke();
             GUILayout.EndVertical();
             GUILayout.EndArea();
+        }
+
+        void CAVERNGui()
+        {
+
         }
 
         #endregion

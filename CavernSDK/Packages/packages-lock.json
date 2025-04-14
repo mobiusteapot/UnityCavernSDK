@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.spelunx.cavern.sdk": "0.1.16",
+        "com.spelunx.cavern.sdk": "0.1.18",
         "com.spelunx.cavern.orbbec.libs": "0.0.3"
       }
     },
@@ -32,7 +32,7 @@
       "source": "embedded",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2",
-        "com.spelunx.cavern.sdk": "0.1.18",
+        "com.spelunx.cavern.sdk": "0.1.19",
         "com.unity.xr.openxr": "1.14.0",
         "com.spelunx.valvesoftware.unity.openvr": "1.2.6"
       }

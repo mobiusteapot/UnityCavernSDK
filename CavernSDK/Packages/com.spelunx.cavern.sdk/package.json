@@ -1,6 +1,6 @@
 {
   "name": "com.spelunx.cavern.sdk",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "displayName": "Spelunx Cavern SDK",
   "description": "SDK for CAVERN Development.",
   "unity": "6000.0",
@@ -20,14 +20,19 @@
   },
   "samples": [
     {
-      "displayName": "Fullscreen Preview Asset",
-      "description": "Fullscreen Preview Asset from the asset store. Helpful for cavern preview. Not for public distribution.",
-      "path": "Samples~/FullscreenAsset"
-    },
-    {
       "displayName": "Spelunx Sample Scenes",
       "description": "Sample scenes that show the functionality of the Spelunx Cavern Toolkit.",
-      "path": "Samples~/SampleScene"
+      "path": "Samples~/Sample Scenes"
+    },
+    {
+      "displayName": "Spelunx Starter Scenes",
+      "description": "Scenes to help you get started. You can copy these scenes to build off of them.",
+      "path": "Samples~/Starter Scenes"
+    },
+    {
+      "displayName": "Spelunx Tester Scenes",
+      "description": "Scenes to help you test the functionality of the Spelunx Cavern Toolkit.",
+      "path": "Samples~/Tester Scenes"
     }
   ],
   "dependencies": {

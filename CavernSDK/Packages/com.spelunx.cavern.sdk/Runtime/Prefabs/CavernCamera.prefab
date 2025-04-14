@@ -101,6 +101,7 @@ MonoBehaviour:
   clampHeadRatio: 0.9
   previewResolution: 512
   previewEye: 0
+  livePreview: 1
   head: {fileID: 5213595555020570760}
   eye: {fileID: 5900885314504736604}
   guiCamera: {fileID: 8119683120021241555}
@@ -179,7 +180,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 23
+    m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -277,7 +278,7 @@ Camera:
   m_GameObject: {fileID: 5271620791747509831}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 4
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -307,7 +308,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 32
+    m_Bits: 0
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
