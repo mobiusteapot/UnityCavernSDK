@@ -80,3 +80,6 @@ crashlytics-build.properties
 /onnxruntime_providers_cuda.dll
 /onnxruntime_providers_shared.dll
 /onnxruntime_providers_tensorrt.dll
+
+# Ignore StreamingAssets
+/StreamingAssets
