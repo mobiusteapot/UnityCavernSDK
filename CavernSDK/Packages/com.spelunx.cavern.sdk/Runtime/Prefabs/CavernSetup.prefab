@@ -189,7 +189,44 @@ MonoBehaviour:
       m_Action: Decrease IPD
       m_Flags: 0
     m_Flags: 0
+  increaseCameraHeight:
+    m_Name: Increase Camera Height
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: fdd0756b-300c-44a9-a7bc-b41a61228a8d
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 5258abe9-b53d-42aa-a11d-4b5b7f8757f5
+      m_Path: <Keyboard>/upArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Increase Camera Height
+      m_Flags: 0
+    m_Flags: 0
+  decreaseCameraHeight:
+    m_Name: Decrease Camera Height
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 581ef384-04bd-4af9-b26b-67dea39044e9
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: c9300b61-a53b-4f22-a440-f16ac0328cd8
+      m_Path: <Keyboard>/downArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Decrease Camera Height
+      m_Flags: 0
+    m_Flags: 0
   IPD_CHANGE: 0.001
+  CAMERA_HEIGHT_CHANGE: 0.0254
+  headTrackingCamera: {fileID: 7971628661186954602}
+  guiSkin: {fileID: 11400000, guid: 5d1fc887d407bc345a6981116c87f29f, type: 2}
 --- !u!1001 &2808701907505350114
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -247,6 +284,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
+--- !u!4 &7971628661186954602 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5213595555020570760, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
+  m_PrefabInstance: {fileID: 2808701907505350114}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8680908265520161431 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6810088677021411189, guid: e3759be80fec5b741b428c3d70192a50, type: 3}
