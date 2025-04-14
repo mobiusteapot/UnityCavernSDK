@@ -58,7 +58,9 @@ namespace Spelunx.Vive
                 }
 
                 // instantiate a new vive tracker
-                PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
+                GameObject tracker = (GameObject)PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
+                tracker.GetComponent<ViveTracker>().SetOrigin(GameObject.FindGameObjectWithTag("ViveManager").transform);
+
             }
 
             //=== interaction building blocks ===

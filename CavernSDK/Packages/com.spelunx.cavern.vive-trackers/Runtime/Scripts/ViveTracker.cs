@@ -161,6 +161,10 @@ namespace Spelunx.Vive
             IsConnected = false;
         }
 
+        public void SetOrigin(Transform t) {
+            origin = t;
+        }
+
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {

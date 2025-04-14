@@ -27,10 +27,9 @@ namespace Spelunx
 
         void OnGUI()
         {
+            //===== CAVERN Setup =====
             GUILayout.Label("CAVERN Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Sets up scene for CAVERN development. Replaces the default Unity camera with the CAVERN camera rig. Defaults audio speaker mode to 7.1 surround sound.", MessageType.Info);
-            // GUILayout.Label("Replaces the default Unity camera with the CAVERN camera rig in your scene");
-            // GUILayout.Label("and creates a CAVERN setup game object to hold additional CAVERN objects.");
             if (GUILayout.Button("Add new CAVERN setup"))
             {
                 // adds cavern setup prefab to scene
@@ -56,6 +55,10 @@ namespace Spelunx
                 Debug.Log(scene.name + isDirty);
             }
 
+
+            //===== Round UI =====
+            GUILayout.Space(20);
+
             GUILayout.Label("Round CAVERN UI Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Creates a curved world space UI that matches the curvature of the CAVERN. This is used to wrap 2D visuals around the CAVERN.", MessageType.Info);
             if (GUILayout.Button("Add new RoundUI setup"))
@@ -70,6 +73,12 @@ namespace Spelunx
                 WorldSpaceMeshCanvas meshCanvas = newRoundRenderer.GetComponent<WorldSpaceMeshCanvas>();
                 meshCanvas.setCavernRenderer(GameObject.Find("CavernCamera").GetComponent<CavernRenderer>());
 
+                if (newCavernSetup.transform.GetChild(0) != null)
+                {
+                    meshCanvas.GetComponent<Transform>().parent = newCavernSetup.transform.GetChild(0).transform;
+                }
+
+                // caverncamera is parent, set trans to 0, 0, 0
                 scene = SceneManager.GetActiveScene();
                 bool isDirty = EditorSceneManager.MarkSceneDirty(scene);
                 Debug.Log(isDirty);
