@@ -86,7 +86,7 @@ namespace Spelunx.Orbbec {
                     // get the absolute offset
                     Quaternion absOffset = absoluteOffsetMap[(JointId)j];
                     Transform finalJoint = avatarAnimator.GetBoneTransform(MapKinectJoint((JointId)j));
-                    finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * bodyTracker.absoluteJointRotations[j] * absOffset;
+                    finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * bodyTracker.GetAbsoluteJointRotation((JointId)j) * absOffset;
                     if (j == 0) {
                         // character root plus translation reading from the kinect, plus the offset from the script public variables
                         finalJoint.position = avatarRoot.position + new Vector3(skeletonRoot.localPosition.x, skeletonRoot.localPosition.y, skeletonRoot.localPosition.z) + avatarOffset;

@@ -517,7 +517,6 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
-  drawSkeletons: 1
 --- !u!1 &230849762
 GameObject:
   m_ObjectHideFlags: 0

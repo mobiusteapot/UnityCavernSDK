@@ -4,14 +4,14 @@ using Microsoft.Azure.Kinect.BodyTracking;
 
 namespace Spelunx.Orbbec {
     public class BodyTracker : MonoBehaviour {
-        public Dictionary<JointId, JointId> parentJointMap;
-        Dictionary<JointId, Quaternion> basisJointMap;
-        public Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
-        public bool drawSkeletons = true;
-        Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+        // Internal variables.
+        private Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+        private Dictionary<JointId, JointId> parentJointMap;
+        private Dictionary<JointId, Quaternion> basisJointMap;
+        [SerializeField, Tooltip("Absolute Joint Rotations - Displayed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
 
         // Start is called before the first frame update
-        void Awake() {
+        private void Awake() {
             parentJointMap = new Dictionary<JointId, JointId>();
 
             // pelvis has no parent so set to count
@@ -103,13 +103,38 @@ namespace Spelunx.Orbbec {
         public void UpdateSkeleton(FrameData trackerFrameData) {
             //this is an array in case you want to get the n closest bodies
             int closestBody = FindClosestTrackedBody(trackerFrameData);
-
+            
             // render the closest body
             Body skeleton = trackerFrameData.Bodies[closestBody];
-            RenderSkeleton(skeleton, 0);
+            SetBonesTransform(skeleton, 0);
         }
 
-        int FindIndexFromId(FrameData frameData, int id) {
+        public void ShowSkeleton(bool show) {
+            for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
+                transform.GetChild(0).GetChild(jointNum).gameObject.GetComponent<MeshRenderer>().enabled = show;
+                transform.GetChild(0).GetChild(jointNum).GetChild(0).GetComponent<MeshRenderer>().enabled = show;
+            }
+        }
+
+        public Quaternion GetAbsoluteJointRotation(JointId jointId) {
+            return absoluteJointRotations[(int)jointId];
+        }
+
+        public Quaternion GetRelativeJointRotation(JointId jointId) {
+            JointId parent = parentJointMap[jointId];
+            Quaternion parentJointRotationBodySpace = Quaternion.identity;
+            if (parent == JointId.Count) {
+                parentJointRotationBodySpace = Y_180_FLIP;
+            } else {
+                parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
+            }
+            Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
+            Quaternion relativeRotation = Quaternion.Inverse(parentJointRotationBodySpace) * jointRotationBodySpace;
+
+            return relativeRotation;
+        }
+
+        private int FindIndexFromId(FrameData frameData, int id) {
             int retIndex = -1;
             for (int i = 0; i < (int)frameData.NumOfBodies; i++) {
                 if ((int)frameData.Bodies[i].Id == id) {
@@ -135,17 +160,8 @@ namespace Spelunx.Orbbec {
             return closestBody;
         }
 
-        public void TurnOnOffSkeletons() {
-            drawSkeletons = !drawSkeletons;
-            const int bodyRenderedNum = 0;
-            for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
-                transform.GetChild(bodyRenderedNum).GetChild(jointNum).gameObject.GetComponent<MeshRenderer>().enabled = drawSkeletons;
-                transform.GetChild(bodyRenderedNum).GetChild(jointNum).GetChild(0).GetComponent<MeshRenderer>().enabled = drawSkeletons;
-            }
-        }
-
         // This is poorly named. It should be named SetSkeletonTransform.
-        public void RenderSkeleton(Body skeleton, int skeletonNumber) {
+        private void SetBonesTransform(Body skeleton, int skeletonNumber) {
             for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
                 Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);
                 Vector3 offsetPosition = transform.rotation * jointPos;
@@ -171,20 +187,6 @@ namespace Spelunx.Orbbec {
                     transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).gameObject.SetActive(false);
                 }
             }
-        }
-
-        public Quaternion GetRelativeJointRotation(JointId jointId) {
-            JointId parent = parentJointMap[jointId];
-            Quaternion parentJointRotationBodySpace = Quaternion.identity;
-            if (parent == JointId.Count) {
-                parentJointRotationBodySpace = Y_180_FLIP;
-            } else {
-                parentJointRotationBodySpace = absoluteJointRotations[(int)parent];
-            }
-            Quaternion jointRotationBodySpace = absoluteJointRotations[(int)jointId];
-            Quaternion relativeRotation = Quaternion.Inverse(parentJointRotationBodySpace) * jointRotationBodySpace;
-
-            return relativeRotation;
         }
     }
 }
