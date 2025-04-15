@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyTracker: {fileID: 0}
+  trackerID: 0
   sensorOrientation: 0
 --- !u!114 &4444805932908963434
 MonoBehaviour:

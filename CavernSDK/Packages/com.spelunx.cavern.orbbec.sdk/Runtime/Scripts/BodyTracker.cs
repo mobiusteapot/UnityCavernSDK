@@ -8,14 +8,22 @@ namespace Spelunx.Orbbec {
         private Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         private Dictionary<JointId, JointId> parentJointMap;
         private Dictionary<JointId, Quaternion> basisJointMap;
-        [SerializeField, Tooltip("Absolute Joint Rotations - Displayed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
+        [SerializeField, Tooltip("Absolute Joint Rotations - Exposed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
 
-        // Start is called before the first frame update
+        // Follow the Left-Hand Rule.
+        readonly Vector3 xPositive = Vector3.right;
+        readonly Vector3 yPositive = Vector3.up;
+        readonly Vector3 zPositive = Vector3.forward;
+
         private void Awake() {
+            InitParentJointMap();
+            InitBasisJointMap();
+        }
+
+        private void InitParentJointMap() {
             parentJointMap = new Dictionary<JointId, JointId>();
 
-            // pelvis has no parent so set to count
-            parentJointMap[JointId.Pelvis] = JointId.Count;
+            parentJointMap[JointId.Pelvis] = JointId.Count; // Pelvis has no parent, so set it's parent to JointId.Count.
             parentJointMap[JointId.SpineNavel] = JointId.Pelvis;
             parentJointMap[JointId.SpineChest] = JointId.SpineNavel;
             parentJointMap[JointId.Neck] = JointId.SpineChest;
@@ -47,21 +55,21 @@ namespace Spelunx.Orbbec {
             parentJointMap[JointId.EarLeft] = JointId.Head;
             parentJointMap[JointId.EyeRight] = JointId.Head;
             parentJointMap[JointId.EarRight] = JointId.Head;
+        }
 
-            Vector3 zpositive = Vector3.forward;
-            Vector3 xpositive = Vector3.right;
-            Vector3 ypositive = Vector3.up;
-            // spine and left hip are the same
-            Quaternion leftHipBasis = Quaternion.LookRotation(xpositive, -zpositive);
-            Quaternion spineHipBasis = Quaternion.LookRotation(xpositive, -zpositive);
-            Quaternion rightHipBasis = Quaternion.LookRotation(xpositive, zpositive);
-            // arms and thumbs share the same basis
-            Quaternion leftArmBasis = Quaternion.LookRotation(ypositive, -zpositive);
-            Quaternion rightArmBasis = Quaternion.LookRotation(-ypositive, zpositive);
-            Quaternion leftHandBasis = Quaternion.LookRotation(-zpositive, -ypositive);
+        private void InitBasisJointMap() {
+            // Spine and left hip share the same basis.
+            Quaternion leftHipBasis = Quaternion.LookRotation(xPositive, -zPositive);
+            Quaternion spineHipBasis = Quaternion.LookRotation(xPositive, -zPositive);
+            Quaternion rightHipBasis = Quaternion.LookRotation(xPositive, zPositive);
+
+            // Arms and thumbs share the same basis.
+            Quaternion leftArmBasis = Quaternion.LookRotation(yPositive, -zPositive);
+            Quaternion rightArmBasis = Quaternion.LookRotation(-yPositive, zPositive);
+            Quaternion leftHandBasis = Quaternion.LookRotation(-zPositive, -yPositive);
             Quaternion rightHandBasis = Quaternion.identity;
-            Quaternion leftFootBasis = Quaternion.LookRotation(xpositive, ypositive);
-            Quaternion rightFootBasis = Quaternion.LookRotation(xpositive, -ypositive);
+            Quaternion leftFootBasis = Quaternion.LookRotation(xPositive, yPositive);
+            Quaternion rightFootBasis = Quaternion.LookRotation(xPositive, -yPositive);
 
             basisJointMap = new Dictionary<JointId, Quaternion>();
 
@@ -100,13 +108,110 @@ namespace Spelunx.Orbbec {
             basisJointMap[JointId.EarRight] = spineHipBasis;
         }
 
-        public void UpdateSkeleton(FrameData trackerFrameData) {
-            //this is an array in case you want to get the n closest bodies
-            int closestBody = FindClosestTrackedBody(trackerFrameData);
-            
-            // render the closest body
-            Body skeleton = trackerFrameData.Bodies[closestBody];
-            SetBonesTransform(skeleton, 0);
+        private int FindIndexFromId(FrameData frameData, int id) {
+            int retIndex = -1;
+            for (int i = 0; i < (int)frameData.NumOfBodies; i++) {
+                if ((int)frameData.Bodies[i].Id == id) {
+                    retIndex = i;
+                    break;
+                }
+            }
+            return retIndex;
+        }
+
+        private int FindClosestTrackedBody(FrameData trackerFrameData) {
+            int closestBody = -1;
+            float minDistanceFromKinect = float.MaxValue;
+            for (int i = 0; i < (int)trackerFrameData.NumOfBodies; i++) {
+                var pelvisPosition = trackerFrameData.Bodies[i].JointPositions3D[(int)JointId.Pelvis];
+                Vector3 pelvisPos = new Vector3((float)pelvisPosition.X, (float)pelvisPosition.Y, (float)pelvisPosition.Z);
+                if (pelvisPos.magnitude < minDistanceFromKinect) {
+                    closestBody = i;
+                    minDistanceFromKinect = pelvisPos.magnitude;
+                }
+            }
+            return closestBody;
+        }
+
+        private Quaternion OrientateRotation(Quaternion rotation, SensorOrientation sensorOrientation) {
+            switch (sensorOrientation) {
+                case SensorOrientation.Clockwise90:
+                    return rotation * Quaternion.AngleAxis(-90.0f, zPositive);
+                case SensorOrientation.CounterClockwise90:
+                    return rotation * Quaternion.AngleAxis(90.0f, zPositive);
+                case SensorOrientation.Flip180:
+                    return rotation * Quaternion.AngleAxis(180.0f, zPositive);
+            }
+            return rotation;
+        }
+
+        private Vector3 OrientatePosition(Vector3 position, SensorOrientation sensorOrientation) {
+            Matrix4x4 translationMatrix = Matrix4x4.Translate(position);
+            Matrix4x4 rotationMatrix = Matrix4x4.identity;
+            // Clockwise 90 degrees means that we face the camera, and then rotate the camera 90 degrees relative to us.
+            switch (sensorOrientation) {
+                case SensorOrientation.Clockwise90:
+                    // Intuitively, I know that if the camera is rotated clockwise 90 degrees, we should be rotating it
+                    // anti-clockwise 90 degrees instead. But trust me, this is correct. Why is it different from OrientateRotation?
+                    // Not a damn clue, I figured it out via trial and error.
+                    rotationMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(90.0f, zPositive));
+                    break;
+                case SensorOrientation.CounterClockwise90:
+                    rotationMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(-90.0f, zPositive));
+                    break;
+                case SensorOrientation.Flip180:
+                    rotationMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(180.0f, zPositive));
+                    break;
+            }
+
+            // Left-Hand Rule!
+            Matrix4x4 positionMatrix = rotationMatrix * translationMatrix;
+            return new Vector3(positionMatrix.m03, positionMatrix.m13, positionMatrix.m23);
+        }
+
+        private void SetBonesTransform(Body skeleton, SensorOrientation sensorOrientation) {
+            for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
+                // Calculate joint position.
+                Vector3 jointPos = OrientatePosition(
+                    new Vector3(skeleton.JointPositions3D[jointNum].X,
+                                -skeleton.JointPositions3D[jointNum].Y,
+                                skeleton.JointPositions3D[jointNum].Z),
+                    sensorOrientation);
+
+                Quaternion jointRot = Y_180_FLIP * new Quaternion(
+                    skeleton.JointRotations[jointNum].X,
+                    skeleton.JointRotations[jointNum].Y,
+                    skeleton.JointRotations[jointNum].Z,
+                    skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(basisJointMap[(JointId)jointNum]);
+                jointRot = OrientateRotation(jointRot, sensorOrientation);
+                absoluteJointRotations[jointNum] = jointRot;
+
+                // These are absolute body space because each joint has the body root for a parent in the scene graph.
+                transform.GetChild(0).GetChild(jointNum).localPosition = jointPos;
+                transform.GetChild(0).GetChild(jointNum).localRotation = jointRot;
+
+                // Certain joints don't have a bone, so there's no need to render them.
+                if (parentJointMap[(JointId)jointNum] == JointId.Head ||
+                    parentJointMap[(JointId)jointNum] == JointId.Count) {
+                    transform.GetChild(0).GetChild(jointNum).GetChild(0).gameObject.SetActive(false);
+                    continue;
+                }
+
+                // For the other joints, rotate and scale their bones so that they link up with the parent joint.
+                Vector3 parentTrackerSpacePosition = OrientatePosition(
+                    new Vector3(skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].X,
+                                -skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Y,
+                                skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Z),
+                    sensorOrientation);
+                Vector3 boneDirectionTrackerSpace = jointPos - parentTrackerSpacePosition;
+                Vector3 boneDirectionWorldSpace = transform.rotation * boneDirectionTrackerSpace;
+                Vector3 boneDirectionLocalSpace = Quaternion.Inverse(transform.GetChild(0).GetChild(jointNum).rotation) * Vector3.Normalize(boneDirectionWorldSpace);
+
+                // If the order of children in the scene hierachy ever changes, this will all be messed up.
+                transform.GetChild(0).GetChild(jointNum).GetChild(0).localScale = new Vector3(1, 20.0f * 0.5f * boneDirectionWorldSpace.magnitude, 1);
+                transform.GetChild(0).GetChild(jointNum).GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, boneDirectionLocalSpace);
+                transform.GetChild(0).GetChild(jointNum).GetChild(0).position = transform.GetChild(0).GetChild(jointNum).position - 0.5f * boneDirectionWorldSpace;
+            }
         }
 
         public void ShowSkeleton(bool show) {
@@ -134,59 +239,13 @@ namespace Spelunx.Orbbec {
             return relativeRotation;
         }
 
-        private int FindIndexFromId(FrameData frameData, int id) {
-            int retIndex = -1;
-            for (int i = 0; i < (int)frameData.NumOfBodies; i++) {
-                if ((int)frameData.Bodies[i].Id == id) {
-                    retIndex = i;
-                    break;
-                }
-            }
-            return retIndex;
-        }
+        public void UpdateSkeleton(FrameData trackerFrameData, SensorOrientation sensorOrientation) {
+            //this is an array in case you want to get the n closest bodies
+            int closestBody = FindClosestTrackedBody(trackerFrameData);
 
-        private int FindClosestTrackedBody(FrameData trackerFrameData) {
-            int closestBody = -1;
-            const float MAX_DISTANCE = 5000.0f;
-            float minDistanceFromKinect = MAX_DISTANCE;
-            for (int i = 0; i < (int)trackerFrameData.NumOfBodies; i++) {
-                var pelvisPosition = trackerFrameData.Bodies[i].JointPositions3D[(int)JointId.Pelvis];
-                Vector3 pelvisPos = new Vector3((float)pelvisPosition.X, (float)pelvisPosition.Y, (float)pelvisPosition.Z);
-                if (pelvisPos.magnitude < minDistanceFromKinect) {
-                    closestBody = i;
-                    minDistanceFromKinect = pelvisPos.magnitude;
-                }
-            }
-            return closestBody;
-        }
-
-        // This is poorly named. It should be named SetSkeletonTransform.
-        private void SetBonesTransform(Body skeleton, int skeletonNumber) {
-            for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
-                Vector3 jointPos = new Vector3(skeleton.JointPositions3D[jointNum].X, -skeleton.JointPositions3D[jointNum].Y, skeleton.JointPositions3D[jointNum].Z);
-                Vector3 offsetPosition = transform.rotation * jointPos;
-                Vector3 positionInTrackerRootSpace = transform.position + offsetPosition;
-                Quaternion jointRot = Y_180_FLIP * new Quaternion(skeleton.JointRotations[jointNum].X, skeleton.JointRotations[jointNum].Y,
-                    skeleton.JointRotations[jointNum].Z, skeleton.JointRotations[jointNum].W) * Quaternion.Inverse(basisJointMap[(JointId)jointNum]);
-                absoluteJointRotations[jointNum] = jointRot;
-                // these are absolute body space because each joint has the body root for a parent in the scene graph
-                transform.GetChild(skeletonNumber).GetChild(jointNum).localPosition = jointPos;
-                transform.GetChild(skeletonNumber).GetChild(jointNum).localRotation = jointRot;
-
-                const int boneChildNum = 0;
-                if (parentJointMap[(JointId)jointNum] != JointId.Head && parentJointMap[(JointId)jointNum] != JointId.Count) {
-                    Vector3 parentTrackerSpacePosition = new Vector3(skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].X,
-                        -skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Y, skeleton.JointPositions3D[(int)parentJointMap[(JointId)jointNum]].Z);
-                    Vector3 boneDirectionTrackerSpace = jointPos - parentTrackerSpacePosition;
-                    Vector3 boneDirectionWorldSpace = transform.rotation * boneDirectionTrackerSpace;
-                    Vector3 boneDirectionLocalSpace = Quaternion.Inverse(transform.GetChild(skeletonNumber).GetChild(jointNum).rotation) * Vector3.Normalize(boneDirectionWorldSpace);
-                    transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).localScale = new Vector3(1, 20.0f * 0.5f * boneDirectionWorldSpace.magnitude, 1);
-                    transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).localRotation = Quaternion.FromToRotation(Vector3.up, boneDirectionLocalSpace);
-                    transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).position = transform.GetChild(skeletonNumber).GetChild(jointNum).position - 0.5f * boneDirectionWorldSpace;
-                } else {
-                    transform.GetChild(skeletonNumber).GetChild(jointNum).GetChild(boneChildNum).gameObject.SetActive(false);
-                }
-            }
+            // render the closest body
+            Body skeleton = trackerFrameData.Bodies[closestBody];
+            SetBonesTransform(skeleton, sensorOrientation);
         }
     }
 }

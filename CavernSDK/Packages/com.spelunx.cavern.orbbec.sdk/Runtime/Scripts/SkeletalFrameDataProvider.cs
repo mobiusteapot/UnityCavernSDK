@@ -1,10 +1,9 @@
-﻿using Microsoft.Azure.Kinect.BodyTracking;
-using Microsoft.Azure.Kinect.Sensor;
+﻿using Microsoft.Azure.Kinect.Sensor;
+using Microsoft.Azure.Kinect.BodyTracking;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
-using UnityEngine;
 
 namespace Spelunx.Orbbec {
     public class SkeletalFrameDataProvider : FrameDataProvider {
@@ -52,6 +51,7 @@ namespace Spelunx.Orbbec {
                         // This doesn't actually orientate the skeleton the right way up. That still needs to be implemented.
                         // But for example if the sensor was set to Default and flipped 180 degrees, then the recording will be jiterry.
                         // Once the orientation is correct, the sensor is much smoother.
+                        // https://github.com/microsoft/Azure-Kinect-Sensor-SDK/issues/1039
                         SensorOrientation = sensorOrientation
                     };
 
@@ -71,8 +71,7 @@ namespace Spelunx.Orbbec {
                                     continue;
                                 }
 
-                                // Flag that the thread has started.
-                                HasStarted = true;
+                                IsRunning = true; // Flag that the thread has started.
 
                                 // Copy bodies.
                                 currentFrameData.NumOfBodies = frame.NumberOfBodies;
@@ -119,10 +118,12 @@ namespace Spelunx.Orbbec {
                     device.Dispose();
                 }
 
-                // Close log file.
-                if (rawDataLoggingFile != null) { rawDataLoggingFile.Close(); }
+                if (rawDataLoggingFile != null) { rawDataLoggingFile.Close(); } // Close log file.
+
+                IsRunning = false; // Flag that the thread has ended.
             } catch (Exception e) {
-                Debug.Log($"SkeletalFrameDataProvider - ID: {id}, Catching exception for background thread: {e.Message}");
+                IsRunning = false; // Flag that the thread has ended.
+                UnityEngine.Debug.Log($"SkeletalFrameDataProvider - ID: {id}, Catching exception for background thread: {e.Message}");
                 token.ThrowIfCancellationRequested();
             }
         }

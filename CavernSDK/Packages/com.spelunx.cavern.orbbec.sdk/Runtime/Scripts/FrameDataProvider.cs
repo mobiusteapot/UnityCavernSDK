@@ -11,7 +11,7 @@ namespace Spelunx.Orbbec {
         private CancellationToken cancellationToken;
         private bool hasData = false;
 
-        public bool HasStarted { get; protected set; } = false;
+        public bool IsRunning { get; protected set; } = false;
 
         public FrameDataProvider(int id) {
 #if UNITY_EDITOR

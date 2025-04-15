@@ -7,10 +7,10 @@ using System.Text;
 namespace Spelunx.Orbbec {
     public class BodyTrackerAvatar : MonoBehaviour {
         [Header("References")]
-        [SerializeField] private BodyTracker bodyTracker;
         [SerializeField] private Animator avatarAnimator;
+        [SerializeField] private Transform avatarRoot; 
         [SerializeField] private Transform skeletonRoot;
-        [SerializeField] private Transform avatarRoot;
+        [SerializeField] private BodyTracker bodyTracker;
 
         [Header("Settings")]
         [SerializeField] private Vector3 avatarOffset = Vector3.zero;
@@ -18,9 +18,8 @@ namespace Spelunx.Orbbec {
         // Internal variables.
         private Dictionary<JointId, Quaternion> absoluteOffsetMap;
 
-        // Map Microsoft Kinect's joints to Unity's joints.
+        // Map Microsoft Kinect's joints to Unity's joints. (https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints)
         private static HumanBodyBones MapKinectJoint(JointId joint) {
-            // https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints
             switch (joint) {
                 case JointId.Pelvis: return HumanBodyBones.Hips;
                 case JointId.SpineNavel: return HumanBodyBones.Spine;
@@ -63,7 +62,7 @@ namespace Spelunx.Orbbec {
         }
 
         private void Start() {
-            Transform rootJointTransform = avatarRoot;
+            // For every bone in the avatar, map it to a joint in the skeleton and find its absolute rotation.
             absoluteOffsetMap = new Dictionary<JointId, Quaternion>();
             for (int i = 0; i < (int)JointId.Count; i++) {
                 HumanBodyBones hbb = MapKinectJoint((JointId)i);
@@ -71,7 +70,7 @@ namespace Spelunx.Orbbec {
                     Transform boneTransform = avatarAnimator.GetBoneTransform(hbb);
                     Quaternion absOffset = GetSkeletonBone(avatarAnimator, boneTransform.name).rotation;
                     // find the absolute offset for the tpose
-                    while (!ReferenceEquals(boneTransform, rootJointTransform)) {
+                    while (!ReferenceEquals(boneTransform, avatarRoot)) {
                         boneTransform = boneTransform.parent;
                         absOffset = GetSkeletonBone(avatarAnimator, boneTransform.name).rotation * absOffset;
                     }
@@ -83,13 +82,13 @@ namespace Spelunx.Orbbec {
         private void LateUpdate() {
             for (int j = 0; j < (int)JointId.Count; j++) {
                 if (MapKinectJoint((JointId)j) != HumanBodyBones.LastBone && absoluteOffsetMap.ContainsKey((JointId)j)) {
-                    // get the absolute offset
                     Quaternion absOffset = absoluteOffsetMap[(JointId)j];
                     Transform finalJoint = avatarAnimator.GetBoneTransform(MapKinectJoint((JointId)j));
                     finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * bodyTracker.GetAbsoluteJointRotation((JointId)j) * absOffset;
                     if (j == 0) {
-                        // character root plus translation reading from the kinect, plus the offset from the script public variables
-                        finalJoint.position = avatarRoot.position + new Vector3(skeletonRoot.localPosition.x, skeletonRoot.localPosition.y, skeletonRoot.localPosition.z) + avatarOffset;
+                        // Avatar root + offset from the script variables + translation reading from the sensor.
+                        finalJoint.position = avatarRoot.position + avatarOffset +
+                                              new Vector3(skeletonRoot.localPosition.x, skeletonRoot.localPosition.y, skeletonRoot.localPosition.z);
                     }
                 }
             }
