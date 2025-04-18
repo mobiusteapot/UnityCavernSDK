@@ -44,7 +44,7 @@ namespace Spelunx.Orbbec {
         private void Update() {
             // Disconnect the currently connected device if the serial number no longer matches what we want.
             if (skeletalFrameDataProvider != null && skeletalFrameDataProvider.GetDeviceSerial() != deviceSerial) {
-                Debug.Log("Switching shit out." + skeletalFrameDataProvider.GetDeviceSerial() + " is different from " + deviceSerial);
+                Debug.Log("New serial number " + deviceSerial + "selected. Shutting down " + skeletalFrameDataProvider.GetDeviceSerial() + ".");
                 skeletalFrameDataProvider.Dispose();
                 skeletalFrameDataProvider = null;
             }
@@ -53,6 +53,7 @@ namespace Spelunx.Orbbec {
             if (isReady && null == skeletalFrameDataProvider) {
                 for (int i = 0; i < foundSerials.Count; ++i) {
                     if (foundSerials[i] == deviceSerial) {
+                        Debug.Log("Attempting to start " + deviceSerial + ".");
                         skeletalFrameDataProvider = new SkeletalFrameDataProvider(deviceSerial, sensorOrientation, i, OnFrameDataProviderFinish);
                         isReady = false;
                     }
