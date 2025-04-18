@@ -13,15 +13,17 @@ namespace Spelunx.Orbbec {
         [SerializeField, Tooltip("The skeleton to control.")] private BodyTracker bodyTracker; // One for each skeleton on the screen. For now we only support 1.
 
         [Header("Settings")]
-        [SerializeField, Tooltip("Serial number of the device we want to connect to. Can be changed on the fly, but you may need to wait for a few seconds.")] private string deviceSerial = "<Insert device serial number here.>";
         [SerializeField, Tooltip("How is the sensor mounted? This needs to be set before entering play mode, and cannot be changed on the fly.")] private SensorOrientation sensorOrientation;
-        [SerializeField, Tooltip("List of found serials. You can copy the values onto your clipboard.")] private List<string> foundSerials = new List<string>();
+        [SerializeField, Tooltip("Serial number of the device we want to connect to. Can be changed on the fly, but you may need to wait for a few seconds.")] private string deviceSerial = "<Insert device serial number here.>";
+        [SerializeField, Tooltip("If no serial numbers match, connect to first device found.")] private bool connectDefaultIfNoSerialMatch = true;
 
         // Internal Variables
         private FrameData frameData = new FrameData();
         private SkeletalFrameDataProvider skeletalFrameDataProvider = null; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
+        private List<string> availableSerials = new List<string>();
         private bool isReady = true; // A flag to ensure that a new frame data provider waits for the old one to shutdown completely, so that it is impossible for them to open the same device.
 
+        public List<string> GetAvailableSerials() { return availableSerials; }
         public void SetDeviceSerial(string deviceSerial) { this.deviceSerial = deviceSerial; }
         public string GetDeviceSerial() { return deviceSerial; }
         public void SetSensorOrientation(SensorOrientation sensorOrientation) { this.sensorOrientation = sensorOrientation; }
@@ -51,31 +53,37 @@ namespace Spelunx.Orbbec {
 
             // Connect to the new device.
             if (isReady && null == skeletalFrameDataProvider) {
-                for (int i = 0; i < foundSerials.Count; ++i) {
-                    if (foundSerials[i] == deviceSerial) {
+                // See if any of the devices match.
+                for (int i = 0; i < availableSerials.Count; ++i) {
+                    if (availableSerials[i] == deviceSerial) {
                         Debug.Log("Attempting to start " + deviceSerial + ".");
                         skeletalFrameDataProvider = new SkeletalFrameDataProvider(deviceSerial, sensorOrientation, i, OnFrameDataProviderFinish);
                         isReady = false;
                     }
                 }
+
+                // If none match, start index 0 if connectDefaultIfNoSerialMatch is set to true.
+                if (connectDefaultIfNoSerialMatch && 0 < availableSerials.Count && skeletalFrameDataProvider == null) {
+                    deviceSerial = availableSerials[0];
+                }
             }
 
             // Update the skeleton.
-            if (null == skeletalFrameDataProvider) { return; }
-            if (!skeletalFrameDataProvider.HasStarted) { return; }
-            if (!skeletalFrameDataProvider.ExtractData(ref frameData)) { return; }
-            if (frameData.NumOfBodies == 0) { return; }
+            if (null == skeletalFrameDataProvider ||
+                !skeletalFrameDataProvider.HasStarted ||
+                !skeletalFrameDataProvider.ExtractData(ref frameData) ||
+                frameData.NumOfBodies == 0) { return; }
             bodyTracker.UpdateSkeleton(frameData, sensorOrientation);
         }
 
         /// Scan through the ORBBEC devices and retrieve their serial numbers.
         private void ScanDeviceSerials() {
             int deviceCount = Device.GetInstalledCount();
-            foundSerials.Clear();
+            availableSerials.Clear();
             for (int i = 0; i < deviceCount; ++i) {
                 try {
                     using (Device device = Device.Open(i)) {
-                        foundSerials.Add(device.SerialNum);
+                        availableSerials.Add(device.SerialNum);
                         Debug.Log("BodyTrackerManager::ScanDeviceSerials - Found device with serial number " + device.SerialNum + ".");
                         device.Dispose();
                     }
