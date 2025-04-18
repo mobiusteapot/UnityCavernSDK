@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 22560629}
   - component: {fileID: 22560628}
   m_Layer: 0
-  m_Name: earLeft
+  m_Name: EarLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 96460006}
   - component: {fileID: 96460005}
   m_Layer: 0
-  m_Name: bone (22)
+  m_Name: AnkleLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -232,7 +232,7 @@ GameObject:
   - component: {fileID: 162193770}
   - component: {fileID: 162193769}
   m_Layer: 0
-  m_Name: pelvisHeadBone
+  m_Name: HeadBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -342,7 +342,7 @@ GameObject:
   - component: {fileID: 172131785}
   - component: {fileID: 172131784}
   m_Layer: 0
-  m_Name: bone (24)
+  m_Name: NoseBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 230849765}
   - component: {fileID: 230849764}
   m_Layer: 0
-  m_Name: bone (11)
+  m_Name: ElbowLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -640,7 +640,7 @@ GameObject:
   - component: {fileID: 249947661}
   - component: {fileID: 249947660}
   m_Layer: 0
-  m_Name: bone (23)
+  m_Name: FootLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -750,7 +750,7 @@ GameObject:
   - component: {fileID: 319584920}
   - component: {fileID: 319584919}
   m_Layer: 0
-  m_Name: bone (2)
+  m_Name: ShoulderRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -857,7 +857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 325103644}
   m_Layer: 0
-  m_Name: pointBody
+  m_Name: Skeleton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -923,7 +923,7 @@ GameObject:
   - component: {fileID: 325181009}
   - component: {fileID: 325181008}
   m_Layer: 0
-  m_Name: bone (19)
+  m_Name: FootRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1033,7 +1033,7 @@ GameObject:
   - component: {fileID: 356017638}
   - component: {fileID: 356017637}
   m_Layer: 0
-  m_Name: leftFoot
+  m_Name: FootLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1142,7 +1142,7 @@ GameObject:
   - component: {fileID: 361991185}
   - component: {fileID: 361991184}
   m_Layer: 0
-  m_Name: bone (15)
+  m_Name: ThumbLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1252,7 +1252,7 @@ GameObject:
   - component: {fileID: 383776977}
   - component: {fileID: 383776976}
   m_Layer: 0
-  m_Name: bone (26)
+  m_Name: EarRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1362,7 +1362,7 @@ GameObject:
   - component: {fileID: 430270601}
   - component: {fileID: 430270600}
   m_Layer: 0
-  m_Name: rightFingerTip
+  m_Name: HandTipRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1471,7 +1471,7 @@ GameObject:
   - component: {fileID: 433970494}
   - component: {fileID: 433970493}
   m_Layer: 0
-  m_Name: bone (28)
+  m_Name: EyeRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1581,7 +1581,7 @@ GameObject:
   - component: {fileID: 439313447}
   - component: {fileID: 439313446}
   m_Layer: 0
-  m_Name: shoulderElbowBone
+  m_Name: ElbowRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1691,7 +1691,7 @@ GameObject:
   - component: {fileID: 442251816}
   - component: {fileID: 442251815}
   m_Layer: 0
-  m_Name: leftThumb
+  m_Name: ThumbLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1800,7 +1800,7 @@ GameObject:
   - component: {fileID: 466055449}
   - component: {fileID: 466055448}
   m_Layer: 0
-  m_Name: head
+  m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1909,7 +1909,7 @@ GameObject:
   - component: {fileID: 475482820}
   - component: {fileID: 475482819}
   m_Layer: 0
-  m_Name: leftWrist
+  m_Name: WristLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2018,7 +2018,7 @@ GameObject:
   - component: {fileID: 507758589}
   - component: {fileID: 507758588}
   m_Layer: 0
-  m_Name: rightHip
+  m_Name: HipRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2127,7 +2127,7 @@ GameObject:
   - component: {fileID: 523990878}
   - component: {fileID: 523990877}
   m_Layer: 0
-  m_Name: rightHand
+  m_Name: HandRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2236,7 +2236,7 @@ GameObject:
   - component: {fileID: 530649536}
   - component: {fileID: 530649535}
   m_Layer: 0
-  m_Name: lefttElbow
+  m_Name: ElbowLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2345,7 +2345,7 @@ GameObject:
   - component: {fileID: 607839275}
   - component: {fileID: 607839274}
   m_Layer: 0
-  m_Name: bone (8)
+  m_Name: ClavicleLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2455,7 +2455,7 @@ GameObject:
   - component: {fileID: 622790449}
   - component: {fileID: 622790448}
   m_Layer: 0
-  m_Name: rightClavicle
+  m_Name: ClavicleRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2564,7 +2564,7 @@ GameObject:
   - component: {fileID: 683408111}
   - component: {fileID: 683408110}
   m_Layer: 0
-  m_Name: rightAnkle
+  m_Name: AnkleRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2673,7 +2673,7 @@ GameObject:
   - component: {fileID: 761279766}
   - component: {fileID: 761279765}
   m_Layer: 0
-  m_Name: rightShoulder
+  m_Name: ShoulderRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2782,7 +2782,7 @@ GameObject:
   - component: {fileID: 775013632}
   - component: {fileID: 775013631}
   m_Layer: 0
-  m_Name: bone (13)
+  m_Name: HandLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2892,7 +2892,7 @@ GameObject:
   - component: {fileID: 858095943}
   - component: {fileID: 858095942}
   m_Layer: 0
-  m_Name: rightKnee
+  m_Name: KneeRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3001,7 +3001,7 @@ GameObject:
   - component: {fileID: 877950159}
   - component: {fileID: 877950158}
   m_Layer: 0
-  m_Name: earRight
+  m_Name: EarRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3110,7 +3110,7 @@ GameObject:
   - component: {fileID: 914869126}
   - component: {fileID: 914869125}
   m_Layer: 0
-  m_Name: bone (16)
+  m_Name: HipRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3220,7 +3220,7 @@ GameObject:
   - component: {fileID: 917885559}
   - component: {fileID: 917885558}
   m_Layer: 0
-  m_Name: bone (1)
+  m_Name: ClavicleRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3330,7 +3330,7 @@ GameObject:
   - component: {fileID: 970833015}
   - component: {fileID: 970833014}
   m_Layer: 0
-  m_Name: leftKnee
+  m_Name: KneeLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3439,7 +3439,7 @@ GameObject:
   - component: {fileID: 972057448}
   - component: {fileID: 972057447}
   m_Layer: 0
-  m_Name: bone (25)
+  m_Name: EarLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3549,7 +3549,7 @@ GameObject:
   - component: {fileID: 1072855859}
   - component: {fileID: 1072855858}
   m_Layer: 0
-  m_Name: eyeLeft
+  m_Name: EyeLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3658,7 +3658,7 @@ GameObject:
   - component: {fileID: 1074493415}
   - component: {fileID: 1074493414}
   m_Layer: 0
-  m_Name: bone (11)
+  m_Name: WristRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3768,7 +3768,7 @@ GameObject:
   - component: {fileID: 1142928003}
   - component: {fileID: 1142928002}
   m_Layer: 0
-  m_Name: neck
+  m_Name: Neck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3877,7 +3877,7 @@ GameObject:
   - component: {fileID: 1147096729}
   - component: {fileID: 1147096728}
   m_Layer: 0
-  m_Name: bone (17)
+  m_Name: KneeRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3987,7 +3987,7 @@ GameObject:
   - component: {fileID: 1152837361}
   - component: {fileID: 1152837360}
   m_Layer: 0
-  m_Name: bone (12)
+  m_Name: WristLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4097,7 +4097,7 @@ GameObject:
   - component: {fileID: 1190608335}
   - component: {fileID: 1190608334}
   m_Layer: 0
-  m_Name: bone (5)
+  m_Name: SpineNavalBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4207,7 +4207,7 @@ GameObject:
   - component: {fileID: 1365219140}
   - component: {fileID: 1365219139}
   m_Layer: 0
-  m_Name: leftHip
+  m_Name: HipLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4316,7 +4316,7 @@ GameObject:
   - component: {fileID: 1373503330}
   - component: {fileID: 1373503329}
   m_Layer: 0
-  m_Name: rightFoot
+  m_Name: FootRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4425,7 +4425,7 @@ GameObject:
   - component: {fileID: 1382029849}
   - component: {fileID: 1382029848}
   m_Layer: 0
-  m_Name: nose
+  m_Name: Nose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4534,7 +4534,7 @@ GameObject:
   - component: {fileID: 1400978689}
   - component: {fileID: 1400978688}
   m_Layer: 0
-  m_Name: bone (4)
+  m_Name: NeckBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4644,7 +4644,7 @@ GameObject:
   - component: {fileID: 1410819576}
   - component: {fileID: 1410819575}
   m_Layer: 0
-  m_Name: eyeRight
+  m_Name: EyeRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4753,7 +4753,7 @@ GameObject:
   - component: {fileID: 1585179222}
   - component: {fileID: 1585179221}
   m_Layer: 0
-  m_Name: pelvis
+  m_Name: Pelvis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4862,7 +4862,7 @@ GameObject:
   - component: {fileID: 1592247137}
   - component: {fileID: 1592247136}
   m_Layer: 0
-  m_Name: bone (20)
+  m_Name: HipLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4972,7 +4972,7 @@ GameObject:
   - component: {fileID: 1626050128}
   - component: {fileID: 1626050127}
   m_Layer: 0
-  m_Name: leftShoulder
+  m_Name: ShoulderLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5081,7 +5081,7 @@ GameObject:
   - component: {fileID: 1635582692}
   - component: {fileID: 1635582691}
   m_Layer: 0
-  m_Name: leftHand
+  m_Name: HandLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5190,7 +5190,7 @@ GameObject:
   - component: {fileID: 1688543381}
   - component: {fileID: 1688543380}
   m_Layer: 0
-  m_Name: bone (21)
+  m_Name: KneeLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5300,7 +5300,7 @@ GameObject:
   - component: {fileID: 1718267336}
   - component: {fileID: 1718267335}
   m_Layer: 0
-  m_Name: leftAnkle
+  m_Name: AnkleLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5409,7 +5409,7 @@ GameObject:
   - component: {fileID: 1807651760}
   - component: {fileID: 1807651759}
   m_Layer: 0
-  m_Name: bone (3)
+  m_Name: PelvisBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5519,7 +5519,7 @@ GameObject:
   - component: {fileID: 1838528415}
   - component: {fileID: 1838528414}
   m_Layer: 0
-  m_Name: leftClavicle
+  m_Name: ClavicleLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5628,7 +5628,7 @@ GameObject:
   - component: {fileID: 1860470965}
   - component: {fileID: 1860470964}
   m_Layer: 0
-  m_Name: spineNaval
+  m_Name: SpineNaval
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5737,7 +5737,7 @@ GameObject:
   - component: {fileID: 1872031323}
   - component: {fileID: 1872031322}
   m_Layer: 0
-  m_Name: rightWrist
+  m_Name: WristRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5846,7 +5846,7 @@ GameObject:
   - component: {fileID: 1873992192}
   - component: {fileID: 1873992191}
   m_Layer: 0
-  m_Name: bone (27)
+  m_Name: EyeLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5956,7 +5956,7 @@ GameObject:
   - component: {fileID: 1881499710}
   - component: {fileID: 1881499709}
   m_Layer: 0
-  m_Name: bone (14)
+  m_Name: HandTipLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6066,7 +6066,7 @@ GameObject:
   - component: {fileID: 1899328838}
   - component: {fileID: 1899328837}
   m_Layer: 0
-  m_Name: bone
+  m_Name: HandRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6176,7 +6176,7 @@ GameObject:
   - component: {fileID: 1922906296}
   - component: {fileID: 1922906295}
   m_Layer: 0
-  m_Name: bone (9)
+  m_Name: SpineChestBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6286,7 +6286,7 @@ GameObject:
   - component: {fileID: 1955530323}
   - component: {fileID: 1955530322}
   m_Layer: 0
-  m_Name: bone (18)
+  m_Name: AnkleRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6396,7 +6396,7 @@ GameObject:
   - component: {fileID: 2004946274}
   - component: {fileID: 2004946273}
   m_Layer: 0
-  m_Name: bone (6)
+  m_Name: HandTipRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6506,7 +6506,7 @@ GameObject:
   - component: {fileID: 2006245554}
   - component: {fileID: 2006245553}
   m_Layer: 0
-  m_Name: leftFingerTip
+  m_Name: HandTipLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6615,7 +6615,7 @@ GameObject:
   - component: {fileID: 2010853981}
   - component: {fileID: 2010853980}
   m_Layer: 0
-  m_Name: rightElbow
+  m_Name: ElbowRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6724,7 +6724,7 @@ GameObject:
   - component: {fileID: 2030953461}
   - component: {fileID: 2030953460}
   m_Layer: 0
-  m_Name: spineChest
+  m_Name: SpineChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6833,7 +6833,7 @@ GameObject:
   - component: {fileID: 2038290606}
   - component: {fileID: 2038290605}
   m_Layer: 0
-  m_Name: rightThumb
+  m_Name: ThumbRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6942,7 +6942,7 @@ GameObject:
   - component: {fileID: 2088096089}
   - component: {fileID: 2088096088}
   m_Layer: 0
-  m_Name: bone (10)
+  m_Name: ShoulderLeftBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7052,7 +7052,7 @@ GameObject:
   - component: {fileID: 2089051044}
   - component: {fileID: 2089051043}
   m_Layer: 0
-  m_Name: bone (7)
+  m_Name: ThumbRightBone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

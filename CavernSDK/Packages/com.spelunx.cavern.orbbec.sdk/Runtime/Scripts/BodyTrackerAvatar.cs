@@ -12,11 +12,9 @@ namespace Spelunx.Orbbec {
         [SerializeField] private Transform skeletonRoot;
         [SerializeField] private BodyTracker bodyTracker;
 
-        [Header("Settings")]
-        [SerializeField] private Vector3 avatarOffset = Vector3.zero;
-
         // Internal variables.
         private Dictionary<JointId, Quaternion> absoluteOffsetMap;
+        private Dictionary<JointId, Quaternion> relativeOffsetMap;
 
         // Map Microsoft Kinect's joints to Unity's joints. (https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints)
         private static HumanBodyBones MapKinectJoint(JointId joint) {
@@ -61,7 +59,18 @@ namespace Spelunx.Orbbec {
             return new SkeletonBone();
         }
 
-        private void Start() {
+        private void InitRelativeOffsetMap() {
+            relativeOffsetMap = new Dictionary<JointId, Quaternion>();
+            for (int i = 0; i < (int)JointId.Count; i++) {
+                HumanBodyBones hbb = MapKinectJoint((JointId)i);
+                if (hbb != HumanBodyBones.LastBone) {
+                    Transform boneTransform = avatarAnimator.GetBoneTransform(hbb);
+                    relativeOffsetMap[(JointId)i] = GetSkeletonBone(avatarAnimator, boneTransform.name).rotation;
+                }
+            }
+        }
+
+        private void InitAbsoluteOffsetMap() {
             // For every bone in the avatar, map it to a joint in the skeleton and find its absolute rotation.
             absoluteOffsetMap = new Dictionary<JointId, Quaternion>();
             for (int i = 0; i < (int)JointId.Count; i++) {
@@ -79,15 +88,21 @@ namespace Spelunx.Orbbec {
             }
         }
 
+        private void Start() {
+            InitRelativeOffsetMap();
+            InitAbsoluteOffsetMap();
+        }
+
         private void LateUpdate() {
             for (int j = 0; j < (int)JointId.Count; j++) {
                 if (MapKinectJoint((JointId)j) != HumanBodyBones.LastBone && absoluteOffsetMap.ContainsKey((JointId)j)) {
                     Quaternion absOffset = absoluteOffsetMap[(JointId)j];
                     Transform finalJoint = avatarAnimator.GetBoneTransform(MapKinectJoint((JointId)j));
-                    finalJoint.rotation = absOffset * Quaternion.Inverse(absOffset) * bodyTracker.GetAbsoluteJointRotation((JointId)j) * absOffset;
-                    if (j == 0) {
-                        // Avatar root + offset from the script variables + translation reading from the sensor.
-                        finalJoint.position = avatarRoot.position + avatarOffset + skeletonRoot.localPosition;
+                    if (j == (int)JointId.Pelvis) {
+                        finalJoint.localRotation = bodyTracker.GetAbsoluteJointRotation((JointId)j) * relativeOffsetMap[(JointId)j]; 
+                        finalJoint.localPosition = bodyTracker.GetJointPosition(JointId.Pelvis);
+                    } else {
+                        finalJoint.localRotation = bodyTracker.GetRelativeJointRotation((JointId)j) * relativeOffsetMap[(JointId)j];
                     }
                 }
             }

@@ -3,11 +3,13 @@ using UnityEngine;
 using Microsoft.Azure.Kinect.BodyTracking;
 
 namespace Spelunx.Orbbec {
+    // IMPORTANT: The child hierachy of BodyTracker must follow JointId!
     public class BodyTracker : MonoBehaviour {
         // Internal variables.
         private Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         private Dictionary<JointId, JointId> parentJointMap;
         private Dictionary<JointId, Quaternion> basisJointMap;
+        [SerializeField, Tooltip("Joint Positions - Exposed for debugging purposes.")] private Vector3[] jointPositions = new Vector3[(int)JointId.Count];
         [SerializeField, Tooltip("Absolute Joint Rotations - Exposed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
 
         // Follow the Left-Hand Rule.
@@ -109,17 +111,6 @@ namespace Spelunx.Orbbec {
             basisJointMap[JointId.EarRight] = spineHipBasis;
         }
 
-        private int FindIndexFromId(FrameData frameData, int id) {
-            int retIndex = -1;
-            for (int i = 0; i < (int)frameData.NumOfBodies; i++) {
-                if ((int)frameData.Bodies[i].Id == id) {
-                    retIndex = i;
-                    break;
-                }
-            }
-            return retIndex;
-        }
-
         private int FindClosestTrackedBody(FrameData trackerFrameData) {
             int closestBody = -1;
             float minDistanceFromKinect = float.MaxValue;
@@ -175,8 +166,12 @@ namespace Spelunx.Orbbec {
             for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
                 // Calculate joint position.
                 Vector3 jointPos = OrientatePosition(
-                    new Vector3(body.JointPositions3D[jointNum].X, -body.JointPositions3D[jointNum].Y, body.JointPositions3D[jointNum].Z), // Convert from System.Numerics.Vector3 to UnityEngine.Vector3.
+                    // Convert from System.Numerics.Vector3 to UnityEngine.Vector3.
+                    new Vector3(body.JointPositions3D[jointNum].X,
+                                -body.JointPositions3D[jointNum].Y,
+                                body.JointPositions3D[jointNum].Z),
                     sensorOrientation);
+                jointPositions[jointNum] = jointPos;
 
                 // We have to convert from System.Numerics.Quaternion to UnityEngine.Quaternion.
                 Quaternion bodyJointRotation = new Quaternion(
@@ -224,9 +219,9 @@ namespace Spelunx.Orbbec {
             }
         }
 
-        public Quaternion GetAbsoluteJointRotation(JointId jointId) {
-            return absoluteJointRotations[(int)jointId];
-        }
+        public Vector3 GetJointPosition(JointId jointId) { return jointPositions[(int)jointId]; }
+
+        public Quaternion GetAbsoluteJointRotation(JointId jointId) { return absoluteJointRotations[(int)jointId]; }
 
         public Quaternion GetRelativeJointRotation(JointId jointId) {
             JointId parent = parentJointMap[jointId];
