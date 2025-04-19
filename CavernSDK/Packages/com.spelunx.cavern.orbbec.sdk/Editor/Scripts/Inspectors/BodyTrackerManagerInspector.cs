@@ -11,12 +11,14 @@ namespace Spelunx.Orbbec {
             BodyTrackerManager bodyTrackerManager = (BodyTrackerManager)target;
             List<string> foundSerials = bodyTrackerManager.GetAvailableSerials();
 
-            if (0 < foundSerials.Count) {
-                GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
-                headerStyle.fontStyle = FontStyle.Bold; // Bold the header.
-                headerStyle.fontSize += 4; // Slightly increase the font size.
-                GUILayout.Space(8); // Leave some padding.
-                GUILayout.Label("Available Devices (Selecting also copies serial number to clipboard.)", headerStyle);
+            GUIStyle headerStyle = new GUIStyle(GUI.skin.label);
+            headerStyle.fontStyle = FontStyle.Bold; // Bold the header.
+            headerStyle.fontSize += 4; // Slightly increase the font size.
+            GUILayout.Space(8); // Leave some padding.
+            if (0 == foundSerials.Count) {
+                GUILayout.Label("No Devices Found (Enter Play Mode to scan for devices.)", headerStyle);
+            } else {
+                GUILayout.Label("Devices Found (Selecting also copies serial number to clipboard.)", headerStyle);
             }
 
             for (int i = 0; i < foundSerials.Count; ++i) {
