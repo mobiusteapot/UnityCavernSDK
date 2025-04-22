@@ -3,10 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
-using Unity.XR.OpenVR;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -16,6 +13,7 @@ namespace Spelunx.Vive
 {
     /// <summary>
     /// Manages connection to OpenVR and dispatches new poses and events.
+    /// You should only have one of these in a scene.
     /// </summary>
     public class Vive_Manager : MonoBehaviour
     {
@@ -230,10 +228,7 @@ namespace Spelunx.Vive
                 float frameDuration = 1f / Math.Max(displayFrequency, 1);
                 float secondsFromNow = Mathf.Max(0, frameDuration - secondsSinceLastVsync) + vsyncToPhotonsSeconds;
                 UpdatePoses(secondsFromNow);
-                // UpdatePoses();
             }
-
-            //Debug.Log($"{frameDuration} - {secondsSinceLastVsync} + {vsyncToPhotonsSeconds} = {secondsFromNow}");
         }
 
         private void OnDeviceConnected(int index, bool connected)
@@ -244,16 +239,12 @@ namespace Spelunx.Vive
         private void Update()
         {
             if (!_isInitialized) return;
-            // if (SteamVR.active == false)
-            //     return;
 
             //without this, unity will crash
             if (OpenVR.System == null)
             {
                 return;
             }
-
-            // UpdatePoses();
 
             // Process OpenVR event queue
             var vrEvent = new VREvent_t();
@@ -278,7 +269,7 @@ namespace Spelunx.Vive
                         break;
                     case EVREventType.VREvent_TrackersSectionSettingChanged:
                         // Allow some time until SteamVR configuration file has been updated on disk
-                        Invoke("UpdateSteamVrTrackerBindings", 1.0f);
+                        Invoke(nameof(UpdateSteamVrTrackerBindings), 1.0f);
                         break;
                     case EVREventType.VREvent_ShowRenderModels:
                         OVRT_Events.HideRenderModelsChanged.Invoke(false);

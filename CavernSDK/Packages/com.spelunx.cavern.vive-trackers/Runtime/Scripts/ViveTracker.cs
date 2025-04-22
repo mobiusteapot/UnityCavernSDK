@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
@@ -9,19 +8,17 @@ namespace Spelunx.Vive
     {
         // an enum representing the possible bindings a vive tracker can be assigned to
         // The tracker -> binding assignment should be done on the CAVERN computer
+        // in SteamVR
         public enum SteamVRPoseBindings
         {
-
-            [InspectorName("None")]
+            [InspectorName("Disabled")] // note: This isn't actually disabled. It's just another binding
             TrackerRole_None,
-            [InspectorName("Handed")]
-            TrackerRole_Handed, // TODO: Check that this works
             [InspectorName("Any Hand")]
-            TrackerControllerRole_Invalid, // TODO: Check that this works
+            AnyHand,
             [InspectorName("Left Hand")]
-            TrackerControllerRole_LeftHand, // TODO: Check that this works
+            LeftHand,
             [InspectorName("Right Hand")]
-            TrackerControllerRole_RightHand, // TODO: Check that this works
+            RightHand,
             [InspectorName("Left Foot")]
             TrackerRole_LeftFoot,
             [InspectorName("Right Foot")]
@@ -46,18 +43,17 @@ namespace Spelunx.Vive
             TrackerRole_LeftAnkle,
             [InspectorName("Right Ankle")]
             TrackerRole_RightAnkle,
-            [InspectorName("Wrist")]
-            TrackerRole_Wrist,
+            [InspectorName("Waist")]
+            TrackerRole_Waist,
             [InspectorName("Chest")]
             TrackerRole_Chest,
             [InspectorName("Camera")]
             TrackerRole_Camera,
             [InspectorName("Keyboard")]
             TrackerRole_Keyboard,
-
         }
 
-        [Tooltip("Specify a binding from SteamVR for this tracker.")]
+        [Tooltip("Specify a binding from SteamVR for this tracker. Assign a tracker to this same binding in SteamVR.")]
         public SteamVRPoseBindings binding;
 
         [Tooltip("If not set, relative to parent")]
@@ -67,6 +63,24 @@ namespace Spelunx.Vive
 
         private Quaternion rotationAlignment = Quaternion.identity;
 
+        // All bindings are referenced in steamvr by their name (like TrackerRole_Camera)
+        // Except for the hands, which have binding names with commas in them
+        // Hence the need for this function
+        public string TrackerRoleToBindingName(SteamVRPoseBindings binding)
+        {
+            switch (binding)
+            {
+                case SteamVRPoseBindings.AnyHand:
+                    return "TrackerRole_Handed,TrackedControllerRole_Invalid";
+                case SteamVRPoseBindings.LeftHand:
+                    return "TrackerRole_Handed,TrackedControllerRole_LeftHand";
+                case SteamVRPoseBindings.RightHand:
+                    return "TrackerRole_Handed,TrackedControllerRole_RightHand";
+                default:
+                    return binding.ToString();
+            }
+        }
+
         private void OnDeviceConnected(int index, bool connected)
         {
             if (DeviceIndex == index && !connected)
@@ -75,11 +89,11 @@ namespace Spelunx.Vive
             }
         }
 
-        private bool doCalibration = false;
+        private bool doCalibration = false; // Whether to calibrate the rotation of the vive tracker on the next frame
 
         private void OnNewBoundPose(string binding, TrackedDevicePose_t pose, int deviceIndex)
         {
-            if (this.binding.ToString() != binding)
+            if (TrackerRoleToBindingName(this.binding) != binding)
                 return;
 
             IsValid = false;
@@ -104,6 +118,8 @@ namespace Spelunx.Vive
             if (origin != null)
             {
                 transform.position = origin.transform.TransformPoint(rigidTransform.pos);
+                // Realign the rotation of the vive tracker. It's hard to know visually when they're pointing forwards,
+                // So this offsets their rotation
                 if (doCalibration)
                 {
                     // calibrate
@@ -131,6 +147,9 @@ namespace Spelunx.Vive
             IsConnected = false;
         }
 
+        // In theory this should be called when pin inputs are sent through the vive trackers
+        // But it doesn't seem to happen. This might be an issue with SteamVR, or because the
+        // tracker pose needs to be set to one of the hands or disabled
         private void OnButtonPressed(int deviceIndex, EVRButtonId button, bool pressed)
         {
             Debug.Log($"{deviceIndex}\t{button}\t{pressed}");
@@ -161,14 +180,18 @@ namespace Spelunx.Vive
             IsConnected = false;
         }
 
-        public void SetOrigin(Transform t) {
+        // t is treated as the (0,0,0) point
+        public void SetOrigin(Transform t)
+        {
             origin = t;
         }
 
 #if UNITY_EDITOR
+        // A gizmo, which can be enabled or disabled through the gizmos menu
+        // This shows the position, size, and rotation of the vive tracker.
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireSphere(transform.position, 0.2f);
+            Gizmos.DrawMesh(ViveDebugRenderer.trackerMesh, transform.position, transform.rotation);
         }
 #endif
     }

@@ -103,6 +103,23 @@ namespace Spelunx.Vive
                 AddInteraction(typeof(EvasiveMotion));
                 // Debug.Log("retreat button pressed");
             }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Look At");
+            EditorGUILayout.HelpBox("Object rotates to face the target.", MessageType.Info);
+            if (GUILayout.Button("Add Look At"))
+            {
+                AddInteraction(typeof(LookAt));
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Zones");
+            EditorGUILayout.HelpBox("Create distinct zones within the CAVERN, with a deadzone in the middle. This script gets attached to the ViveTrackerManager object, and zone information can be read from there.", MessageType.Info);
+            if (GUILayout.Button("Add Zones"))
+            {
+                Zones component = GameObject.FindGameObjectWithTag("ViveManager").AddComponent(typeof(Zones)) as Zones;
+                component.cavern = FindFirstObjectByType<CavernRenderer>();
+            }
         }
 
         private void AddInteraction(Type interaction)

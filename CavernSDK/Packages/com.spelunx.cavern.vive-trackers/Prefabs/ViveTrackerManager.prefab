@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackingUniverse: 1
   displayFrequency: 0
-  usePosePrediction: 1
+  usePosePrediction: 0
   doUpdatePosesBeforeRendering: 1
   vsyncToPhotonsSeconds: 0.03
   useSteamVrTrackerRoles: 1

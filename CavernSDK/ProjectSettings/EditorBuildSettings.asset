@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/Test.unity
     guid: 1b13123210899194b84933ddba7a7995
   m_configObjects:
-    Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 7a30cec0dd851d74bb5bbfbdc332b518, type: 2}
+    Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 78a4e217f08c6ef4c8ce40301f06cd8c, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: f64cf0895015b404790a690bfc8079b2, type: 2}
-    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 7e17dc14da6171944a71365e365fcb9a, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 52b869158132a2a448633a802b07d078, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 3b8dada8d89196b419e038305ee89330, type: 2}
     xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: af45d854db3154a4b85b7ec4bc206475, type: 2}
   m_UseUCBPForAssetBundles: 0

@@ -1,14 +1,14 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 namespace Spelunx.Vive
 {
+    /// <summary>
+    /// Helpful debug information (both keyboard shortcuts and GUI) for Vive Trackers.
+    /// This also adds the ability to calibrate the rotation of all active Vive Trackers.
+    /// </summary>
     [DisallowMultipleComponent]
     public class ViveDebugKeys : MonoBehaviour, IDebugKeys
     {
@@ -18,7 +18,7 @@ namespace Spelunx.Vive
 
         // display the number of vive trackers in the debug GUI
         private int numViveTrackers = 0;
-        private List<string> trackerRoles = new();
+        private readonly List<string> trackerRoles = new();
         public List<(string Key, string Description)> KeyDescriptions()
         {
             return new(){
@@ -26,6 +26,7 @@ namespace Spelunx.Vive
             };
         }
 
+        // Render information about the currently bound Vive Trackers in the Debug UI
         public void DoExtraGUI()
         {
             GUILayout.Label($"Vive Trackers: {numViveTrackers}");

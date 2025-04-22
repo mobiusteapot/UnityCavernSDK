@@ -3,6 +3,7 @@ using UnityEngine.Events;
 
 namespace Spelunx.Vive
 {
+    // A class that represents both Vive Trackers and Vive Controllers
     public abstract class OVRT_TrackedDevice : MonoBehaviour
     {
         public Transform origin;
