@@ -5,6 +5,8 @@ using Microsoft.Azure.Kinect.BodyTracking;
 using System.Text;
 
 namespace Spelunx.Orbbec {
+    /// Maps a 3D avatar's movements to a BodyTracker skeleton.
+    /// Ensure that the Avatar's GameObjects in the scene matches what is defined in the FBX file, or it will break.
     public class BodyTrackerAvatar : MonoBehaviour {
         [Header("References")]
         [SerializeField] private Animator avatarAnimator;
@@ -16,7 +18,7 @@ namespace Spelunx.Orbbec {
         private Dictionary<JointId, Quaternion> absoluteOffsetMap;
         private Dictionary<JointId, Quaternion> relativeOffsetMap;
 
-        // Map Microsoft Kinect's joints to Unity's joints. (https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints)
+        /// Map Microsoft Kinect's joints to Unity's joints. (https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints)
         private static HumanBodyBones MapKinectJoint(JointId joint) {
             switch (joint) {
                 case JointId.Pelvis: return HumanBodyBones.Hips;
