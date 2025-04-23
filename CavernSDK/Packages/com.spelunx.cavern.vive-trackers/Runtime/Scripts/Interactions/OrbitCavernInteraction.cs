@@ -8,7 +8,7 @@ namespace Spelunx.Vive {
     public class OrbitCavernInteraction : CavernInteraction {
         public enum OrbitMode {
             Default = 0,
-            Inverse,
+            MirrorDistance,
             FixedDistance
         }
 
@@ -36,7 +36,7 @@ namespace Spelunx.Vive {
             float screenRadius = cavernRenderer.GetCavernRadius();
 
             switch (orbitMode) {
-                case OrbitMode.Inverse:
+                case OrbitMode.MirrorDistance:
                     transform.position = cavernPosition +
                                  new Vector3(0.0f, target.position.y, 0.0f) +
                                  cavernToTarget.normalized * (2.0f * screenRadius - cavernToTarget.magnitude);
