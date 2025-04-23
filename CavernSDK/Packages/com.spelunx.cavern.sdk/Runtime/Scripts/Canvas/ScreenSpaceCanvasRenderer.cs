@@ -5,6 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace Spelunx
 {
+    [ExecuteInEditMode]
     public class ScreenSpaceCanvasRenderer : MonoBehaviour
     {
 

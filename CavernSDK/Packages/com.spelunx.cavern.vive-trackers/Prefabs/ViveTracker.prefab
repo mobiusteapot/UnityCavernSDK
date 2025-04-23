@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 207025976839484658}
-  - component: {fileID: 2704641275854850002}
   - component: {fileID: 1855851254415368291}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: ViveTracker
   m_TagString: ViveTracker
   m_Icon: {fileID: 0}
@@ -33,14 +32,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2704641275854850002
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8752055925891109592}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &1855851254415368291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,4 +48,4 @@ MonoBehaviour:
   onDeviceIndexChanged:
     m_PersistentCalls:
       m_Calls: []
-  binding: 8
+  binding: 7

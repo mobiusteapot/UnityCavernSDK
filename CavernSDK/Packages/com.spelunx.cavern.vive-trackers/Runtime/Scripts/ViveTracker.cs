@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
@@ -66,7 +67,7 @@ namespace Spelunx.Vive
         // All bindings are referenced in steamvr by their name (like TrackerRole_Camera)
         // Except for the hands, which have binding names with commas in them
         // Hence the need for this function
-        public string TrackerRoleToBindingName(SteamVRPoseBindings binding)
+        public static string TrackerRoleToBindingName(SteamVRPoseBindings binding)
         {
             switch (binding)
             {
@@ -78,6 +79,33 @@ namespace Spelunx.Vive
                     return "TrackerRole_Handed,TrackedControllerRole_RightHand";
                 default:
                     return binding.ToString();
+            }
+        }
+
+        // get the display name instead of the actual enum name of our bindings
+        // thanks stackoverflow: https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value
+        public static string GetReadableName(SteamVRPoseBindings binding)
+        {
+            try
+            {
+                var enumType = typeof(ViveTracker.SteamVRPoseBindings);
+
+                var memberInfos = enumType
+                    .GetMember(binding.ToString());
+
+                var enumValueMemberInfo = memberInfos
+                    .FirstOrDefault(m => m.DeclaringType == enumType);
+
+                var valueAttributes = enumValueMemberInfo
+                    .GetCustomAttributes(typeof(InspectorNameAttribute), false);
+
+                var description = ((InspectorNameAttribute)valueAttributes[0])
+                    .displayName;
+                return description;
+            }
+            catch
+            {
+                return TrackerRoleToBindingName(binding);
             }
         }
 

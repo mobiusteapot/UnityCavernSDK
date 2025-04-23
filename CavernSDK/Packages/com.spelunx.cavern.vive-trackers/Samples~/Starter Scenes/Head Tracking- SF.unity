@@ -171,6 +171,10 @@ PrefabInstance:
       propertyPath: origin
       value: 
       objectReference: {fileID: 830860774}
+    - target: {fileID: 1855851254415368291, guid: bb1405a042fc4da4385fb75b1068a94f, type: 3}
+      propertyPath: binding
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: 8752055925891109592, guid: bb1405a042fc4da4385fb75b1068a94f, type: 3}
       propertyPath: m_Name
       value: ViveTracker

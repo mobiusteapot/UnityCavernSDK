@@ -58,30 +58,7 @@ namespace Spelunx.Vive
             {
                 numViveTrackers++;
                 ViveTracker.SteamVRPoseBindings binding = go.GetComponent<ViveTracker>().binding;
-                // thanks stackoverflow: https://stackoverflow.com/questions/1799370/getting-attributes-of-enums-value
-                // get the display name instead of the actual enum name of our bindings
-                try
-                {
-                    var enumType = typeof(ViveTracker.SteamVRPoseBindings);
-
-                    var memberInfos = enumType
-                        .GetMember(binding.ToString());
-
-                    var enumValueMemberInfo = memberInfos
-                        .FirstOrDefault(m => m.DeclaringType == enumType);
-
-                    var valueAttributes = enumValueMemberInfo
-                        .GetCustomAttributes(typeof(InspectorNameAttribute), false);
-
-                    var description = ((InspectorNameAttribute)valueAttributes[0])
-                        .displayName;
-                    trackerRoles.Add(description);
-                }
-                catch
-                {
-                    trackerRoles.Add(binding.ToString());
-                }
-
+                trackerRoles.Add(ViveTracker.GetReadableName(binding));
             }
         }
 
