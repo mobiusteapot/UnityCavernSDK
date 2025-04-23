@@ -3,25 +3,29 @@ using UnityEngine;
 using Microsoft.Azure.Kinect.BodyTracking;
 
 namespace Spelunx.Orbbec {
-    // IMPORTANT: The child hierachy of BodyTracker must follow JointId!
+    /// <summary>
+    /// BodyTracker represents the BodyData from the ORBBEC sensor as a skeleton.
+    /// Important: BodyTracker prefab's child hierachy must be in the same order as JointId.
+    /// </summary>
     public class BodyTracker : MonoBehaviour {
+        // Constants
+        readonly Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+        readonly Vector3 X_POSITIVE = Vector3.right; // Follow the Left-Hand Rule.
+        readonly Vector3 Y_POSITIVE = Vector3.up; // Follow the Left-Hand Rule.
+        readonly Vector3 Z_POSITIVE = Vector3.forward; // Follow the Left-Hand Rule.
+
         // Internal variables.
-        private Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         private Dictionary<JointId, JointId> parentJointMap;
         private Dictionary<JointId, Quaternion> basisJointMap;
         [SerializeField, Tooltip("Joint Positions - Exposed for debugging purposes.")] private Vector3[] jointPositions = new Vector3[(int)JointId.Count];
         [SerializeField, Tooltip("Absolute Joint Rotations - Exposed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
-
-        // Follow the Left-Hand Rule.
-        readonly Vector3 xPositive = Vector3.right;
-        readonly Vector3 yPositive = Vector3.up;
-        readonly Vector3 zPositive = Vector3.forward;
 
         private void Awake() {
             InitParentJointMap();
             InitBasisJointMap();
         }
 
+        /// Sets the parent of every joint.
         private void InitParentJointMap() {
             parentJointMap = new Dictionary<JointId, JointId>();
 
@@ -59,20 +63,20 @@ namespace Spelunx.Orbbec {
             parentJointMap[JointId.EarRight] = JointId.Head;
         }
 
+        /// Sets the rotation basis of every joint. The rotation basis are according to (https://learn.microsoft.com/en-us/previous-versions/azure/kinect-dk/body-joints).
         private void InitBasisJointMap() {
-            // https://learn.microsoft.com/en-us/previous-versions/azure/kinect-dk/body-joints
             // Spine and left hip share the same basis.
-            Quaternion leftHipBasis = Quaternion.LookRotation(xPositive, -zPositive);
-            Quaternion spineHipBasis = Quaternion.LookRotation(xPositive, -zPositive);
-            Quaternion rightHipBasis = Quaternion.LookRotation(xPositive, zPositive);
+            Quaternion leftHipBasis = Quaternion.LookRotation(X_POSITIVE, -Z_POSITIVE);
+            Quaternion spineHipBasis = Quaternion.LookRotation(X_POSITIVE, -Z_POSITIVE);
+            Quaternion rightHipBasis = Quaternion.LookRotation(X_POSITIVE, Z_POSITIVE);
 
             // Arms and thumbs share the same basis.
-            Quaternion leftArmBasis = Quaternion.LookRotation(yPositive, -zPositive);
-            Quaternion rightArmBasis = Quaternion.LookRotation(-yPositive, zPositive);
-            Quaternion leftHandBasis = Quaternion.LookRotation(-zPositive, -yPositive);
+            Quaternion leftArmBasis = Quaternion.LookRotation(Y_POSITIVE, -Z_POSITIVE);
+            Quaternion rightArmBasis = Quaternion.LookRotation(-Y_POSITIVE, Z_POSITIVE);
+            Quaternion leftHandBasis = Quaternion.LookRotation(-Z_POSITIVE, -Y_POSITIVE);
             Quaternion rightHandBasis = Quaternion.identity;
-            Quaternion leftFootBasis = Quaternion.LookRotation(xPositive, yPositive);
-            Quaternion rightFootBasis = Quaternion.LookRotation(xPositive, -yPositive);
+            Quaternion leftFootBasis = Quaternion.LookRotation(X_POSITIVE, Y_POSITIVE);
+            Quaternion rightFootBasis = Quaternion.LookRotation(X_POSITIVE, -Y_POSITIVE);
 
             basisJointMap = new Dictionary<JointId, Quaternion>();
 
@@ -114,7 +118,7 @@ namespace Spelunx.Orbbec {
         private int FindClosestTrackedBody(FrameData trackerFrameData) {
             int closestBody = -1;
             float minDistanceFromKinect = float.MaxValue;
-            for (int i = 0; i < (int)trackerFrameData.NumOfBodies; i++) {
+            for (int i = 0; i < (int)trackerFrameData.NumDetectedBodies; i++) {
                 var pelvisPosition = trackerFrameData.Bodies[i].JointPositions3D[(int)JointId.Pelvis];
                 Vector3 pelvisPos = new Vector3((float)pelvisPosition.X, (float)pelvisPosition.Y, (float)pelvisPosition.Z);
                 if (pelvisPos.magnitude < minDistanceFromKinect) {
@@ -128,11 +132,11 @@ namespace Spelunx.Orbbec {
         private Quaternion OrientateRotation(Quaternion rotation, SensorOrientation sensorOrientation) {
             switch (sensorOrientation) {
                 case SensorOrientation.Clockwise90:
-                    return Quaternion.AngleAxis(90.0f, zPositive) * rotation;
+                    return Quaternion.AngleAxis(90.0f, Z_POSITIVE) * rotation;
                 case SensorOrientation.CounterClockwise90:
-                    return Quaternion.AngleAxis(-90.0f, zPositive) * rotation;
+                    return Quaternion.AngleAxis(-90.0f, Z_POSITIVE) * rotation;
                 case SensorOrientation.Flip180:
-                    return Quaternion.AngleAxis(180.0f, zPositive) * rotation;
+                    return Quaternion.AngleAxis(180.0f, Z_POSITIVE) * rotation;
             }
             return rotation;
         }
@@ -157,12 +161,12 @@ namespace Spelunx.Orbbec {
 
             // Left-Hand Rule!
             Matrix4x4 translationMatrix = Matrix4x4.Translate(position);
-            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(rotationAngle, zPositive));
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(rotationAngle, Z_POSITIVE));
             Matrix4x4 positionMatrix = rotationMatrix * translationMatrix;
             return new Vector3(positionMatrix.m03, positionMatrix.m13, positionMatrix.m23);
         }
 
-        private void SetBonesTransform(Body body, SensorOrientation sensorOrientation) {
+        private void SetBonesTransform(BodyData body, SensorOrientation sensorOrientation) {
             for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
                 // Calculate joint position.
                 Vector3 jointPos = OrientatePosition(
@@ -212,6 +216,12 @@ namespace Spelunx.Orbbec {
             }
         }
 
+        /// <summary>
+        /// Show or hide the skeleton in the game scene.
+        /// </summary>
+        /// <param name="show">
+        /// Show the skeleton if true, else hide the skeleton.
+        /// </param>
         public void ShowSkeleton(bool show) {
             for (int jointNum = 0; jointNum < (int)JointId.Count; jointNum++) {
                 transform.GetChild(0).GetChild(jointNum).gameObject.GetComponent<MeshRenderer>().enabled = show;
@@ -221,8 +231,26 @@ namespace Spelunx.Orbbec {
 
         public Vector3 GetJointPosition(JointId jointId) { return jointPositions[(int)jointId]; }
 
+        /// <summary>
+        /// Get the rotation of a joint, relative to the root.
+        /// </summary>
+        /// <param name="jointId">
+        /// The ID of the joint which to get the rotation.
+        /// </param>
+        /// <returns>
+        /// The rotation of the joint of ID jointId, relative to the root.
+        /// </returns>
         public Quaternion GetAbsoluteJointRotation(JointId jointId) { return absoluteJointRotations[(int)jointId]; }
 
+        /// <summary>
+        /// Get the rotation of a joint, relative to its parent.
+        /// </summary>
+        /// <param name="jointId">
+        /// The ID of the joint which to get the rotation.
+        /// </param>
+        /// <returns>
+        /// The rotation of the joint of ID jointId, relative to its parent.
+        /// </returns>
         public Quaternion GetRelativeJointRotation(JointId jointId) {
             JointId parent = parentJointMap[jointId];
             Quaternion parentJointRotationBodySpace = Quaternion.identity;
@@ -237,13 +265,21 @@ namespace Spelunx.Orbbec {
             return relativeRotation;
         }
 
-        public void UpdateSkeleton(FrameData trackerFrameData, SensorOrientation sensorOrientation) {
+        /// <summary>
+        /// Update the skeleton based on frame data.
+        /// </summary>
+        /// <param name="frameData">
+        /// The frame data to update the skeleton.
+        /// </param>
+        /// The sensor orientation, used to rotate the skeleton is upright.
+        /// <param name="orientation"></param>
+        public void UpdateSkeleton(FrameData frameData, SensorOrientation orientation) {
             //this is an array in case you want to get the n closest bodies
-            int closestBody = FindClosestTrackedBody(trackerFrameData);
+            int closestBody = FindClosestTrackedBody(frameData);
 
             // render the closest body
-            Body skeleton = trackerFrameData.Bodies[closestBody];
-            SetBonesTransform(skeleton, sensorOrientation);
+            BodyData skeleton = frameData.Bodies[closestBody];
+            SetBonesTransform(skeleton, orientation);
         }
     }
 }

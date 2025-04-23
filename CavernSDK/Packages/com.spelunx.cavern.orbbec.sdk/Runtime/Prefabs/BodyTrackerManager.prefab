@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6247801478335531830}
-  - component: {fileID: 4891565743053095662}
   - component: {fileID: 2113269473824800708}
   m_Layer: 0
   m_Name: BodyTrackerManager
@@ -33,18 +32,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4891565743053095662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8427662446648088132}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03544edac74ca2f42a8269f1d8103aa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2113269473824800708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bodyTracker: {fileID: 0}
-  deviceSerial: <Insert device serial number here.>
   sensorOrientation: 0
-  foundSerials: []
+  deviceSerial: <Insert device serial number here.>
+  connectDefaultIfNoSerialMatch: 1

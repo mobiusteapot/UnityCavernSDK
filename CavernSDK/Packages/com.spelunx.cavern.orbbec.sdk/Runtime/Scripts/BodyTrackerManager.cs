@@ -8,6 +8,8 @@ namespace Spelunx.Orbbec {
     // ********************************* IMPORTANT: There should only be one instance of BodyTrackerManager in the scene. ********************************* //
     // If anyone ever wants to add support for more sensors at a time, put the work in to modify this class instead of just adding more BodyTrackerManager.
     // That is because this class opens and closes devices, and I am not sure if we should allow more than one instance to possibly do that simultaneously and cause multi-threading problems.
+
+    /// Manager class to pass data from FrameDataProvider to BodyTracker.
     public class BodyTrackerManager : MonoBehaviour {
         [Header("References")]
         [SerializeField, Tooltip("The skeleton to control.")] private BodyTracker bodyTracker; // One for each skeleton on the screen. For now we only support 1.
@@ -19,7 +21,7 @@ namespace Spelunx.Orbbec {
 
         // Internal Variables
         private FrameData frameData = new FrameData();
-        private SkeletalFrameDataProvider skeletalFrameDataProvider = null; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
+        private FrameDataProvider frameDataProvider = null; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
         private List<string> availableSerials = new List<string>();
         private bool isReady = true; // A flag to ensure that a new frame data provider waits for the old one to shutdown completely, so that it is impossible for them to open the same device.
 
@@ -29,50 +31,46 @@ namespace Spelunx.Orbbec {
         public void SetSensorOrientation(SensorOrientation sensorOrientation) { this.sensorOrientation = sensorOrientation; }
         public SensorOrientation GetSensorOrientation() { return this.sensorOrientation; }
 
-        private void Awake() {
-        }
-
-        private void Start() {
-            ScanDeviceSerials();
-        }
-
         private void OnDestroy() {
-            if (skeletalFrameDataProvider != null) {
-                skeletalFrameDataProvider.Dispose();
-                skeletalFrameDataProvider = null;
+            if (frameDataProvider != null) {
+                frameDataProvider.Dispose();
+                frameDataProvider = null;
             }
         }
 
         private void Update() {
             // Disconnect the currently connected device if the serial number no longer matches what we want.
-            if (skeletalFrameDataProvider != null && skeletalFrameDataProvider.GetDeviceSerial() != deviceSerial) {
-                Debug.Log("New serial number " + deviceSerial + "selected. Shutting down " + skeletalFrameDataProvider.GetDeviceSerial() + ".");
-                skeletalFrameDataProvider.Dispose();
-                skeletalFrameDataProvider = null;
+            if (frameDataProvider != null && frameDataProvider.HasStarted && frameDataProvider.DeviceSerial != deviceSerial) {
+                Debug.Log("New serial number " + deviceSerial + "selected. Shutting down " + frameDataProvider.DeviceSerial + ".");
+                frameDataProvider.Dispose();
+                frameDataProvider = null;
             }
 
             // Connect to the new device.
-            if (isReady && null == skeletalFrameDataProvider) {
+            if (isReady && null == frameDataProvider) {
+                // Scan for devices.
+                ScanDeviceSerials();
+
                 // See if any of the devices match.
                 for (int i = 0; i < availableSerials.Count; ++i) {
                     if (availableSerials[i] == deviceSerial) {
                         Debug.Log("Attempting to start " + deviceSerial + ".");
-                        skeletalFrameDataProvider = new SkeletalFrameDataProvider(deviceSerial, sensorOrientation, i, OnFrameDataProviderFinish);
+                        frameDataProvider = new FrameDataProvider(i, sensorOrientation, OnFrameDataProviderFinish);
                         isReady = false;
                     }
                 }
 
                 // If none match, start index 0 if connectDefaultIfNoSerialMatch is set to true.
-                if (connectDefaultIfNoSerialMatch && 0 < availableSerials.Count && skeletalFrameDataProvider == null) {
+                if (connectDefaultIfNoSerialMatch && 0 < availableSerials.Count && frameDataProvider == null) {
                     deviceSerial = availableSerials[0];
                 }
             }
 
             // Update the skeleton.
-            if (null == skeletalFrameDataProvider ||
-                !skeletalFrameDataProvider.HasStarted ||
-                !skeletalFrameDataProvider.ExtractData(ref frameData) ||
-                frameData.NumOfBodies == 0) { return; }
+            if (null == frameDataProvider ||
+                !frameDataProvider.HasStarted ||
+                !frameDataProvider.GetData(ref frameData) ||
+                frameData.NumDetectedBodies == 0) { return; }
             bodyTracker.UpdateSkeleton(frameData, sensorOrientation);
         }
 
@@ -93,8 +91,6 @@ namespace Spelunx.Orbbec {
             }
         }
 
-        private void OnFrameDataProviderFinish() {
-            isReady = true;
-        }
+        private void OnFrameDataProviderFinish() { isReady = true; }
     }
 }

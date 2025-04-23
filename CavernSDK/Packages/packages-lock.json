@@ -1,18 +1,17 @@
 {
   "dependencies": {
     "com.spelunx.cavern.orbbec.libs": {
-      "version": "0.0.3",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://upm.etc.cmu.edu"
+      "version": "file:com.spelunx.cavern.orbbec.libs",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.spelunx.cavern.orbbec.sdk": {
       "version": "file:com.spelunx.cavern.orbbec.sdk",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.spelunx.cavern.orbbec.libs": "0.0.3"
+        "com.spelunx.cavern.orbbec.libs": "0.0.4"
       }
     },
     "com.spelunx.cavern.sdk": {

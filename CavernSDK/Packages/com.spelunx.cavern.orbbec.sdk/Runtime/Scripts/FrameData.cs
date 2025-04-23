@@ -7,27 +7,25 @@ namespace Spelunx.Orbbec {
     // Class which contains all data sent from background thread to main thread. Copied from BackgroundData from Azure Body Tracking Samples.
     [Serializable]
     public class FrameData : ISerializable {
-        // Timestamp of current data.
+        /// Timestamp of current data.
         public float TimestampInMs { get; set; }
 
-        // Depth image frame. 
         public byte[] DepthImage { get; set; }
         public int DepthImageWidth { get; set; }
         public int DepthImageHeight { get; set; }
         public int DepthImageSize { get; set; }
+        
+        public ulong NumDetectedBodies { get; set; }
 
-        // Number of detected bodies.
-        public ulong NumOfBodies { get; set; }
-
-        // List of all bodies in current frame, each body is list of Body objects.
-        public Body[] Bodies { get; set; }
+        /// Array of bodies. Use NumDetectedBodies to determine how many bodies contain useful data.
+        public BodyData[] Bodies { get; set; }
 
         public FrameData(int maxDepthImageSize = 1024 * 1024 * 3, int maxBodiesCount = 20, int maxJointsSize = 100) {
+            NumDetectedBodies = 0;
             DepthImage = new byte[maxDepthImageSize];
-
-            Bodies = new Body[maxBodiesCount];
+            Bodies = new BodyData[maxBodiesCount];
             for (int i = 0; i < maxBodiesCount; i++) {
-                Bodies[i] = new Body(maxJointsSize);
+                Bodies[i] = new BodyData(maxJointsSize);
             }
         }
 
@@ -36,8 +34,8 @@ namespace Spelunx.Orbbec {
             DepthImageWidth = (int)info.GetValue("DepthImageWidth", typeof(int));
             DepthImageHeight = (int)info.GetValue("DepthImageHeight", typeof(int));
             DepthImageSize = (int)info.GetValue("DepthImageSize", typeof(int));
-            NumOfBodies = (ulong)info.GetValue("NumOfBodies", typeof(ulong));
-            Bodies = (Body[])info.GetValue("Bodies", typeof(Body[]));
+            NumDetectedBodies = (ulong)info.GetValue("NumDetectedBodies", typeof(ulong));
+            Bodies = (BodyData[])info.GetValue("Bodies", typeof(BodyData[]));
             DepthImage = (byte[])info.GetValue("DepthImage", typeof(byte[]));
         }
 
@@ -48,12 +46,12 @@ namespace Spelunx.Orbbec {
             info.AddValue("DepthImageWidth", DepthImageWidth, typeof(int));
             info.AddValue("DepthImageHeight", DepthImageHeight, typeof(int));
             info.AddValue("DepthImageSize", DepthImageSize, typeof(int));
-            info.AddValue("NumOfBodies", NumOfBodies, typeof(ulong));
-            Body[] ValidBodies = new Body[NumOfBodies];
-            for (int i = 0; i < (int)NumOfBodies; i++) {
+            info.AddValue("NumDetectedBodies", NumDetectedBodies, typeof(ulong));
+            BodyData[] ValidBodies = new BodyData[NumDetectedBodies];
+            for (int i = 0; i < (int)NumDetectedBodies; i++) {
                 ValidBodies[i] = Bodies[i];
             }
-            info.AddValue("Bodies", ValidBodies, typeof(Body[]));
+            info.AddValue("Bodies", ValidBodies, typeof(BodyData[]));
             byte[] ValidDepthImage = new byte[DepthImageSize];
             for (int i = 0; i < DepthImageSize; i++) {
                 ValidDepthImage[i] = DepthImage[i];
