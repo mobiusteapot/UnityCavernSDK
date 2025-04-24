@@ -8,6 +8,9 @@ namespace Spelunx.Orbbec {
     /// Important: BodyTracker prefab's child hierachy must be in the same order as JointId.
     /// </summary>
     public class BodyTracker : MonoBehaviour {
+        [Header("References (Do NOT edit unless you know what you're doing!)")]
+        [SerializeField] private Transform rootJoint = null;
+
         // Constants
         readonly Quaternion Y_180_FLIP = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         readonly Vector3 X_POSITIVE = Vector3.right; // Follow the Left-Hand Rule.
@@ -15,10 +18,11 @@ namespace Spelunx.Orbbec {
         readonly Vector3 Z_POSITIVE = Vector3.forward; // Follow the Left-Hand Rule.
 
         // Internal variables.
+        [Header("Internal Variables (Exposed for debugging purposes.)")]
+        [SerializeField, Tooltip("Joint Positions")] private Vector3[] jointPositions = new Vector3[(int)JointId.Count];
+        [SerializeField, Tooltip("Absolute Joint Rotations")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
         private Dictionary<JointId, JointId> parentJointMap;
         private Dictionary<JointId, Quaternion> basisJointMap;
-        [SerializeField, Tooltip("Joint Positions - Exposed for debugging purposes.")] private Vector3[] jointPositions = new Vector3[(int)JointId.Count];
-        [SerializeField, Tooltip("Absolute Joint Rotations - Exposed for debugging purposes.")] private Quaternion[] absoluteJointRotations = new Quaternion[(int)JointId.Count];
 
         private void Awake() {
             InitParentJointMap();
@@ -281,5 +285,7 @@ namespace Spelunx.Orbbec {
             BodyData skeleton = frameData.Bodies[closestBody];
             SetBonesTransform(skeleton, orientation);
         }
+
+        public Transform GetRootJoint() { return rootJoint; }
     }
 }

@@ -11,12 +11,21 @@ namespace Spelunx.Orbbec {
         [Header("References")]
         [SerializeField] private Animator avatarAnimator;
         [SerializeField] private Transform avatarRoot; 
-        [SerializeField] private Transform skeletonRoot;
+        [SerializeField] private Transform skeletonRootJoint;
         [SerializeField] private BodyTracker bodyTracker;
 
         // Internal variables.
         private Dictionary<JointId, Quaternion> absoluteOffsetMap;
         private Dictionary<JointId, Quaternion> relativeOffsetMap;
+
+        public Animator GetAvatarAnimator() { return avatarAnimator; }
+        public Transform GetAvatarRoot() { return avatarRoot; }
+
+        public void SetSkeletonRootJoint(Transform skeletonRoot) { this.skeletonRootJoint = skeletonRoot; }
+        public Transform GetSkeletonRootJoint() { return skeletonRootJoint; }
+
+        public void SetBodyTracker(BodyTracker bodyTracker) { this.bodyTracker = bodyTracker; }
+        public BodyTracker GetBodyTracker() { return bodyTracker; }
 
         /// Map Microsoft Kinect's joints to Unity's joints. (https://docs.microsoft.com/en-us/azure/Kinect-dk/body-joints)
         private static HumanBodyBones MapKinectJoint(JointId joint) {

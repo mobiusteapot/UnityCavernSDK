@@ -4,56 +4,52 @@ using System;
 
 namespace Spelunx.Vive {
     public class ViveToolsPanel : EditorWindow {
-        private UnityEngine.Object viveManager;
-        private UnityEngine.Object viveTracker;
-        private GameObject newViveManager;
+        private UnityEngine.Object viveManagerPrefab;
+        private UnityEngine.Object viveTrackerPrefab;
+        private GameObject viveManagerInstance;
         private int trackerCount;
 
-        [MenuItem("CAVERN/VIVE Trackers")]
+        private const string VIVE_MANAGER_TAG = "ViveManager";
+        private const string VIVE_TRACKER_TAG = "ViveTracker";
+
+        [MenuItem("CAVERN/VIVE Trackers Tools", false, 101)]
         public static void ShowWindow() {
             GetWindow<ViveToolsPanel>("VIVE Tracker Tools");
         }
 
-        void OnGUI() {
+        private void OnGUI() {
+            TagUtil.AddTag(VIVE_MANAGER_TAG);
+            TagUtil.AddTag(VIVE_TRACKER_TAG);
+
             // === add Vive Tracker and Manager ===
             GUILayout.Label("VIVE Tracker", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Adds a new VIVE tracker to your scene and a new VIVE tracker manager to your scene if no tracker managers present.", MessageType.Info);
 
-            TagAdder.AddTag("ViveManager");
-            TagAdder.AddTag("ViveTracker");
-
-            trackerCount = GameObject.FindGameObjectsWithTag("ViveTracker").Length;
+            trackerCount = GameObject.FindGameObjectsWithTag(VIVE_TRACKER_TAG).Length;
             GUILayout.Label("Current trackers in scene: " + trackerCount);
 
             // === Add Vive Tracker to Scene ===
             if (GUILayout.Button("Add new Vive Tracker")) {
-                // load from GUI input
-                // objToSpawn = EditorGUILayout.ObjectField("Prefab", objToSpawn, typeof(Object), true);
-
                 // load from path
-                viveManager = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTrackerManager.prefab", typeof(GameObject));
-                viveTracker = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTracker.prefab", typeof(GameObject));
-                // Debug.Log("vive setup: " + viveManager.name + " " + viveTracker.name);
-                // Debug.Log("Got " + objToSpawn.name + objToSpawn.GetType());
+                viveManagerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTrackerManager.prefab", typeof(GameObject));
+                viveTrackerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTracker.prefab", typeof(GameObject));
 
                 // check if vive tracker manager is already present
-                if (GameObject.FindGameObjectsWithTag("ViveManager").Length == 0) {
-                    newViveManager = (GameObject)PrefabUtility.InstantiatePrefab(viveManager as GameObject);
+                if (GameObject.FindGameObjectsWithTag(VIVE_MANAGER_TAG).Length == 0) {
+                    viveManagerInstance = (GameObject)PrefabUtility.InstantiatePrefab(viveManagerPrefab as GameObject);
 
                     // set vive manager to be in the CAVERN setup folder in the scene hierarchy
                     GameObject cavernSetup = GameObject.Find("CavernSetup");
                     if (cavernSetup != null) {
-                        newViveManager.GetComponent<Transform>().parent = cavernSetup.transform;
+                        viveManagerInstance.GetComponent<Transform>().parent = cavernSetup.transform;
                     }
                     // load in the debug keys
                     cavernSetup.AddComponent<ViveDebugKeys>();
-                    // cavernSetup.GetComponent<DebugManager>().AddKeyManager(new ViveDebugKeys());
                 }
 
                 // instantiate a new vive tracker
-                GameObject tracker = (GameObject)PrefabUtility.InstantiatePrefab(viveTracker as GameObject);
-                tracker.GetComponent<ViveTracker>().SetOrigin(GameObject.FindGameObjectWithTag("ViveManager").transform);
-
+                GameObject viveTrackerInstance = (GameObject)PrefabUtility.InstantiatePrefab(viveTrackerPrefab as GameObject);
+                viveTrackerInstance.GetComponent<ViveTracker>().SetOrigin(GameObject.FindGameObjectWithTag(VIVE_MANAGER_TAG).transform);
             }
 
             //=== interaction building blocks ===
@@ -93,7 +89,7 @@ namespace Spelunx.Vive {
             GUILayout.Label("Zones");
             EditorGUILayout.HelpBox("Create distinct zones within the CAVERN, with a deadzone in the middle. This script gets attached to the ViveTrackerManager object, and zone information can be read from there.", MessageType.Info);
             if (GUILayout.Button("Add Zones")) {
-                Zones component = GameObject.FindGameObjectWithTag("ViveManager").AddComponent(typeof(Zones)) as Zones;
+                Zones component = GameObject.FindGameObjectWithTag(VIVE_MANAGER_TAG).AddComponent(typeof(Zones)) as Zones;
                 component.cavern = FindFirstObjectByType<CavernRenderer>();
             }
         }

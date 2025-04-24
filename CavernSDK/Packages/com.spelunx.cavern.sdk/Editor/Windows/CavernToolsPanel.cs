@@ -9,12 +9,12 @@ namespace Spelunx {
     public class CavernToolsPanel : EditorWindow {
         const float padding = 20.0f;
 
-        [MenuItem("CAVERN/Tools")]
+        [MenuItem("CAVERN/CAVERN Tools", false, 100)]
         public static void ShowWindow() {
-            GetWindow<CavernToolsPanel>("CAVERN Tools and Setup");
+            GetWindow<CavernToolsPanel>("CAVERN Tools");
         }
 
-        void OnGUI() {
+        private void OnGUI() {
             //===== CAVERN Setup =====
             GUILayout.Label("CAVERN Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Sets up scene for CAVERN development. Replaces the default Unity camera with the CAVERN camera rig. Defaults audio speaker mode to 7.1 surround sound.", MessageType.Info);

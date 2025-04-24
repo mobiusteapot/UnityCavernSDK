@@ -20,16 +20,20 @@ namespace Spelunx.Orbbec {
         [SerializeField, Tooltip("If no serial numbers match, connect to first device found.")] private bool connectDefaultIfNoSerialMatch = true;
 
         // Internal Variables
+        private List<string> availableSerials = new List<string>();
         private FrameData frameData = new FrameData();
         private FrameDataProvider frameDataProvider = null; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
-        private List<string> availableSerials = new List<string>();
         private bool isReady = true; // A flag to ensure that a new frame data provider waits for the old one to shutdown completely, so that it is impossible for them to open the same device.
 
-        public List<string> GetAvailableSerials() { return availableSerials; }
-        public void SetDeviceSerial(string deviceSerial) { this.deviceSerial = deviceSerial; }
-        public string GetDeviceSerial() { return deviceSerial; }
+        public void SetBodyTracker(BodyTracker bodyTracker) { this.bodyTracker = bodyTracker; }
+        public BodyTracker GetBodyTracker() { return this.bodyTracker; }
+
         public void SetSensorOrientation(SensorOrientation sensorOrientation) { this.sensorOrientation = sensorOrientation; }
         public SensorOrientation GetSensorOrientation() { return this.sensorOrientation; }
+        
+        public void SetDeviceSerial(string deviceSerial) { this.deviceSerial = deviceSerial; }
+        public string GetDeviceSerial() { return deviceSerial; }
+        public List<string> GetAvailableSerials() { return availableSerials; }
 
         private void OnDestroy() {
             if (frameDataProvider != null) {
