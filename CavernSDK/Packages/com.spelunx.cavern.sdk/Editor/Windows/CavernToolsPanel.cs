@@ -1,13 +1,12 @@
 using UnityEngine;
-using UnityEditor;
-using UnityEditor.SearchService;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 
 
 namespace Spelunx {
     public class CavernToolsPanel : EditorWindow {
-        const float padding = 20.0f;
+        const float PADDING = 20.0f;
 
         [MenuItem("CAVERN/CAVERN Tools", false, 100)]
         public static void ShowWindow() {
@@ -20,7 +19,7 @@ namespace Spelunx {
             EditorGUILayout.HelpBox("Sets up scene for CAVERN development. Replaces the default Unity camera with the CAVERN camera rig. Defaults audio speaker mode to 7.1 surround sound.", MessageType.Info);
             if (GUILayout.Button("Add new CAVERN setup")) {
                 // adds cavern setup prefab to scene
-                GameObject cavernSetupPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/CavernSetup.prefab", typeof(GameObject));
+                GameObject cavernSetupPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Prefabs/CavernSetup.prefab", typeof(GameObject));
                 GameObject cavernSetupInstance = (GameObject)PrefabUtility.InstantiatePrefab(cavernSetupPrefab as GameObject);
 
                 // load in the debug keys
@@ -44,14 +43,14 @@ namespace Spelunx {
             if (cavernRenderer == null) return;
 
             //===== Round UI =====
-            GUILayout.Space(padding);
+            GUILayout.Space(PADDING);
             GUILayout.Label("Round CAVERN UI Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Creates a curved world space UI that matches the curvature of the CAVERN. This is used to wrap 2D visuals around the CAVERN.", MessageType.Info);
             if (GUILayout.Button("Add new RoundUI setup")) {
-                GameObject cavernUIPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/CavernUI.prefab", typeof(GameObject));
+                GameObject cavernUIPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Prefabs/CavernUI.prefab", typeof(GameObject));
                 GameObject cavernUIInstance = (GameObject)PrefabUtility.InstantiatePrefab(cavernUIPrefab as GameObject);
 
-                GameObject roundCavernMeshRendererPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Runtime/Prefabs/RoundCavernMeshRenderer.prefab", typeof(GameObject));
+                GameObject roundCavernMeshRendererPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Prefabs/RoundCavernMeshRenderer.prefab", typeof(GameObject));
                 GameObject roundCavernMeshRendererInstance = (GameObject)PrefabUtility.InstantiatePrefab(roundCavernMeshRendererPrefab as GameObject);
 
                 WorldSpaceMeshCanvas meshCanvas = roundCavernMeshRendererInstance.GetComponent<WorldSpaceMeshCanvas>();
