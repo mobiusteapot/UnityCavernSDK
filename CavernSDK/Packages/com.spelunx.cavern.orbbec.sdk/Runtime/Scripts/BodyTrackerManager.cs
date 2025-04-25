@@ -37,6 +37,7 @@ namespace Spelunx.Orbbec {
         public List<string> GetAvailableSerials() { return availableSerials; }
 
         private void Awake() {
+            // This ensures that only 1 BodyTrackerManager exists at a time.
             if (instance == null) {
                 instance = this;
             } else {
