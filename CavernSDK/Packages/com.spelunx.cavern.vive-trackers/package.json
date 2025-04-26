@@ -4,7 +4,7 @@
   "displayName": "Spelunx Vive Tracking",
   "description": "OpenVR tracking for Unity without hassle.",
   "unity": "6000.0",
-  "documentationUrl": "https://github.com/biosmanager/unity-openvr-tracking",
+  "documentationUrl": "https://github.com/spelunx/UnityCavernSDK/tree/main/CavernSDK/Packages/com.spelunx.cavern.vive-trackers",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.spelunx.cavern.sdk": "1.2.1",
@@ -36,7 +36,7 @@
   "author": {
     "name": "Spelunx",
     "email": "jgkaplan@andrew.cmu.edu",
-    "url": "https://api.spelunx.net"
+    "url": "https://github.com/spelunx/UnityCavernSDK/tree/main/CavernSDK/Packages/com.spelunx.cavern.vive-trackers"
   },
   "hideInEditor": false
 }

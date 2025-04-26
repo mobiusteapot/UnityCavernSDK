@@ -4,9 +4,9 @@
   "displayName": "Spelunx Cavern SDK",
   "description": "SDK for CAVERN Development.",
   "unity": "6000.0",
-  "documentationUrl": "https://api.spelunx.net",
-  "changelogUrl": "https://github.com/TypeDefinition/UnityCAVERN",
-  "licensesUrl": "https://github.com/TypeDefinition/UnityCAVERN",
+  "documentationUrl": "https://github.com/spelunx/UnityCavernSDK/tree/main/CavernSDK/Packages/com.spelunx.cavern.sdk",
+  "changelogUrl": "https://github.com/spelunx/UnityCavernSDK",
+  "licensesUrl": "https://github.com/spelunx/UnityCavernSDK",
   "keywords": [
     "ETC",
     "CAVERN",
@@ -16,7 +16,7 @@
   "author": {
     "name": "Spelunx",
     "email": "terrylim@andrew.cmu.edu",
-    "url": "https://api.spelunx.net"
+    "url": "https://github.com/spelunx/UnityCavernSDK/tree/main/CavernSDK/Packages/com.spelunx.cavern.sdk"
   },
   "samples": [
     {
