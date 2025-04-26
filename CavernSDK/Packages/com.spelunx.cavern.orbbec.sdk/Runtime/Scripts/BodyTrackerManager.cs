@@ -25,6 +25,7 @@ namespace Spelunx.Orbbec {
         private FrameDataProvider frameDataProvider = null; // One for each Femto Bolt. One Femto Bolt can support multiple (like 20?) skeletons.
         private bool isReady = true; // A flag to ensure that a new frame data provider waits for the old one to shutdown completely, so that it is impossible for them to open the same device.
 
+        private static BodyTrackerManager instance;
         public void SetBodyTracker(BodyTracker bodyTracker) { this.bodyTracker = bodyTracker; }
         public BodyTracker GetBodyTracker() { return this.bodyTracker; }
 
@@ -35,10 +36,23 @@ namespace Spelunx.Orbbec {
         public string GetDeviceSerial() { return deviceSerial; }
         public List<string> GetAvailableSerials() { return availableSerials; }
 
+        private void Awake() {
+            // This ensures that only 1 BodyTrackerManager exists at a time.
+            if (instance == null) {
+                instance = this;
+            } else {
+                Destroy(this);
+            }
+        }
+
         private void OnDestroy() {
             if (frameDataProvider != null) {
                 frameDataProvider.Dispose();
                 frameDataProvider = null;
+            }
+
+            if (instance == this) {
+                instance = null;
             }
         }
 

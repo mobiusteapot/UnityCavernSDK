@@ -4,20 +4,25 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 
-namespace Spelunx {
-    public class CavernToolsPanel : EditorWindow {
+namespace Spelunx
+{
+    public class CavernToolsPanel : EditorWindow
+    {
         const float PADDING = 20.0f;
 
         [MenuItem("CAVERN/CAVERN Tools", false, 100)]
-        public static void ShowWindow() {
+        public static void ShowWindow()
+        {
             GetWindow<CavernToolsPanel>("CAVERN Tools");
         }
 
-        private void OnGUI() {
+        private void OnGUI()
+        {
             //===== CAVERN Setup =====
             GUILayout.Label("CAVERN Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Sets up scene for CAVERN development. Replaces the default Unity camera with the CAVERN camera rig. Defaults audio speaker mode to 7.1 surround sound.", MessageType.Info);
-            if (GUILayout.Button("Add new CAVERN setup")) {
+            if (GUILayout.Button("Add new CAVERN setup"))
+            {
                 // adds cavern setup prefab to scene
                 GameObject cavernSetupPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Prefabs/CavernSetup.prefab", typeof(GameObject));
                 GameObject cavernSetupInstance = (GameObject)PrefabUtility.InstantiatePrefab(cavernSetupPrefab as GameObject);
@@ -32,7 +37,8 @@ namespace Spelunx {
 
                 // removes any default main cameras in scene (but preserves any cameras not tagged as MainCamera)
                 GameObject mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-                if (mainCamera != null) {
+                if (mainCamera != null)
+                {
                     Undo.DestroyObjectImmediate(GameObject.FindGameObjectWithTag("MainCamera"));
                 }
                 bool isDirty = EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
@@ -46,7 +52,8 @@ namespace Spelunx {
             GUILayout.Space(PADDING);
             GUILayout.Label("Round CAVERN UI Setup", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Creates a curved world space UI that matches the curvature of the CAVERN. This is used to wrap 2D visuals around the CAVERN.", MessageType.Info);
-            if (GUILayout.Button("Add new RoundUI setup")) {
+            if (GUILayout.Button("Add new RoundUI setup"))
+            {
                 GameObject cavernUIPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.sdk/Prefabs/CavernUI.prefab", typeof(GameObject));
                 GameObject cavernUIInstance = (GameObject)PrefabUtility.InstantiatePrefab(cavernUIPrefab as GameObject);
 
