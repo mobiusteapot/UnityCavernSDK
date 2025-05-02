@@ -15,8 +15,8 @@ namespace Spelunx.Orbbec {
         [SerializeField, Tooltip("The skeleton to control.")] private BodyTracker bodyTracker; // One for each skeleton on the screen. For now we only support 1.
 
         [Header("Settings")]
-        [SerializeField, Tooltip("How is the sensor mounted? This needs to be set before entering play mode, and cannot be changed on the fly.")] private SensorOrientation sensorOrientation;
-        [SerializeField, Tooltip("Serial number of the device we want to connect to. Can be changed on the fly, but you may need to wait for a few seconds.")] private string deviceSerial = "<Insert device serial number here.>";
+        [SerializeField, Tooltip("How is the sensor mounted?")] private SensorOrientation sensorOrientation;
+        [SerializeField, Tooltip("Serial number of the device we want to connect to.")] private string deviceSerial = "<Insert device serial number here.>";
         [SerializeField, Tooltip("If no serial numbers match, connect to first device found.")] private bool connectDefaultIfNoSerialMatch = true;
 
         // Internal Variables
@@ -58,7 +58,9 @@ namespace Spelunx.Orbbec {
 
         private void Update() {
             // Disconnect the currently connected device if the serial number no longer matches what we want.
-            if (frameDataProvider != null && frameDataProvider.HasStarted && frameDataProvider.DeviceSerial != deviceSerial) {
+            if (frameDataProvider != null &&
+                frameDataProvider.HasStarted &&
+                (frameDataProvider.DeviceSerial != deviceSerial || frameDataProvider.Orientation != sensorOrientation)) {
                 Debug.Log("New serial number " + deviceSerial + "selected. Shutting down " + frameDataProvider.DeviceSerial + ".");
                 frameDataProvider.Dispose();
                 frameDataProvider = null;
