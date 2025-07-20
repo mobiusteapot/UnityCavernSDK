@@ -300,5 +300,10 @@ namespace Spelunx.Vive
 
 			return new Vector3(x, y, z);
 		}
+
+		public static Vector2 ToVector2(this VRControllerAxis_t axis)
+		{
+			return new Vector2(axis.x, axis.y);
+		}
 	}
 }

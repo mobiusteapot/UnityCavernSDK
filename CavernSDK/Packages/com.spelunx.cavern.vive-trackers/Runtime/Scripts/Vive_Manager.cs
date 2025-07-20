@@ -42,6 +42,8 @@ namespace Spelunx.Vive
         private UnityAction<int, bool> _onDeviceConnected;
         private string _steamVrConfigPath = null;
 
+        public static Vive_Manager Instance;
+
 
         public Dictionary<string, string> GetSteamVrTrackerBindings()
         {
@@ -126,8 +128,18 @@ namespace Spelunx.Vive
 
         private void Awake()
         {
-            _onDeviceConnected += OnDeviceConnected;
-            Init();
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                _onDeviceConnected += OnDeviceConnected;
+                Init();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+            // todo: make Instance child of cavern
         }
 
         private void OnEnable()
