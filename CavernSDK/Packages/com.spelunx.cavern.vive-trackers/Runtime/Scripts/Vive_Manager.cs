@@ -36,14 +36,13 @@ namespace Spelunx.Vive
         public Dictionary<string, string> Bindings { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> SteamVrTrackerBindings { get; private set; } = new Dictionary<string, string>();
 
-        private bool _isInitialized = false;
+        // This keeps track of if we've already done the setup so we don't redo it
+        // and prevents crashes when changing scenes
+        private static bool _isInitialized = false;
         private TrackedDevicePose_t[] _poses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
         private TrackedDevicePose_t[] gamePoses = new TrackedDevicePose_t[0];
         private UnityAction<int, bool> _onDeviceConnected;
         private string _steamVrConfigPath = null;
-
-        public static Vive_Manager Instance;
-
 
         public Dictionary<string, string> GetSteamVrTrackerBindings()
         {
@@ -128,18 +127,11 @@ namespace Spelunx.Vive
 
         private void Awake()
         {
-            if (Instance == null)
+            _onDeviceConnected += OnDeviceConnected;
+            if (!_isInitialized)
             {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-                _onDeviceConnected += OnDeviceConnected;
                 Init();
             }
-            else
-            {
-                Destroy(gameObject);
-            }
-            // todo: make Instance child of cavern
         }
 
         private void OnEnable()
@@ -211,15 +203,10 @@ namespace Spelunx.Vive
 
         private void Start()
         {
-            if (doUpdatePosesBeforeRendering && QualitySettings.vSyncCount == 0)
-            {
-                Debug.LogWarning("Pose prediction requires vertical synchronization for sensible prediction results. Set QualitySettings.vSyncCount to 1 or higher.");
-            }
-        }
-
-        private void OnDestroy()
-        {
-            OpenVR.Shutdown();
+            // if (doUpdatePosesBeforeRendering && QualitySettings.vSyncCount == 0)
+            // {
+            //     Debug.LogWarning("Pose prediction requires vertical synchronization for sensible prediction results. Set QualitySettings.vSyncCount to 1 or higher.");
+            // }
         }
 
         void OnApplicationQuit()

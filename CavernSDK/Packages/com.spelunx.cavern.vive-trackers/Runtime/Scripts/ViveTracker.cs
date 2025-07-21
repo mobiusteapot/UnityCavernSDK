@@ -210,7 +210,7 @@ namespace Spelunx.Vive
 
         private void Start()
         {
-            SetOrigin(FindObjectsByType<Vive_Manager>(FindObjectsSortMode.None)[0].transform);
+            SetOrigin(FindFirstObjectByType<Vive_Manager>().transform);
         }
 
         // t is treated as the (0,0,0) point

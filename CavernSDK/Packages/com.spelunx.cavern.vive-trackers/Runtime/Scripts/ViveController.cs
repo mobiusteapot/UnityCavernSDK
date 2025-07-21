@@ -230,6 +230,12 @@ namespace Spelunx.Vive
         private void Start()
         {
             UpdateIndex();
+            SetOrigin(FindFirstObjectByType<Vive_Manager>().transform);
+        }
+        // t is treated as the (0,0,0) point
+        public void SetOrigin(Transform t)
+        {
+            origin = t;
         }
 
         private void OnEnable()

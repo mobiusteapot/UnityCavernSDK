@@ -18,6 +18,21 @@
                     <ui:Label text="VIVE Trackers in Scene: 0" name="TrackerCount" style="flex-wrap: nowrap; white-space: normal; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; font-size: 16px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement name="ViveControllerUISetup" class="doBackground" style="height: auto; min-height: auto; flex-wrap: nowrap; flex-direction: column; padding-bottom: 5px;">
+                <ui:VisualElement name="ViveControllerSetup" style="flex-grow: 1; width: auto; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; padding-bottom: 5px;">
+                    <ui:Label text="VIVE Controller Setup" name="ViveControllerSetupTitle" class="custom-label title" style="font-size: 16px; -unity-text-align: middle-left; margin-top: 0; margin-bottom: 0;" />
+                    <ui:VisualElement style="flex-grow: 1; flex-direction: row; padding-top: 2px; margin-bottom: 15px;">
+                        <ui:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Packages/com.spelunx.cavern.vive-trackers/Editor/Windows/Icons/UI_VIVE.png?fileID=2800000&amp;guid=d81b6ffaa24ab894a905c7cb2e636913&amp;type=3#UI_VIVE&quot;); width: 25%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px; -unity-background-scale-mode: scale-to-fit; min-width: 75px; min-height: 75px;" />
+                        <ui:Label text="Adds a new VIVE controller to your scene. Also adds a new VIVE manager to your scene if no manager is present." name="Description" style="flex-wrap: wrap; white-space: normal; width: 75%; border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; margin-right: 0;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Buttons" style="flex-grow: 1; border-left-color: rgba(209, 209, 209, 0); border-right-color: rgba(209, 209, 209, 0); border-top-color: rgba(209, 209, 209, 0); border-bottom-color: rgba(209, 209, 209, 0); height: auto; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                        <ui:Button text="Add new VIVE Controller" name="ViveControllerSetupButton" class="button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="ViveInfo" style="flex-grow: 1; flex-wrap: nowrap; width: auto; -unity-font-style: bold; border-left-color: rgb(88, 88, 88); border-right-color: rgb(88, 88, 88); border-top-color: rgb(88, 88, 88); border-bottom-color: rgb(88, 88, 88); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;">
+                    <ui:Label text="VIVE Controllers in Scene: 0" name="ControllerCount" style="flex-wrap: nowrap; white-space: normal; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; font-size: 16px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:Label text="Interaction Building Blocks" name="BuildingBlocks" class="title" style="font-size: 20px; margin-top: 5px; margin-right: 5px; margin-bottom: 0; margin-left: 5px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;" />
             <ui:Label text="A collection of interactions using Vive Trackers. To add to an interaction to an object, select the object, then click the desired add interaction button." name="Description" style="flex-wrap: wrap; white-space: normal; width: 100%; border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; margin-right: 5px; -unity-text-align: middle-left; margin-top: 5px; margin-bottom: 0; margin-left: 5px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;" />
             <ui:VisualElement name="Follow" class="doBackground">
