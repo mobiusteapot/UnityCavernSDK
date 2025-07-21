@@ -15,9 +15,12 @@ namespace Spelunx
 
         private UnityEngine.Object viveManagerPrefab;
         private UnityEngine.Object viveTrackerPrefab;
+        private UnityEngine.Object viveControllerPrefab;
         private GameObject viveManagerInstance;
         private int trackerCount = 0;
+        private int controllerCount = 0;
         private Label trackerCountLabel;
+        private Label controllerCountLabel;
 
         // places tools under CAVERN toolbar with hierarchy ordering
         [MenuItem("CAVERN/VIVE Tracker Tools", false, 101)]
@@ -40,7 +43,12 @@ namespace Spelunx
             VisualElement viveSetupButton = root.Q("ViveSetupButton");
             viveSetupButton.RegisterCallback<ClickEvent>(ViveSetup);
 
+            // Add button functionality for vive controller setup
+            VisualElement viveControllerSetupButton = root.Q("ViveControllerSetupButton");
+            viveControllerSetupButton.RegisterCallback<ClickEvent>(ViveControllerSetup);
+
             trackerCountLabel = root.Q<Label>("TrackerCount");
+            controllerCountLabel = root.Q<Label>("ControllerCount");
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
 
 
@@ -65,12 +73,18 @@ namespace Spelunx
         private void OnHierarchyChanged()
         {
             var trackers = FindObjectsByType<ViveTracker>(FindObjectsSortMode.None);
-
+            var controllers = FindObjectsByType<ViveController>(FindObjectsSortMode.None);
             // update information if number of Vive trackers in scene changes
             if (trackerCount != trackers.Length)
             {
                 trackerCount = trackers.Length;
                 trackerCountLabel.text = "VIVE Trackers in Scene: " + trackerCount;
+            }
+
+            if (controllerCount != controllers.Length)
+            {
+                controllerCount = controllers.Length;
+                controllerCountLabel.text = "VIVE Controllers in Scene: " + controllerCount;
             }
         }
 
@@ -102,6 +116,39 @@ namespace Spelunx
             // instantiate a new vive tracker and set its origin to the vive manager
             GameObject viveTrackerInstance = (GameObject)PrefabUtility.InstantiatePrefab(viveTrackerPrefab as GameObject);
             viveTrackerInstance.GetComponent<ViveTracker>().SetOrigin(FindObjectsByType<Vive_Manager>(FindObjectsSortMode.None)[0].transform);
+
+            // mark scene as edited to prompt saving
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        }
+
+        // Adds vive controller
+        private void ViveControllerSetup(ClickEvent evt)
+        {
+            // load from path
+            viveManagerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveTrackerManager.prefab", typeof(GameObject));
+            viveControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Packages/com.spelunx.cavern.vive-trackers/Prefabs/ViveController.prefab", typeof(GameObject));
+
+            // check if vive tracker manager is already present
+            var manager = FindObjectsByType<Vive_Manager>(FindObjectsSortMode.None);
+
+            // adds manager if not present in scene
+            if (manager.Length == 0)
+            {
+                viveManagerInstance = (GameObject)PrefabUtility.InstantiatePrefab(viveManagerPrefab as GameObject);
+
+                // set vive manager to be in the CAVERN setup folder in the scene hierarchy
+                GameObject cavernSetup = GameObject.Find("CavernSetup");
+                if (cavernSetup != null)
+                {
+                    viveManagerInstance.GetComponent<Transform>().parent = cavernSetup.transform;
+                    // load in the debug keys
+                    cavernSetup.AddComponent<ViveDebugKeys>();
+                }
+            }
+
+            // instantiate a new vive tracker and set its origin to the vive manager
+            GameObject viveController = (GameObject)PrefabUtility.InstantiatePrefab(viveControllerPrefab as GameObject);
+            viveController.GetComponent<ViveController>().SetOrigin(FindObjectsByType<Vive_Manager>(FindObjectsSortMode.None)[0].transform);
 
             // mark scene as edited to prompt saving
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());

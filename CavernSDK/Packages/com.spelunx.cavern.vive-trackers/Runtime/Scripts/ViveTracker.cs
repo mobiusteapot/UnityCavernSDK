@@ -208,6 +208,11 @@ namespace Spelunx.Vive
             IsConnected = false;
         }
 
+        private void Start()
+        {
+            SetOrigin(FindFirstObjectByType<Vive_Manager>().transform);
+        }
+
         // t is treated as the (0,0,0) point
         public void SetOrigin(Transform t)
         {
