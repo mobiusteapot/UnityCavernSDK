@@ -33,6 +33,16 @@ namespace Spelunx.Vive
         private UnityAction<int, EVRButtonId, bool> _onButtonPressedAction;
         private UnityAction<int> _onTrackedDeviceRoleChangedAction;
 
+        public static string GetReadableRoleName(Role r)
+        {
+            return r switch
+            {
+                Role.LeftHand => "Left Hand",
+                Role.RightHand => "Right Hand",
+                _ => "None",
+            };
+        }
+
         public void TriggerHapticPulse(ushort durationMicroSec = 500, EVRButtonId buttonId = EVRButtonId.k_EButton_SteamVR_Touchpad)
         {
             if (DeviceIndex == -1)
@@ -188,6 +198,7 @@ namespace Spelunx.Vive
             if (i < 0 || poses.Length <= i)
                 return;
 
+            IsConnected = poses[i].bDeviceIsConnected;
             if (!poses[i].bDeviceIsConnected)
                 return;
 
@@ -210,19 +221,9 @@ namespace Spelunx.Vive
             }
         }
 
-        // This method doesn't work because of openvr events not properly giving button data
-        private void OnButtonPressed(int index, EVRButtonId button, bool pressed)
-        {
-            if (index == DeviceIndex)
-            {
-                // onButtonPressed.Invoke(button, pressed);
-            }
-        }
-
         private void Awake()
         {
             _onNewPosesAction += OnNewPoses;
-            _onButtonPressedAction += OnButtonPressed;
             _onDeviceConnectedAction += OnDeviceConnected;
             _onTrackedDeviceRoleChangedAction += OnTrackedDeviceRoleChanged;
         }
@@ -262,6 +263,23 @@ namespace Spelunx.Vive
             DeviceIndex = FindIndexForRole();
             onDeviceIndexChanged.Invoke(DeviceIndex);
         }
+
+#if UNITY_EDITOR
+        // A gizmo, which can be enabled or disabled through the gizmos menu
+        // This shows the position, size, and rotation of the vive tracker.
+        private void OnDrawGizmos()
+        {
+            if (role == Role.LeftHand)
+            {
+
+                Gizmos.DrawMesh(ViveDebugRenderer.indexControllerLeftMesh, transform.position, transform.rotation);
+            }
+            else
+            {
+                Gizmos.DrawMesh(ViveDebugRenderer.indexControllerRightMesh, transform.position, transform.rotation);
+            }
+        }
+#endif
 
         // Masks for the controller buttons
         public enum ViveControllerButton : ulong

@@ -175,14 +175,6 @@ namespace Spelunx.Vive
             IsConnected = false;
         }
 
-        // In theory this should be called when pin inputs are sent through the vive trackers
-        // But it doesn't seem to happen. This might be an issue with SteamVR, or because the
-        // tracker pose needs to be set to one of the hands or disabled
-        private void OnButtonPressed(int deviceIndex, EVRButtonId button, bool pressed)
-        {
-            Debug.Log($"{deviceIndex}\t{button}\t{pressed}");
-        }
-
         private void Awake()
         {
             _onNewBoundPoseAction += OnNewBoundPose;
@@ -195,7 +187,6 @@ namespace Spelunx.Vive
             OVRT_Events.NewBoundPose.AddListener(_onNewBoundPoseAction);
             OVRT_Events.TrackedDeviceConnected.AddListener(_onDeviceConnectedAction);
             OVRT_Events.TrackerRolesChanged.AddListener(_onTrackerRolesChanged);
-            OVRT_Events.ButtonPressed.AddListener(OnButtonPressed);
         }
 
         private void OnDisable()
@@ -203,7 +194,6 @@ namespace Spelunx.Vive
             OVRT_Events.NewBoundPose.RemoveListener(_onNewBoundPoseAction);
             OVRT_Events.TrackedDeviceConnected.RemoveListener(_onDeviceConnectedAction);
             OVRT_Events.TrackerRolesChanged.RemoveListener(_onTrackerRolesChanged);
-            OVRT_Events.ButtonPressed.RemoveListener(OnButtonPressed);
             IsValid = false;
             IsConnected = false;
         }

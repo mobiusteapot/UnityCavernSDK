@@ -81,10 +81,11 @@ namespace Spelunx
             framerates[framerateIndex] = (int)(1 / Time.unscaledDeltaTime);
             framerateIndex = (framerateIndex + 1) % framerates.Length;
             int currentFramerate = (int)framerates.Average();
-            GUILayout.Label($"Framerate: {currentFramerate} fps");
-            GUILayout.Label($"Head height: {headTrackingCamera.localPosition.y} meters");
+
             CavernRenderer cavern = GetComponentInChildren<CavernRenderer>();
-            GUILayout.Label($"IPD: {cavern.IPD:F3} mm");
+            GUILayout.Label($"Framerate: {currentFramerate} fps");
+            float ipd = cavern.IPD * 1000;
+            GUILayout.Label($"Head height: {headTrackingCamera.localPosition.y} meters\t\tIPD: {ipd:F1} mm");
         }
 
         // enable the input actions on play mode start

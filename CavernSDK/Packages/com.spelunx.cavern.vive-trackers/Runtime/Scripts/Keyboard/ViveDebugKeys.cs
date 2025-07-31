@@ -18,7 +18,9 @@ namespace Spelunx.Vive
 
         // display the number of vive trackers in the debug GUI
         private int numViveTrackers = 0;
+        private int numViveControllers = 0;
         private readonly List<string> trackerRoles = new();
+        private readonly List<string> controllerRoles = new();
         public List<(string Key, string Description)> KeyDescriptions()
         {
             return new(){
@@ -29,8 +31,16 @@ namespace Spelunx.Vive
         // Render information about the currently bound Vive Trackers in the Debug UI
         public void DoExtraGUI()
         {
-            GUILayout.Label($"Vive Trackers: {numViveTrackers}");
-            GUILayout.Label($"Tracker roles: {string.Join(", ", trackerRoles)}");
+            if (numViveTrackers > 0)
+            {
+                GUILayout.Label($"Vive Trackers: {numViveTrackers}");
+                GUILayout.Label($"Tracker roles: {string.Join(", ", trackerRoles)}");
+            }
+            if (numViveControllers > 0)
+            {
+                GUILayout.Label($"Vive Controllers: {numViveControllers}");
+                GUILayout.Label($"Controller roles: {string.Join(", ", controllerRoles)}");
+            }
         }
 
         // enable the input actions on play mode start
@@ -54,11 +64,17 @@ namespace Spelunx.Vive
             calibrate.performed += CalibrateAction;
 
             // add the vive tracker info to the GUI
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag("ViveTracker"))
+            foreach (ViveTracker tracker in FindObjectsByType<ViveTracker>(FindObjectsSortMode.None))
             {
                 numViveTrackers++;
-                ViveTracker.SteamVRPoseBindings binding = go.GetComponent<ViveTracker>().binding;
+                ViveTracker.SteamVRPoseBindings binding = tracker.binding;
                 trackerRoles.Add(ViveTracker.GetReadableName(binding));
+            }
+            foreach (ViveController controller in FindObjectsByType<ViveController>(FindObjectsSortMode.None))
+            {
+                numViveControllers++;
+                ViveController.Role role = controller.role;
+                controllerRoles.Add(ViveController.GetReadableRoleName(role));
             }
         }
 

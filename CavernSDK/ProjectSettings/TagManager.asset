@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ViveManager
   - ViveTracker
+  - ViveController
   layers:
   - Default
   - TransparentFX

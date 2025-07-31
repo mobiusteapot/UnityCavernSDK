@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 270697985905776029}
   m_Layer: 0
   m_Name: ViveController
-  m_TagString: Untagged
+  m_TagString: ViveController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
